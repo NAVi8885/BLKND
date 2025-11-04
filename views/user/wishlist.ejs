@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist - BLKND</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Jost', sans-serif; }
+        .page-header { background-color: #f8f9fa; padding: 80px 0 40px; margin-bottom: 60px; }
+        .wishlist-item { border-bottom: 1px solid #dee2e6; padding: 20px 0; }
+        .wishlist-item img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="top-nav text-white" style="background-color: #212529; padding: 10px 0; font-size: 14px;">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div><span>Free shipping on orders over $50</span></div>
+                <div>
+                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
+                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">KAIRA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+                <div class="nav-icons d-flex align-items-center">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
+                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="modal fade" id="searchModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
+                    <div class="mt-4">
+                        <input type="search" class="form-control form-control-lg" placeholder="Search products...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="mb-2">Wishlist</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item active">Wishlist</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="wishlist-item">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200" alt="Product">
+                </div>
+                <div class="col-md-5">
+                    <h5>Classic White Shirt</h5>
+                    <p class="text-muted mb-0">SKU: KA-001</p>
+                    <div class="mt-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star-half-alt text-warning"></i>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <p class="fw-bold mb-0">$49.99</p>
+                    <p class="text-success small mb-0">In Stock</p>
+                </div>
+                <div class="col-md-3 text-end">
+                    <a href="cart.html" class="btn btn-dark btn-sm">Add to Cart</a>
+                    <button class="btn btn-link text-danger btn-sm"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="wishlist-item">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=200" alt="Product">
+                </div>
+                <div class="col-md-5">
+                    <h5>Denim Jacket</h5>
+                    <p class="text-muted mb-0">SKU: KA-002</p>
+                    <div class="mt-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <p class="fw-bold mb-0">$89.99</p>
+                    <p class="text-success small mb-0">In Stock</p>
+                </div>
+                <div class="col-md-3 text-end">
+                    <a href="cart.html" class="btn btn-dark btn-sm">Add to Cart</a>
+                    <button class="btn btn-link text-danger btn-sm"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="wishlist-item">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=200" alt="Product">
+                </div>
+                <div class="col-md-5">
+                    <h5>Summer Dress</h5>
+                    <p class="text-muted mb-0">SKU: KA-003</p>
+                    <div class="mt-2">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="far fa-star text-warning"></i>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <p class="fw-bold mb-0">$69.99</p>
+                    <p class="text-danger small mb-0">Out of Stock</p>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-secondary btn-sm" disabled>Unavailable</button>
+                    <button class="btn btn-link text-danger btn-sm"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="shop.html" class="btn btn-outline-dark">Continue Shopping</a>
+        </div>
+    </div>
+
+    <footer style="background-color: #212529; color: #fff; padding: 60px 0 20px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>KAIRA</h5>
+                    <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="about.html" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="shop.html" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
+                        <li style="margin-bottom: 10px;"><a href="contact.html" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Customer Service</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="profile.html" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Newsletter</h5>
+                    <form>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email">
+                            <button class="btn btn-light" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+            <div class="text-center">
+                <p style="color: #adb5bd;">&copy; 2025 Kaira. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

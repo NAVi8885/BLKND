@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin • Orders</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --side:260px; }
+    .sidebar{position:fixed;inset:0 auto 0 0;width:var(--side);background:#d8d8d8da;border-right:1px solid #e9ecef;padding:20px;overflow-y:auto}
+    .nav-aside .nav-link{color:#212529;padding:10px 12px;border-radius:8px;display:flex;gap:10px}
+    .nav-aside .nav-link.active, .nav-aside .nav-link:hover { background:#000000da; color: #f8f9fa; font-weight: 500;}
+    .content{margin-left:var(--side)}
+    .topbar { position: sticky; top:0; z-index:10; background:#d8d8d8; border-bottom:1px solid #e9ecef; text-align: center; padding: 10px 0; font-size: 1.50rem; }
+    .filter-chip{border:1px dashed #ced4da;border-radius:20px;padding:.25rem .6rem;display:inline-flex;gap:.4rem;align-items:center}
+    .table thead th{white-space:nowrap}
+    @media(max-width:992px){.sidebar{transform:translateX(-100%);transition:transform .3s; z-index: 1000;}.sidebar.show{transform:translateX(0)}.content{margin-left:0}}
+  </style>
+</head>
+<body>
+  <aside id="sidebar" class="sidebar">
+    <a href="dashboard.html" class="h4 text-decoration-none d-block mb-3 fw-bold text-dark">BLKND Admin</a>
+    <nav class="nav nav-pills flex-column nav-aside">
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+      <a class="nav-link active" href="orders.html"><i class="fa-solid fa-receipt"></i> Orders</a>
+      <a class="nav-link" href="products.html"><i class="fa-solid fa-shirt"></i> Products</a>
+      <a class="nav-link" href="customers.html"><i class="fa-solid fa-user-group"></i> Customers</a>
+      <a class="nav-link" href="coupons.html"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a class="nav-link" href="analytics.html"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+      <a class="nav-link" href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between py-2">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')"><i class="fa-solid fa-bars"></i></button>
+            <span class="fw-bold">Orders</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-secondary" id="bulkExport"><i class="fa-solid fa-file-export me-1"></i> Export</button>
+            <button class="btn btn-sm btn-dark" id="bulkMarkShipped"><i class="fa-solid fa-truck-fast me-1"></i> Mark shipped</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="container-fluid py-3">
+      <div class="card mb-3">
+        <div class="card-body">
+          <form class="row g-2 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label">Search</label>
+              <input type="search" class="form-control" placeholder="Order #, customer, email">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Status</label>
+              <select class="form-select">
+                <option value="">Any</option>
+                <option>Paid</option><option>Processing</option><option>Shipped</option><option>Refunded</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Payment</label>
+              <select class="form-select"><option>Any</option><option>Card</option><option>COD</option><option>UPI</option><option>PayPal</option></select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Date range</label>
+              <div class="input-group">
+                <input type="date" class="form-control"><span class="input-group-text">to</span><input type="date" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-dark w-100" type="button"><i class="fa-solid fa-filter me-1"></i> Apply</button>
+            </div>
+          </form>
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            <span class="filter-chip">This month <button class="btn-close btn-close-sm"></button></span>
+            <span class="filter-chip">Paid <button class="btn-close btn-close-sm"></button></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width:36px"><input type="checkbox" onclick="toggleAll(this)"></th>
+                <th>Order <i class="fa-solid fa-sort text-muted"></i></th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th style="width:110px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><a href="#" data-bs-toggle="modal" data-bs-target="#orderModal">#12345</a></td>
+                <td>Oct 20, 2025</td>
+                <td>Jane Smith</td>
+                <td>$149.98</td>
+                <td><span class="badge text-bg-success">Paid</span></td>
+                <td><span class="badge text-bg-info">Shipped</span></td>
+                <td class="text-nowrap">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#orderModal"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-outline-secondary"><i class="fa-solid fa-truck"></i></button>
+                    <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><a href="#" data-bs-toggle="modal" data-bs-target="#orderModal">#12344</a></td>
+                <td>Oct 20, 2025</td>
+                <td>Arjun Das</td>
+                <td>$89.99</td>
+                <td><span class="badge text-bg-warning">COD</span></td>
+                <td><span class="badge text-bg-warning">Processing</span></td>
+                <td class="text-nowrap">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#orderModal"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-outline-secondary"><i class="fa-solid fa-truck"></i></button>
+                    <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="row-check"></td>
+                <td><a href="#" data-bs-toggle="modal" data-bs-target="#orderModal">#12343</a></td>
+                <td>Oct 19, 2025</td>
+                <td>Wei Chen</td>
+                <td>$219.40</td>
+                <td><span class="badge text-bg-primary">Card</span></td>
+                <td><span class="badge text-bg-success">Paid</span></td>
+                <td class="text-nowrap">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#orderModal"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-outline-secondary"><i class="fa-solid fa-truck"></i></button>
+                    <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <div class="small text-muted">Showing 1–20 of 2,341</div>
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item disabled"><a class="page-link">Prev</a></li>
+            <li class="page-item active"><a class="page-link">1</a></li>
+            <li class="page-item"><a class="page-link">2</a></li>
+            <li class="page-item"><a class="page-link">3</a></li>
+            <li class="page-item"><a class="page-link">Next</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Order details modal -->
+  <div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Order #12345</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-header fw-semibold">Customer</div>
+                <div class="card-body">
+                  <div class="d-flex justify-content-between"><span>Name</span><span class="fw-semibold">Jane Smith</span></div>
+                  <div class="d-flex justify-content-between"><span>Email</span><span class="fw-semibold">jane@example.com</span></div>
+                  <div class="d-flex justify-content-between"><span>Phone</span><span class="fw-semibold">+91 98xxxxxx10</span></div>
+                  <hr>
+                  <div class="fw-semibold mb-1">Shipping address</div>
+                  <div class="text-muted small">123 Main St, Kochi, Kerala 682001, IN</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-header fw-semibold">Payment & Status</div>
+                <div class="card-body">
+                  <div class="d-flex justify-content-between"><span>Method</span><span class="fw-semibold">Card (VISA)</span></div>
+                  <div class="d-flex justify-content-between"><span>Subtotal</span><span class="fw-semibold">$139.98</span></div>
+                  <div class="d-flex justify-content-between"><span>Shipping</span><span class="fw-semibold">$10.00</span></div>
+                  <div class="d-flex justify-content-between"><span>Total</span><span class="fw-bold">$149.98</span></div>
+                  <hr>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge text-bg-success">Paid</span>
+                    <span class="badge text-bg-info">Shipped</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header fw-semibold">Items</div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Product</th><th>SKU</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+                    <tbody>
+                      <tr><td>Denim Jacket</td><td>KA-002</td><td>1</td><td>$89.99</td><td>$89.99</td></tr>
+                      <tr><td>Classic White Shirt</td><td>KA-001</td><td>1</td><td>$49.99</td><td>$49.99</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                  <button class="btn btn-outline-secondary">Print invoice</button>
+                  <button class="btn btn-outline-secondary">Refund</button>
+                  <button class="btn btn-dark">Update status</button>
+                </div>
+              </div>
+            </div>
+          </div>  
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleAll(cb){ document.querySelectorAll('.row-check').forEach(x=>x.checked=cb.checked); }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

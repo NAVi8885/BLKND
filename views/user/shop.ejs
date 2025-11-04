@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - BLKND</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Jost', sans-serif; }
+        .page-header { background-color: #f8f9fa; padding: 80px 0 40px; margin-bottom: 60px; }
+        .product-card { border: none; transition: transform 0.3s; margin-bottom: 30px; }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-card img { height: 350px; object-fit: cover; }
+        .filter-sidebar { position: sticky; top: 100px; }
+    </style>
+</head>
+<body>
+    <div class="top-nav text-white" style="background-color: #212529; padding: 10px 0; font-size: 14px;">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div><span>Free shipping on orders over $50</span></div>
+                <div>
+                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
+                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">KAIRA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="shop.html">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+                <div class="nav-icons d-flex align-items-center">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
+                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="modal fade" id="searchModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
+                    <div class="mt-4">
+                        <input type="search" class="form-control form-control-lg" placeholder="Search products...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="mb-2">Shop</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item active">Shop</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="filter-sidebar">
+                    <h5 class="mb-3">Categories</h5>
+                    <div class="list-group mb-4">
+                        <a href="#" class="list-group-item list-group-item-action">All Products</a>
+                        <a href="#" class="list-group-item list-group-item-action">Women</a>
+                        <a href="#" class="list-group-item list-group-item-action">Men</a>
+                        <a href="#" class="list-group-item list-group-item-action">Accessories</a>
+                        <a href="#" class="list-group-item list-group-item-action">Shoes</a>
+                    </div>
+                    
+                    <h5 class="mb-3">Price Range</h5>
+                    <div class="mb-4">
+                        <input type="range" class="form-range" min="0" max="500" step="10">
+                        <div class="d-flex justify-content-between">
+                            <span>$0</span>
+                            <span>$500</span>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mb-3">Size</h5>
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sizeXS">
+                            <label class="form-check-label" for="sizeXS">XS</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sizeS">
+                            <label class="form-check-label" for="sizeS">S</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sizeM">
+                            <label class="form-check-label" for="sizeM">M</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sizeL">
+                            <label class="form-check-label" for="sizeL">L</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sizeXL">
+                            <label class="form-check-label" for="sizeXL">XL</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="mb-0">Showing 1-12 of 48 results</p>
+                    <select class="form-select w-auto">
+                        <option>Sort by latest</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Name: A to Z</option>
+                    </select>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Classic White Shirt</h5>
+                                <p class="text-muted">$49.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Denim Jacket</h5>
+                                <p class="text-muted">$89.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Summer Dress</h5>
+                                <p class="text-muted">$69.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Casual Sneakers</h5>
+                                <p class="text-muted">$79.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Elegant Handbag</h5>
+                                <p class="text-muted">$129.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Striped T-Shirt</h5>
+                                <p class="text-muted">$29.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Black Boots</h5>
+                                <p class="text-muted">$119.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Casual Jeans</h5>
+                                <p class="text-muted">$59.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card product-card">
+                            <img src="https://images.unsplash.com/photo-1566206091558-7f218b696731?w=400" class="card-img-top" alt="Product">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Stylish Sunglasses</h5>
+                                <p class="text-muted">$39.99</p>
+                                <a href="single-product.html" class="btn btn-outline-dark btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background-color: #212529; color: #fff; padding: 60px 0 20px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>KAIRA</h5>
+                    <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="about.html" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="shop.html" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
+                        <li style="margin-bottom: 10px;"><a href="contact.html" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Customer Service</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="profile.html" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Newsletter</h5>
+                    <form>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email">
+                            <button class="btn btn-light" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+            <div class="text-center">
+                <p style="color: #adb5bd;">&copy; 2025 Kaira. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

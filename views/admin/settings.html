@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin • Settings</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{--side:260px}
+    body{background:#f8f9fa;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+    .sidebar{position:fixed;inset:0 auto 0 0;width:var(--side);background:#d8d8d8da;border-right:1px solid #e9ecef;padding:20px;overflow-y:auto}
+    .nav-aside .nav-link{color:#212529;padding:10px 12px;border-radius:8px;display:flex;gap:10px}
+    .nav-aside .nav-link.active, .nav-aside .nav-link:hover { background:#000000da; color: #f8f9fa; font-weight: 500;}
+    .content{margin-left:var(--side)}
+    .topbar { position: sticky; top:0; z-index:10; background:#d8d8d8; border-bottom:1px solid #e9ecef; text-align: center; padding: 10px 0; font-size: 1.50rem; }
+    .subnav .list-group-item{border:0;border-radius:8px}
+    .subnav .list-group-item.active{background:#212529;color:#fff}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .muted{color:#6c757d}
+    @media(max-width:992px){.sidebar{transform:translateX(-100%);transition:transform .3s; z-index: 1000;}.sidebar.show{transform:translateX(0)}.content{margin-left:0}}
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <a href="dashboard.html" class="h4 text-decoration-none d-block mb-3 fw-bold text-dark">BLKND Admin</a>
+    <nav class="nav nav-pills flex-column nav-aside">
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+      <a class="nav-link" href="orders.html"><i class="fa-solid fa-receipt"></i> Orders</a>
+      <a class="nav-link" href="products.html"><i class="fa-solid fa-shirt"></i> Products</a>
+      <a class="nav-link" href="customers.html"><i class="fa-solid fa-user-group"></i> Customers</a>
+      <a class="nav-link" href="coupons.html"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a class="nav-link" href="analytics.html"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+      <a class="nav-link active" href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between py-2">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <span class="fw-bold">Settings</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <a href="../user/login.html" class="btn btn-dark text-whitebtn-outline-secondary"><i class="fa-solid fa-right-from-bracket me-1"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Settings Body -->
+    <section class="container-fluid py-3">
+      <div class="row g-3">
+        <!-- Left subnav -->
+        <div class="col-lg-3">
+          <div class="list-group subnav" id="settingsTabs" role="tablist">
+            <a href="#general" class="list-group-item list-group-item-action active" data-bs-toggle="list" role="tab">General</a>
+            <a href="#payments" class="list-group-item list-group-item-action" data-bs-toggle="list" role="tab">Payments</a>
+            <a href="#shipping" class="list-group-item list-group-item-action" data-bs-toggle="list" role="tab">Shipping</a>
+            <a href="#tax" class="list-group-item list-group-item-action" data-bs-toggle="list" role="tab">Tax</a>
+            <a href="#emails" class="list-group-item list-group-item-action" data-bs-toggle="list" role="tab">Emails</a>
+            <a href="#roles" class="list-group-item list-group-item-action" data-bs-toggle="list" role="tab">Roles & Permissions</a>
+            <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="list" role="tab">Security</a>
+            <a href="#api" class="list-group-item list-group-item-action" data-bs-toggle="list" role="tab">API & Webhooks</a>
+          </div>
+        </div>
+
+        <!-- Right content -->
+        <div class="col-lg-9">
+          <div class="tab-content">
+            <!-- General -->
+            <div class="tab-pane fade show active" id="general" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold">Store details</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Store name</label><input class="form-control" value="KAIRA"></div>
+                    <div class="col-md-3"><label class="form-label">Currency</label><select class="form-select"><option>USD ($)</option><option selected>INR (₹)</option><option>EUR (€)</option></select></div>
+                    <div class="col-md-3"><label class="form-label">Timezone</label><select class="form-select"><option selected>Asia/Kolkata</option><option>UTC</option><option>America/New_York</option></select></div>
+                    <div class="col-12"><label class="form-label">Address</label><input class="form-control" placeholder="Street, City, State, ZIP"></div>
+                    <div class="col-md-6"><label class="form-label">Support email</label><input type="email" class="form-control" value="support@kaira.com"></div>
+                    <div class="col-md-6"><label class="form-label">Support phone</label><input type="tel" class="form-control" value="+91 9876543210"></div>
+                    <div class="col-md-6"><label class="form-label">Legal business name</label><input class="form-control" placeholder="Kaira Retail Pvt Ltd"></div>
+                    <div class="col-md-6"><label class="form-label">GST/VAT Number</label><input class="form-control" placeholder="GSTIN / VAT ID"></div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save changes</button></div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold">Branding</div>
+                <div class="card-body">
+                  <div class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                      <label class="form-label">Primary color</label>
+                      <input type="color" class="form-control form-control-color" value="#212529" title="Choose color">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Logo</label>
+                      <input type="file" class="form-control">
+                      <div class="form-text">PNG/SVG, up to 1 MB</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-outline-secondary">Preview</button> <button class="btn btn-dark">Save branding</button></div>
+              </div>
+            </div>
+
+            <!-- Payments -->
+            <div class="tab-pane fade" id="payments" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold">Payment gateways</div>
+                <div class="card-body">
+                  <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="cod" checked>
+                        <label class="form-check-label" for="cod">Cash on Delivery</label>
+                      </div>
+                    </div>
+                    <div class="col-md-8"></div>
+
+                    <div class="col-md-4">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="razor">
+                        <label class="form-check-label" for="razor">Razorpay</label>
+                      </div>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="row g-2">
+                        <div class="col-6"><input class="form-control" placeholder="Key ID"></div>
+                        <div class="col-6"><input class="form-control" placeholder="Key Secret"></div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="stripe">
+                        <label class="form-check-label" for="stripe">Stripe</label>
+                      </div>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="row g-2">
+                        <div class="col-6"><input class="form-control" placeholder="Publishable key"></div>
+                        <div class="col-6"><input class="form-control" placeholder="Secret key"></div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="paypal">
+                        <label class="form-check-label" for="paypal">PayPal</label>
+                      </div>
+                    </div>
+                    <div class="col-md-8">
+                      <div class="row g-2">
+                        <div class="col-6"><input class="form-control" placeholder="Client ID"></div>
+                        <div class="col-6"><input class="form-control" placeholder="Client Secret"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save payment settings</button></div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold">Checkout preferences</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Checkout mode</label>
+                      <select class="form-select">
+                        <option>Guest + Account</option>
+                        <option>Accounts required</option>
+                        <option>Guest only</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Default payment capture</label>
+                      <select class="form-select">
+                        <option>Immediate capture</option>
+                        <option>Authorize only</option>
+                      </select>
+                    </div>
+                    <div class="col-12">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="saveCards" checked>
+                        <label class="form-check-label" for="saveCards">Offer to save cards (tokenized)</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save checkout preferences</button></div>
+              </div>
+            </div>
+
+            <!-- Shipping -->
+            <div class="tab-pane fade" id="shipping" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                  Shipping zones
+                  <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#zoneModal"><i class="fa-solid fa-plus me-1"></i> Add zone</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Zone</th><th>Regions</th><th>Rates</th><th style="width:120px">Actions</th></tr></thead>
+                    <tbody>
+                      <tr>
+                        <td>India</td>
+                        <td>All states</td>
+                        <td>Standard: ₹199, Express: ₹499</td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#zoneModal"><i class="fa-regular fa-pen-to-square"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>International</td>
+                        <td>US, UK, EU, UAE</td>
+                        <td>Standard: $15, Express: $35</td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#zoneModal"><i class="fa-regular fa-pen-to-square"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold">Packaging & handling</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-4"><label class="form-label">Default weight (kg)</label><input type="number" step="0.01" class="form-control" value="0.5"></div>
+                    <div class="col-md-4"><label class="form-label">Box size (cm)</label><div class="input-group"><input class="form-control" placeholder="L"><span class="input-group-text">x</span><input class="form-control" placeholder="W"><span class="input-group-text">x</span><input class="form-control" placeholder="H"></div></div>
+                    <div class="col-md-4"><label class="form-label">Handling fee</label><div class="input-group"><span class="input-group-text">₹</span><input type="number" step="0.01" class="form-control" value="0.00"></div></div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save shipping settings</button></div>
+              </div>
+            </div>
+
+            <!-- Tax -->
+            <div class="tab-pane fade" id="tax" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                  Tax rates
+                  <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#taxModal"><i class="fa-solid fa-plus me-1"></i> Add rate</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Region</th><th>Tax name</th><th>Rate</th><th>Inclusive</th><th style="width:120px">Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>India</td><td>GST</td><td>18%</td><td><span class="badge text-bg-secondary">No</span></td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#taxModal"><i class="fa-regular fa-pen-to-square"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr><td>US</td><td>Sales Tax</td><td>8.25%</td><td><span class="badge text-bg-secondary">No</span></td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#taxModal"><i class="fa-regular fa-pen-to-square"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold">Calculation options</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label">Prices include tax</label>
+                      <select class="form-select"><option>No</option><option>Yes</option></select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Rounding</label>
+                      <select class="form-select"><option>Line item</option><option>Order total</option></select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Shipping taxable</label>
+                      <select class="form-select"><option>Yes</option><option>No</option></select>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save tax settings</button></div>
+              </div>
+            </div>
+
+            <!-- Emails -->
+            <div class="tab-pane fade" id="emails" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold">Sender & notifications</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">From name</label><input class="form-control" value="Kaira Store"></div>
+                    <div class="col-md-6"><label class="form-label">From email</label><input type="email" class="form-control" value="noreply@kaira.com"></div>
+                    <div class="col-12">
+                      <div class="form-check"><input class="form-check-input" type="checkbox" id="bccSupport" checked><label class="form-check-label" for="bccSupport">BCC support on all order emails</label></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save sender</button></div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                  Templates
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="email" class="form-control form-control-sm" placeholder="test@yourmail.com" style="width:220px">
+                    <button class="btn btn-sm btn-outline-secondary">Send test</button>
+                  </div>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Template</th><th>Description</th><th>Enabled</th><th style="width:150px">Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>Order confirmation</td><td class="muted">Sent after successful payment</td><td><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-nowrap"><button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#emailPreview"><i class="fa-regular fa-eye"></i></button> <button class="btn btn-sm btn-outline-secondary"><i class="fa-regular fa-pen-to-square"></i></button></td></tr>
+                      <tr><td>Shipping update</td><td class="muted">Tracking number and carrier</td><td><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-nowrap"><button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#emailPreview"><i class="fa-regular fa-eye"></i></button> <button class="btn btn-sm btn-outline-secondary"><i class="fa-regular fa-pen-to-square"></i></button></td></tr>
+                      <tr><td>Password reset</td><td class="muted">Reset link for customers</td><td><div class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" checked></div></td>
+                        <td class="text-nowrap"><button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#emailPreview"><i class="fa-regular fa-eye"></i></button> <button class="btn btn-sm btn-outline-secondary"><i class="fa-regular fa-pen-to-square"></i></button></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Roles -->
+            <div class="tab-pane fade" id="roles" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                  Roles & permissions
+                  <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#roleModal"><i class="fa-solid fa-plus me-1"></i> New role</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Role</th><th>Members</th><th>Modules</th><th style="width:140px">Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>Owner</td><td>1</td><td>All</td><td class="text-nowrap"><button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#roleModal"><i class="fa-regular fa-pen-to-square"></i></button> <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-users-gear"></i></button></td></tr>
+                      <tr><td>Manager</td><td>3</td><td>Orders, Products, Customers, Coupons</td><td class="text-nowrap"><button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#roleModal"><i class="fa-regular fa-pen-to-square"></i></button> <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-users-gear"></i></button></td></tr>
+                      <tr><td>Support</td><td>4</td><td>Orders, Customers</td><td class="text-nowrap"><button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#roleModal"><i class="fa-regular fa-pen-to-square"></i></button> <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-users-gear"></i></button></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold">Invite team member</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control" placeholder="user@company.com"></div>
+                    <div class="col-md-4"><label class="form-label">Role</label><select class="form-select"><option>Manager</option><option>Support</option><option>Viewer</option></select></div>
+                    <div class="col-md-2 d-grid"><label class="form-label invisible">.</label><button class="btn btn-dark">Invite</button></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Security -->
+            <div class="tab-pane fade" id="security" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold">Authentication</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enforce2fa" checked>
+                        <label class="form-check-label" for="enforce2fa">Enforce 2‑factor for staff</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Session timeout</label>
+                      <select class="form-select"><option>30 minutes</option><option>60 minutes</option><option>90 minutes</option></select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Password policy</label>
+                      <select class="form-select"><option>Standard (8+ chars)</option><option>Strict (12+ chars, symbols)</option></select>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label">IP allowlist (comma separated)</label>
+                      <input class="form-control" placeholder="123.45.67.89, 10.0.0.0/24">
+                      <div class="form-text">Restrict admin access to these IPs</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save security</button></div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold">Bot & fraud protection</div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">reCAPTCHA site key</label><input class="form-control" placeholder="Site key"></div>
+                    <div class="col-md-6"><label class="form-label">reCAPTCHA secret</label><input class="form-control" placeholder="Secret key"></div>
+                    <div class="col-12">
+                      <div class="form-check"><input class="form-check-input" type="checkbox" id="blockVPN"><label class="form-check-label" for="blockVPN">Block known VPN/proxy IPs</label></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-end"><button class="btn btn-dark">Save protection</button></div>
+              </div>
+            </div>
+
+            <!-- API & Webhooks -->
+            <div class="tab-pane fade" id="api" role="tabpanel">
+              <div class="card mb-3">
+                <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                  API keys
+                  <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#apiKeyModal"><i class="fa-solid fa-key me-1"></i> Create key</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Name</th><th>Scope</th><th>Last used</th><th>Status</th><th style="width:160px">Actions</th></tr></thead>
+                    <tbody>
+                      <tr><td>Backend Service</td><td>Read/Write</td><td>Oct 20, 2025</td><td><span class="badge text-bg-success">Active</span></td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="copyFake('sk_live_***')"><i class="fa-regular fa-copy"></i></button>
+                            <button class="btn btn-outline-secondary"><i class="fa-solid fa-rotate"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td></tr>
+                      <tr><td>Reporting Client</td><td>Read‑only</td><td>Oct 18, 2025</td><td><span class="badge text-bg-secondary">Disabled</span></td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="copyFake('rk_live_***')"><i class="fa-regular fa-copy"></i></button>
+                            <button class="btn btn-outline-secondary"><i class="fa-solid fa-power-off"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                  Webhooks
+                  <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#webhookModal"><i class="fa-solid fa-plug me-1"></i> Add webhook</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table align-middle mb-0">
+                    <thead class="table-light"><tr><th>Endpoint</th><th>Events</th><th>Secret</th><th>Status</th><th style="width:180px">Actions</th></tr></thead>
+                    <tbody>
+                      <tr>
+                        <td class="code">https://api.example.com/webhooks/orders</td>
+                        <td>order.created, order.paid</td>
+                        <td class="code">whsec_••••••••</td>
+                        <td><span class="badge text-bg-success">Active</span></td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="alert('Ping sent')"><i class="fa-solid fa-satellite-dish"></i></button>
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#webhookModal"><i class="fa-regular fa-pen-to-square"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="code">https://api.example.com/webhooks/inventory</td>
+                        <td>product.updated, stock.low</td>
+                        <td class="code">whsec_••••••••</td>
+                        <td><span class="badge text-bg-secondary">Disabled</span></td>
+                        <td class="text-nowrap">
+                          <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="alert('Ping sent')"><i class="fa-solid fa-satellite-dish"></i></button>
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#webhookModal"><i class="fa-regular fa-pen-to-square"></i></button>
+                            <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div> <!-- /API tab -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+
+  <!-- Shipping Zone Modal -->
+  <div class="modal fade" id="zoneModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Shipping zone</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Zone name</label><input class="form-control" placeholder="e.g., India"></div>
+            <div class="col-md-6"><label class="form-label">Regions</label><input class="form-control" placeholder="States or countries"></div>
+            <div class="col-12">
+              <label class="form-label">Rates</label>
+              <div class="row g-2 align-items-end mb-2">
+                <div class="col-md-5"><input class="form-control" placeholder="Rate name (Standard)"></div>
+                <div class="col-md-3"><div class="input-group"><span class="input-group-text">₹</span><input type="number" step="0.01" class="form-control" placeholder="0.00"></div></div>
+                <div class="col-md-2"><input class="form-control" placeholder="ETA (days)"></div>
+                <div class="col-md-2 d-grid"><button class="btn btn-outline-secondary">Add</button></div>
+              </div>
+              <div class="form-text">Add multiple rates (e.g., Standard, Express)</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-dark">Save zone</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tax Modal -->
+  <div class="modal fade" id="taxModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Tax rate</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Region</label><input class="form-control" placeholder="Country/State"></div>
+          <div class="mb-3"><label class="form-label">Tax name</label><input class="form-control" placeholder="GST, VAT, Sales Tax"></div>
+          <div class="mb-3"><label class="form-label">Rate (%)</label><input type="number" step="0.01" class="form-control" placeholder="0.00"></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="inclusive"><label class="form-check-label" for="inclusive">Price includes this tax</label></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-dark">Save rate</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email Preview Modal -->
+  <div class="modal fade" id="emailPreview" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Template preview</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="border rounded p-3">
+            <h5>Order Confirmation</h5>
+            <p class="muted">Hi Jane, thanks for your order #12345!</p>
+            <ul>
+              <li>Denim Jacket — $89.99</li>
+              <li>Classic White Shirt — $49.99</li>
+            </ul>
+            <p>Total: $149.98</p>
+            <p class="muted small">This is a preview.</p>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Modal -->
+  <div class="modal fade" id="roleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Role</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Role name</label><input class="form-control" placeholder="e.g., Manager"></div>
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Read</h6>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="rOrders" checked><label class="form-check-label" for="rOrders">Orders</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="rProducts" checked><label class="form-check-label" for="rProducts">Products</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="rCustomers" checked><label class="form-check-label" for="rCustomers">Customers</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="rCoupons" checked><label class="form-check-label" for="rCoupons">Coupons</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="rAnalytics"><label class="form-check-label" for="rAnalytics">Analytics</label></div>
+            </div>
+            <div class="col-md-6">
+              <h6>Write</h6>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="wOrders" checked><label class="form-check-label" for="wOrders">Orders</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="wProducts" checked><label class="form-check-label" for="wProducts">Products</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="wCustomers"><label class="form-check-label" for="wCustomers">Customers</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="wCoupons"><label class="form-check-label" for="wCoupons">Coupons</label></div>
+              <div class="form-check"><input class="form-check-input" type="checkbox" id="wSettings"><label class="form-check-label" for="wSettings">Settings</label></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-dark">Save role</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key Modal -->
+  <div class="modal fade" id="apiKeyModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Create API key</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Name</label><input class="form-control" placeholder="Integration name"></div>
+          <div class="mb-3"><label class="form-label">Scope</label><select class="form-select"><option>Read‑only</option><option>Read/Write</option></select></div>
+          <div class="mb-3"><label class="form-label">IP restrictions (optional)</label><input class="form-control" placeholder="CIDR or IP list"></div>
+          <div class="alert alert-warning small mb-0"><i class="fa-solid fa-triangle-exclamation me-1"></i> Store this key securely; it will be shown only once.</div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-dark" onclick="alert('Key created: sk_live_••••')">Create</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Webhook Modal -->
+  <div class="modal fade" id="webhookModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Webhook</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Endpoint URL</label><input class="form-control" placeholder="https://yourdomain.com/webhooks/orders"></div>
+          <div class="mb-3"><label class="form-label">Events (comma separated)</label><input class="form-control" placeholder="order.created, order.paid"></div>
+          <div class="mb-3"><label class="form-label">Secret (header)</label><input class="form-control" placeholder="whsec_********"></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="whEnabled" checked><label class="form-check-label" for="whEnabled">Enabled</label></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-dark">Save webhook</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function copyFake(val){ navigator.clipboard?.writeText(val).then(()=>alert('Copied')).catch(()=>alert(val)); }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

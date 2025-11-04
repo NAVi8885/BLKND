@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - BLKND</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Jost', sans-serif; }
+        .page-header { background-color: #f8f9fa; padding: 80px 0 40px; margin-bottom: 60px; }
+        .profile-sidebar { background-color: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .profile-sidebar .nav-link { color: #212529; padding: 12px 20px; border-radius: 6px; margin-bottom: 5px; }
+        .profile-sidebar .nav-link:hover { background-color: #e9ecef; }
+        .profile-sidebar .nav-link.active { background-color: #212529; color: #fff; }
+        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <div class="top-nav text-white" style="background-color: #212529; padding: 10px 0; font-size: 14px;">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div><span>Free shipping on orders over $50</span></div>
+                <div>
+                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
+                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">KAIRA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+                <div class="nav-icons d-flex align-items-center">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
+                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="modal fade" id="searchModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
+                    <div class="mt-4">
+                        <input type="search" class="form-control form-control-lg" placeholder="Search products...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="mb-2">Account Settings</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="profile.html">Profile</a></li>
+                    <li class="breadcrumb-item active">Settings</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="profile-sidebar">
+                    <div class="text-center mb-4">
+                        <img src="https://ui-avatars.com/api/?name=John+Doe&size=120&background=212529&color=fff" class="profile-avatar mb-3" alt="Profile">
+                        <h5>John Doe</h5>
+                        <p class="text-muted small">john.doe@example.com</p>
+                    </div>
+                    
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="profile.html">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                        <a class="nav-link" href="profileOrder.html">
+                            <i class="fas fa-shopping-bag me-2"></i> Orders
+                        </a>
+                        <a class="nav-link" href="profileAddress.html">
+                            <i class="fas fa-map-marker-alt me-2"></i> Addresses
+                        </a>
+                        <a class="nav-link active" href="profileSetting.html">
+                            <i class="fas fa-cog me-2"></i> Settings
+                        </a>
+                        <a class="nav-link" href="wishlist.html">
+                            <i class="fas fa-heart me-2"></i> Wishlist
+                        </a>
+                        <a class="nav-link" href="login.html">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <div class="col-lg-9">
+                <div class="card mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">Change Password</h4>
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-dark">Update Password</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">Email Preferences</h4>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="newsletter" checked>
+                            <label class="form-check-label" for="newsletter">
+                                <strong>Newsletter</strong><br>
+                                <small class="text-muted">Receive our weekly newsletter with special offers and new arrivals</small>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="orderUpdates" checked>
+                            <label class="form-check-label" for="orderUpdates">
+                                <strong>Order Updates</strong><br>
+                                <small class="text-muted">Get notifications about your orders and deliveries</small>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="promotions" checked>
+                            <label class="form-check-label" for="promotions">
+                                <strong>Promotional Emails</strong><br>
+                                <small class="text-muted">Receive exclusive deals and discount codes</small>
+                            </label>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="recommendations">
+                            <label class="form-check-label" for="recommendations">
+                                <strong>Product Recommendations</strong><br>
+                                <small class="text-muted">Get personalized product suggestions based on your preferences</small>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Save Preferences</button>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">Privacy Settings</h4>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="profileVisible" checked>
+                            <label class="form-check-label" for="profileVisible">
+                                <strong>Make my profile visible to other users</strong>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="showActivity" checked>
+                            <label class="form-check-label" for="showActivity">
+                                <strong>Show my activity and purchase history</strong>
+                            </label>
+                        </div>
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="dataCollection">
+                            <label class="form-check-label" for="dataCollection">
+                                <strong>Allow data collection for personalized experience</strong>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Save Settings</button>
+                    </div>
+                </div>
+                
+                <div class="card border-danger">
+                    <div class="card-body p-4">
+                        <h4 class="mb-3 text-danger">Danger Zone</h4>
+                        <p class="text-muted">Once you delete your account, there is no going back. Please be certain.</p>
+                        <button class="btn btn-outline-danger">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background-color: #212529; color: #fff; padding: 60px 0 20px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>KAIRA</h5>
+                    <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="about.html" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="shop.html" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
+                        <li style="margin-bottom: 10px;"><a href="contact.html" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Customer Service</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="profile.html" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Newsletter</h5>
+                    <form>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email">
+                            <button class="btn btn-light" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+            <div class="text-center">
+                <p style="color: #adb5bd;">&copy; 2025 Kaira. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

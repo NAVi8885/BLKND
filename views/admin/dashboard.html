@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin • Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --side: 260px; --dark:#212529; --muted:#6c757d; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f8f9fa; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--side); background:#d8d8d8da; border-right:1px solid #e9ecef; padding:20px; overflow-y:auto; }
+    .brand { font-weight:700; letter-spacing:.5px; color:var(--dark); text-decoration:none; }
+    .nav-aside .nav-link { color:#212529; padding:10px 12px; border-radius:8px; display:flex; align-items:center; gap:10px; }
+    .nav-aside .nav-link.active, .nav-aside .nav-link:hover { background:#000000da; color: #f8f9fa; font-weight: 500;}
+    .content { margin-left: var(--side); min-height:100vh; }
+    .topbar { position: sticky; top:0; z-index:10; background:#d8d8d8; border-bottom:1px solid #e9ecef; text-align: center; padding: 10px 0; font-size: 1.50rem; }
+    .kpi-card .title { color: var(--muted); font-size:.9rem; }
+    .kpi-card .value { font-weight:700; font-size:1.6rem; }
+    .table thead th { font-weight: 900;}
+    .status-badge { font-size:.75rem; }
+    @media (max-width: 992px){
+      .sidebar { position: fixed; transform: translateX(-100%); transition: transform .3s ease; z-index: 1000;}
+      .sidebar.show { transform: translateX(0); }
+      .content { margin-left: 0;}
+    }
+  </style>
+</head>
+<body>
+  <aside id="sidebar" class="sidebar">
+    <a href="dashboard.html" class="brand h4 d-block mb-3">BLKND Admin</a>
+    <nav class="nav nav-pills flex-column nav-aside">
+      <a class="nav-link active " href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+      <a class="nav-link" href="orders.html"><i class="fa-solid fa-receipt"></i> Orders</a>
+      <a class="nav-link" href="products.html"><i class="fa-solid fa-shirt"></i> Products</a>
+      <a class="nav-link" href="customers.html"><i class="fa-solid fa-user-group"></i> Customers</a>
+      <a class="nav-link" href="coupons.html"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a class="nav-link" href="analytics.html"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+      <a class="nav-link" href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between py-2">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')">
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <span class="fw-bold">Dashboard</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="dropdown">
+              <button class="btn btn-light dropdown-toggle btn-sm" data-bs-toggle="dropdown"><i class="fa-regular fa-bell"></i> Alerts</button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <span class="dropdown-item-text text-muted small">No new notifications</span>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown"><i class="fa-regular fa-user"></i> Admin</button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <a class="dropdown-item" href="settings.html">Account</a>
+                <a class="dropdown-item" href="settings.html#team">Team</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="../user/login.html">Logout</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="container-fluid py-4">
+      <div class="row g-3">
+        <div class="col-6 col-lg-3">
+          <div class="card kpi-card h-100">
+            <div class="card-body">
+              <div class="title">Revenue (30d)</div>
+              <div class="value">$82,460</div>
+              <div class="text-success small"><i class="fa-solid fa-arrow-up-right-from-square"></i> +12.4%</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card kpi-card h-100">
+            <div class="card-body">
+              <div class="title">Orders</div>
+              <div class="value">2,341</div>
+              <div class="text-success small">+5.1%</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card kpi-card h-100">
+            <div class="card-body">
+              <div class="title">Customers</div>
+              <div class="value">12,047</div>
+              <div class="text-primary small">+640 new</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card kpi-card h-100">
+            <div class="card-body">
+              <div class="title">Refund Rate</div>
+              <div class="value">1.8%</div>
+              <div class="text-danger small">+0.2%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-lg-8">
+          <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">Sales performance</span>
+              <div>
+                <select class="form-select form-select-sm">
+                  <option>Last 30 days</option>
+                  <option>Last 90 days</option>
+                  <option>This year</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-body">
+              nvas id="chartSales" heightght="110"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-header fw-semibold">Top categories</div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2"><span>Women</span><span class="fw-semibold">$24,300</span></div>
+              <div class="progress mb-3" style="height:8px;"><div class="progress-bar bg-dark" style="width:62%"></div></div>
+              <div class="d-flex justify-content-between mb-2"><span>Men</span><span class="fw-semibold">$18,120</span></div>
+              <div class="progress mb-3" style="height:8px;"><div class="progress-bar bg-secondary" style="width:46%"></div></div>
+              <div class="d-flex justify-content-between mb-2"><span>Accessories</span><span class="fw-semibold">$12,040</span></div>
+              <div class="progress mb-3" style="height:8px;"><div class="progress-bar bg-success" style="width:34%"></div></div>
+              <div class="d-flex justify-content-between mb-2"><span>Shoes</span><span class="fw-semibold">$9,200</span></div>
+              <div class="progress" style="height:8px;"><div class="progress-bar bg-info" style="width:26%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mt-1">
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+              Recent orders
+              <a href="orders.html" class="btn btn-sm btn-outline-secondary">View all</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Order</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#12345</td><td>Oct 20</td><td>Jane Smith</td><td>$149.98</td>
+                    <td><span class="badge text-bg-success status-badge">Paid</span></td>
+                  </tr>
+                  <tr>
+                    <td>#12344</td><td>Oct 20</td><td>Arjun Das</td><td>$89.99</td>
+                    <td><span class="badge text-bg-warning status-badge">Processing</span></td>
+                  </tr>
+                  <tr>
+                    <td>#12343</td><td>Oct 19</td><td>Wei Chen</td><td>$219.40</td>
+                    <td><span class="badge text-bg-info status-badge">Shipped</span></td>
+                  </tr>
+                  <tr>
+                    <td>#12342</td><td>Oct 19</td><td>Ana Ruiz</td><td>$59.00</td>
+                    <td><span class="badge text-bg-secondary status-badge">Awaiting</span></td>
+                  </tr>
+                  <tr>
+                    <td>#12341</td><td>Oct 18</td><td>John Doe</td><td>$79.99</td>
+                    <td><span class="badge text-bg-danger status-badge">Refunded</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer small text-muted">Updated just now</div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header fw-semibold">Quick actions</div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <a class="btn btn-dark w-100" href="products.html#add"><i class="fa-solid fa-plus me-1"></i> New product</a>
+                </div>
+                <div class="col-sm-6">
+                  <a class="btn btn-outline-dark w-100" href="orders.html"><i class="fa-solid fa-receipt me-1"></i> Review orders</a>
+                </div>
+                <div class="col-sm-6">
+                  <a class="btn btn-outline-dark w-100" href="coupons.html#new"><i class="fa-solid fa-ticket me-1"></i> Create coupon</a>
+                </div>
+                <div class="col-sm-6">
+                  <a class="btn btn-outline-dark w-100" href="analytics.html"><i class="fa-solid fa-chart-line me-1"></i> View analytics</a>
+                </div>
+              </div>
+              <hr>
+              <div class="d-flex align-items-center gap-3">
+                <div class="flex-fill">
+                  <div class="small text-muted">Low stock alerts</div>
+                  <div class="fw-semibold">7 products below threshold</div>
+                </div>
+                <a class="btn btn-sm btn-outline-secondary" href="products.html#inventory">Review</a>
+              </div>
+              <div class="d-flex align-items-center gap-3 mt-3">
+                <div class="flex-fill">
+                  <div class="small text-muted">Customer tickets</div>
+                  <div class="fw-semibold">3 open tickets</div>
+                </div>
+                <a class="btn btn-sm btn-outline-secondary" href="customers.html#tickets">Open</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    const ctx = document.getElementById('chartSales');
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: Array.from({length: 12}, (_,i)=>`W${i+1}`),
+          datasets: [
+            {label:'Revenue', data:[8,9,10,9,12,13,11,15,14,16,18,17], borderColor:'#212529', backgroundColor:'rgba(33,37,41,.08)', fill:true, tension:.35},
+            {label:'Orders', data:[420,480,520,500,560,590,570,630,610,680,720,700], borderColor:'#adb5bd', borderDash:[4,4], tension:.35}
+          ]
+        },
+        options: {
+          plugins:{ legend:{display:true} },
+          scales:{ y:{ beginAtZero:false, grid:{color:'rgba(0,0,0,.05)'} }, x:{ grid:{display:false} } }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - BLKND</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Jost', sans-serif; }
+        .page-header { background-color: #f8f9fa; padding: 80px 0 40px; margin-bottom: 60px; }
+        .contact-info { background-color: #f8f9fa; padding: 30px; border-radius: 8px; height: 100%; }
+        .contact-info i { font-size: 24px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="top-nav text-white" style="background-color: #212529; padding: 10px 0; font-size: 14px;">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
+                </div>
+                <div><span>Free shipping on orders over $50</span></div>
+                <div>
+                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
+                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div class="container">
+            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">KAIRA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="contact.html">Contact</a></li>
+                </ul>
+                <div class="nav-icons d-flex align-items-center">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
+                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="modal fade" id="searchModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
+                    <div class="mt-4">
+                        <input type="search" class="form-control form-control-lg" placeholder="Search products...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="mb-2">Contact Us</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item active">Contact</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="contact-info text-center">
+                    <i class="fas fa-map-marker-alt text-dark"></i>
+                    <h5>Visit Us</h5>
+                    <p class="text-muted mb-0">123 Fashion Street<br>Kochi, Kerala 682001<br>India</p>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="contact-info text-center">
+                    <i class="fas fa-phone text-dark"></i>
+                    <h5>Call Us</h5>
+                    <p class="text-muted mb-0">+91 9876543210<br>+91 9876543211<br>Mon-Sat: 9AM-6PM</p>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="contact-info text-center">
+                    <i class="fas fa-envelope text-dark"></i>
+                    <h5>Email Us</h5>
+                    <p class="text-muted mb-0">support@kaira.com<br>sales@kaira.com<br>We reply within 24hrs</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-body p-5">
+                        <h3 class="mb-4 text-center">Send Us a Message</h3>
+                        <form>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">First Name *</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Last Name *</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Subject *</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Message *</label>
+                                <textarea class="form-control" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-dark btn-lg w-100">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3929.0403458453436!2d76.29415931479154!3d9.991175292851853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b080d514ab7c6d5%3A0xc8f08f80f45639b3!2sKochi%2C%20Kerala!5e0!3m2!1sen!2sin!4v1697542345678!5m2!1sen!2sin" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background-color: #212529; color: #fff; padding: 60px 0 20px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>KAIRA</h5>
+                    <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="about.html" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="shop.html" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
+                        <li style="margin-bottom: 10px;"><a href="contact.html" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Customer Service</h5>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="profile.html" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Newsletter</h5>
+                    <form>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email">
+                            <button class="btn btn-light" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+            <div class="text-center">
+                <p style="color: #adb5bd;">&copy; 2025 Kaira. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
