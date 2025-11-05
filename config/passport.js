@@ -34,13 +34,15 @@ async (accessToken, refreshToken, profile, done) => {
 
     // USER CREATION THROUGH GMAIL \\
     try{
-      let userExist = await User.findOne({email: newUser.email})
-      console.log(userExist);
-      if(userExist) return res.render('user/login',{errors: [{msg:"Email already found please login", path:"email"}]})
+      let userExist = await User.findOne({email: newUser.email});
+      if(userExist){
+        return done(null, false,{message:"email-already-exist"});
+      }
       
       const user = await User.create(newUser);
-      
-    }catch{
-
+      return done(null, user);
+    }catch(err){
+      console.log("Error happened at google auth",err);
+      return done(err, null);
     }
 }));
