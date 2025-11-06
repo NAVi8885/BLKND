@@ -1,6 +1,7 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport =require('passport');
 const User = require('../models/userSchema');
+// const router = require('express').Router();
 
 passport.serializeUser((user,done)=>{
     done(null,user.id);
@@ -46,3 +47,4 @@ async (accessToken, refreshToken, profile, done) => {
       return done(err, null);
     }
 }));
+

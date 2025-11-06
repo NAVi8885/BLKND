@@ -1,4 +1,4 @@
-const {hash} = require('@node-rs/argon2');
+const {hash, verify} = require('@node-rs/argon2');
 const User = require('../models/userSchema');
 
 
@@ -12,8 +12,8 @@ const userRegister = async (req, res) => {
     try {
         const {fullName, email, phoneNumber, password, confirmPassword} = req.body
         
-        const isUser = await User.findOne({email})
-        if(isUser){
+        const userExist= await User.findOne({email})
+        if(userExist){
             return res.render('user/signup',{errors: [{msg:"User already exist", path: 'email'}]});
         }
         
@@ -31,6 +31,25 @@ const userRegister = async (req, res) => {
     }
 }
 
+const loginUser = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        const userExist = await User.findOne({email});
+        if(!userExist){
+            return res.render('user/login',{errors:[{msg:"User does not exist", path:'email'}]});
+        }
+
+        const checkPass = await verify(userExist.password, password)
+        if(!checkPass){
+            return res.render('user/login',{errors:[{msg:"Incorrect password", path:"password"}]})
+        }
+        return res.redirect('/index');
+    } catch (error) {
+        console.log("Error happened at user Login controller",error);
+    }
+}
+
 module.exports = {
-    userRegister
+    userRegister,
+    loginUser
 };

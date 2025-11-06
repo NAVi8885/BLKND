@@ -11,7 +11,6 @@ const passport = require('passport');
 require('./config/passport');
 
 
-
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
