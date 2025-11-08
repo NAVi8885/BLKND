@@ -1,4 +1,5 @@
 const {hash, verify} = require('@node-rs/argon2');
+const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 
 
@@ -43,6 +44,9 @@ const loginUser = async (req, res) => {
         if(!checkPass){
             return res.render('user/login',{errors:[{msg:"Incorrect password", path:"password"}]})
         }
+
+        
+
         return res.redirect('/index');
     } catch (error) {
         console.log("Error happened at user Login controller",error);

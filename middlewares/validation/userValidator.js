@@ -47,12 +47,11 @@ const validateUserLogin = [
     async(req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.render('user/signup',{errors: errors.array()});
+            return res.render('user/login',{errors: errors.array()});
         }
         next();
     }
 ]
-
 
 module.exports = {
     validateUserReg,

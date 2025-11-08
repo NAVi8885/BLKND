@@ -23,10 +23,10 @@
                     <h2 style="font-weight: 700; color: #212529;">BLKND</h2>
                 </a>
                 <p class="text-muted">Welcome back! Please login to your account.</p>
-            </div>         
-            <div class="card shadow-sm">
-                <div class="card-body p-5">
-                                            <% if (errors && errors.length> 0) {
+            </div>
+
+
+                        <% if (errors && errors.length> 0) {
                             const error = errors.find(err => ['fullName', 'email', 'phoneNumber', 'password','confirmPassword'].includes(err.path)) ;
                             if(error) {%>
                             <div class="validation-wrapper mb-3">
@@ -38,52 +38,28 @@
                                 </div>
                             </div>
                             <% } } %>
+                                
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
                     <form action="/login" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Email Address</label>
-                            <input type="email" name="email" class="form-control form-control-lg" placeholder="Enter your email" >
+                            <input type="email" name="email" class="form-control form-control-lg" placeholder="Enter your email" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control form-control-lg" placeholder="Enter your password"  >
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <a href="/forgotPassword" class="text-decoration-none">Forgot Password?</a>
+                            <input type="password" name="password" class="form-control form-control-lg" placeholder="Enter your password" required>
                         </div>
                         <button type="submit" class="btn btn-dark btn-lg w-100 mb-3">Login</button>
                     </form>
-                    
-                    <div class="text-center mb-3">
-                        <span class="text-muted">or login with</span>
-                    </div>
-                    
-                        <% if (errors && errors.length> 0) {
-                            const error = errors.find(err => ['signup'].includes(err.path)) ;
-                            if(error) {%>
-                            <div class="validation-wrapper mb-3">
-                                <div class="validation-error">
-                                    <i class="bi bi-exclamation-circle"></i>
-                                    <span>
-                                        <%= error.msg %>
-                                    </span>
-                                </div>
-                            </div>
-                            <% } } %>
-
-                    <form method="GET" action="/auth/google/login">
-                        <button class="btn btn-outline-dark btn-social">
-                            <i class="fab fa-google"></i> Continue with Google
-                        </button>
-                    </form>
-
-                    <div class="text-center mt-4">
-                        <p class="mb-0">Don't have an account? <a href="/signup" class="text-decoration-none fw-bold">Sign Up</a></p>
-                    </div>
                 </div>
+                    <div class="footer-text text-center mb-3">
+                        © 2025 BLKND | Secure Admin Access Only
+                    </div>
             </div>
             
             <div class="text-center mt-4">
-                <a href="index.html" class="text-decoration-none">
+                <a href="/index" class="text-decoration-none">
                     <i class="fas fa-arrow-left"></i> Back to Home
                 </a>
             </div>

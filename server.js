@@ -6,7 +6,7 @@ const path = require('path');
 const userGetRouter = require('./routes/user/userGetRoutes');
 const userPostRouter = require('./routes/user/userPostRoutes');
 const connectDB = require('./config/db');
-const connectRedis = require('./config/redis');
+// const connectRedis = require('./config/redis');
 const passport = require('passport');
 require('./config/passport');
 
@@ -23,7 +23,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 connectDB();
-connectRedis();
+// connectRedis();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

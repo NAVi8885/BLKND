@@ -10,8 +10,11 @@ router.get('/index',(req,res) => {
 router.get('/login',(req,res) => {
   const errKey = req.query.error;
   let errorMsg = null;
+
   if(errKey === 'email-already-exist'){
-    errorMsg = "Email already registered please log in using gmail from here."
+    errorMsg = "Email already registered please log in using gmail."
+  }else if(errKey === 'acc-not-found'){
+    errorMsg = "This email is not registered"
   }
   res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[]});
 })
@@ -19,6 +22,7 @@ router.get('/login',(req,res) => {
 router.get('/signup',(req,res) => {
   const errKey = req.query.error;
   let errorMsg = null;
+
   if(errKey === 'google-auth-failed'){
     errorMsg = "Google authentication failed." 
   }else if(errKey === 'server-error'){
@@ -39,7 +43,7 @@ router.get('/auth/google/callback',(req, res, next) => {
   passport.authenticate('google-signup',(err, user, info) =>{
     if(!user){
       // info.message sent from passport.js
-      return res.redirect(`/login?error=${info.message}`);
+      return res.redirect(`/login?error=${encodeURIComponent(info.message)}`);
     }
     req.logIn(user, (err) => {
       return res.redirect('/login?error=google-exist');
@@ -52,10 +56,16 @@ router.get('/auth/google/callback',(req, res, next) => {
 router.get('/auth/google/login', passport.authenticate('google-login', { scope: ['profile', 'email'] }));
 
 // callback route for login
-router.get('/auth/google/login/callback',
-  passport.authenticate('google-login', { failureRedirect: '/login', failureFlash: true }),
+router.get('/auth/google/login/callback',(req, res, next) => {
+  passport.authenticate('google-login', (err, user, info) => {
+    if(!user){
+      return res.redirect(`/login?error=${encodeURIComponent(info.message)}`);
+    }
+    res.redirect('/index');
+  })
+  (req, res, next);
 //   googleLogin  this is for going in controller and creating a token.
-);
+});
   //========================================\\
  //===========PASS PORT GOOGLE END===========\\
 //============================================\\
