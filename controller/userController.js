@@ -45,7 +45,14 @@ const loginUser = async (req, res) => {
             return res.render('user/login',{errors:[{msg:"Incorrect password", path:"password"}]})
         }
 
-        
+        const token = jwt.sign({userExist}, process.env.SECRET_KEY,{expiresIn:'1h'});
+        // console.log(token);
+
+        res.cookie('token', token,{
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict'
+        });
 
         return res.redirect('/index');
     } catch (error) {

@@ -1,7 +1,6 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport =require('passport');
 const User = require('../models/userSchema');
-// const router = require('express').Router();
 
 passport.serializeUser((user,done)=>{
   done(null,user.id);
@@ -55,10 +54,11 @@ passport.use('google-login', new GoogleStrategy({
   callbackURL: process.env.GOOGLE_LOGIN_CALLBACK_URL
 },
 async (accessToken, refreshToken, profile, done) => {
-  console.log('hey');
-  
   try{
     let userExist = await User.findOne({email: profile.emails[0].value})
+    if(userExist.loginType === 'local'){
+      return done(null, false, {message: "login-mismatch"})
+    }
     if(!userExist){
       return done(null, false, {message: "acc-not-found"});
     }

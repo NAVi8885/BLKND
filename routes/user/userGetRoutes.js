@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const verifyUser = require('../../middlewares/authentication/userAuth');
 
 
-router.get('/index',(req,res) => {
+router.get('/index', verifyUser,(req,res) => {
   res.render('user/index');
 })
 
@@ -15,6 +16,8 @@ router.get('/login',(req,res) => {
     errorMsg = "Email already registered please log in using gmail."
   }else if(errKey === 'acc-not-found'){
     errorMsg = "This email is not registered"
+  }else if(errKey === 'login-mismatch'){
+    
   }
   res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[]});
 })

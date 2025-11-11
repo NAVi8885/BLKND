@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const session = require('express-session')
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const userGetRouter = require('./routes/user/userGetRoutes');
 const userPostRouter = require('./routes/user/userPostRoutes');
 const connectDB = require('./config/db');
@@ -26,6 +27,7 @@ connectDB();
 // connectRedis();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 app.set('views' , 'views');
