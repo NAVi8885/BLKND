@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const verifyUser = require('../../middlewares/authentication/userAuth');
+const jwt = require('jsonwebtoken');
 
-
-router.get('/index', verifyUser,(req,res) => {
+router.get('/index', verifyUser,(req, res) => {
   res.render('user/index');
 })
 
-router.get('/login',(req,res) => {
+router.get('/login',(req, res) => {
   const errKey = req.query.error;
   let errorMsg = null;
 
@@ -17,12 +17,15 @@ router.get('/login',(req,res) => {
   }else if(errKey === 'acc-not-found'){
     errorMsg = "This email is not registered"
   }else if(errKey === 'login-mismatch'){
-    
+    errorMsg = "Please login using the form"
+    return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path:'email'}]:[]});
+  }else if(errKey === 'server-error'){
+    errorMsg = "There was a server error."
   }
-  res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[]});
-})
+  return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[]});
+});
 
-router.get('/signup',(req,res) => {
+router.get('/signup',(req, res) => {
   const errKey = req.query.error;
   let errorMsg = null;
 
@@ -32,7 +35,7 @@ router.get('/signup',(req,res) => {
     errorMsg = "There was a server error."
   }
   res.render('user/signup',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[]});
-})
+});
 
   //========================================\\
  //===========PASS PORT GOOGLE START=========\\
@@ -42,12 +45,15 @@ router.get('/signup',(req,res) => {
 router.get('/auth/google/signup', passport.authenticate('google-signup', { scope: ['profile', 'email'] }));
 
 // callback route
-router.get('/auth/google/callback',(req, res, next) => {
+router.get('/auth/google/signup/callback',(req, res, next) => {
   passport.authenticate('google-signup',(err, user, info) =>{
     if(!user){
       // info.message sent from passport.js
-      return res.redirect(`/login?error=${encodeURIComponent(info.message)}`);
+      const msg = info?.message || 'server-error';
+      return res.redirect(`/login?error=${encodeURIComponent(msg)}`);
     }
+
+    res.clearCookie("token");
     req.logIn(user, (err) => {
       return res.redirect('/login?error=google-exist');
     })
@@ -61,17 +67,32 @@ router.get('/auth/google/login', passport.authenticate('google-login', { scope: 
 // callback route for login
 router.get('/auth/google/login/callback',(req, res, next) => {
   passport.authenticate('google-login', (err, user, info) => {
-    if(!user){
-      return res.redirect(`/login?error=${encodeURIComponent(info.message)}`);
+
+    if (!user) {
+    const msg = info?.message || 'server-error';
+    return res.redirect(`/login?error=${encodeURIComponent(msg)}`);
     }
+
+    const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{ expiresIn: '1h' });
+    console.log(token);
+
+    res.cookie('token', token,{
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/'
+    })
+
     res.redirect('/index');
   })
   (req, res, next);
-//   googleLogin  this is for going in controller and creating a token.
 });
   //========================================\\
  //===========PASS PORT GOOGLE END===========\\
 //============================================\\
 
+router.get('/forgotpassword', (req, res) => {
+  res.render('user/forgotPassword');
+})
 
 module.exports = router;

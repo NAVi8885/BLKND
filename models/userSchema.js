@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose
+const { Schema } = mongoose;
 
 
 const userSchema = new Schema({
@@ -21,7 +21,7 @@ const userSchema = new Schema({
     },
     googleId: {
         type: String,
-        unique: true,
+        default: null
     },
     loginType: {
         type: String,
