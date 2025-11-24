@@ -2,7 +2,7 @@ const {body, validationResult} = require('express-validator');
 
 const validateAdminLogin = [
     body('email')
-    .isEmail().withMessage("Email is empty"),
+    .notEmpty().withMessage("Email cannot be empty"),
 
     body('password')
     .notEmpty().withMessage("Password cannot be empty")
@@ -12,7 +12,7 @@ const validateAdminLogin = [
     const errors = validationResult(req);
     if(!errors.isEmpty()){
         // console.log(errors)
-        return res.render('user/signup',{errors: errors.array()});
+        return res.render('admin/adminLogin',{errors: errors.array()});
     }
     next();
     }

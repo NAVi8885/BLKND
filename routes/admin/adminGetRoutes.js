@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/adminlogin',(req, res) => {
-    console.log("hello at admin route");
     res.render('admin/adminLogin',{errors:null});
 });
 

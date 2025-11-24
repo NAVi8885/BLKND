@@ -17,7 +17,7 @@ router.get('/login',(req, res) => {
   }else if(errKey === 'acc-not-found'){
     errorMsg = "This email is not registered"
   }else if(errKey === 'login-mismatch'){
-    errorMsg = "Please login using the form"
+    errorMsg = "User already exist please login using the form"
     return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path:'email'}]:[]});
   }else if(errKey === 'server-error'){
     errorMsg = "There was a server error."
@@ -92,7 +92,15 @@ router.get('/auth/google/login/callback',(req, res, next) => {
 //============================================\\
 
 router.get('/forgotpassword', (req, res) => {
-  res.render('user/forgotPassword');
+  res.render('user/forgotPassword', {errors : null});
+})
+
+router.get('/verifyotp', (req, res) => {
+  res.render('user/verifyOtp', {errors : null, email: null} );
+})
+
+router.get('/resetPassword', (req, res) => {
+  res.render('user/resetPassword', {errors: null});
 })
 
 module.exports = router;

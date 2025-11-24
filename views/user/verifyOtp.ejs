@@ -1,27 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP - BLKND</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/errorStyle.css">
     <style>
-        body { font-family: 'Jost', sans-serif; background-color: #f8f9fa; }
-        .otp-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 0; }
-        .otp-card { max-width: 450px; width: 100%; }
-        .otp-input { width: 50px; height: 50px; text-align: center; font-size: 24px; font-weight: bold; margin: 0 5px; }
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .otp-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+        }
+
+        .otp-card {
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
     </style>
 </head>
+
 <body>
     <div class="otp-container">
         <div class="otp-card">
             <div class="text-center mb-4">
-                <a href="index.html" class="text-decoration-none">
-                    <h2 style="font-weight: 700; color: #212529;">KAIRA</h2>
+                <a href="/index" class="text-decoration-none">
+                    <h2 style="font-weight: 700; color: #212529;">BLKND</h2>
                 </a>
             </div>
-            
+
             <div class="card shadow-sm">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
@@ -30,10 +55,23 @@
                         </div>
                         <h4>Verify Your Account</h4>
                         <p class="text-muted">We've sent a verification code to your email address</p>
-                        <p class="fw-bold">user@example.com</p>
+                        <p class="fw-bold"><%= email || '' %></p>
                     </div>
-                    
-                    <form>
+
+                    <% if (errors && errors.length> 0) {
+                            const error = errors.find(err => ['otp'].includes(err.path)) ;
+                            if(error) {%>
+                            <div class="validation-wrapper mb-3">
+                                <div class="validation-error">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    <span>
+                                        <%= error.msg %>
+                                    </span>
+                                </div>
+                            </div>
+                    <% } } %>
+
+                    <form action="/verifyotp" method="POST">
                         <div class="mb-4">
                             <label class="form-label text-center d-block">Enter OTP Code</label>
                             <div class="d-flex justify-content-center">
@@ -45,9 +83,10 @@
                                 <input type="text" class="form-control otp-input" maxlength="1" required>
                             </div>
                         </div>
-                        
+                        <input type="hidden" name="email" value="<%= email || '' %>" />
+                        <input type="hidden" name="otp" id="otpValue">
                         <button type="submit" class="btn btn-dark btn-lg w-100 mb-3">Verify OTP</button>
-                        
+
                         <div class="text-center">
                             <p class="text-muted mb-2">Didn't receive the code?</p>
                             <a href="#" class="text-decoration-none fw-bold">Resend Code</a>
@@ -55,15 +94,43 @@
                     </form>
                 </div>
             </div>
-            
+
             <div class="text-center mt-4">
-                <a href="login.html" class="text-decoration-none">
+                <a href="/login" class="text-decoration-none">
                     <i class="fas fa-arrow-left"></i> Back to Login
                 </a>
             </div>
         </div>
     </div>
     
+    <script>
+        const inputs = document.querySelectorAll(".otp-input");
+
+        inputs.forEach((input, index) => {
+
+            // typing moves to next
+            input.addEventListener("input", () => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            // backspace moves to previous
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && input.value === "" && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+
+            // paste entire OTP
+            input.addEventListener("paste", (e) => {
+                const data = e.clipboardData.getData("text").split("");
+                inputs.forEach((input, i) => input.value = data[i] || "");
+            });
+        });
+
+
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
