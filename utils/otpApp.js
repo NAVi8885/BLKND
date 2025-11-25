@@ -11,7 +11,7 @@ async function sendOtpEmail(email){
     hashedOtp = await hash(otp, 10)
     await helper.sendEmail(
         email,
-        'BLKND OTP  verification',
+        'BLKND OTP verification',
         "verify your account using this otp ",
         otp
     );

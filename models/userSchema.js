@@ -39,7 +39,7 @@ const userSchema = new Schema({
         type: String,
         default: null
     },
-    otpExiry:{
+    otpExpiry:{
         type: Date,
         default: null
     }

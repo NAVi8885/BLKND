@@ -4,8 +4,10 @@ const passport = require('passport');
 const verifyUser = require('../../middlewares/authentication/userAuth');
 const jwt = require('jsonwebtoken');
 
+
+
 router.get('/index', verifyUser,(req, res) => {
-  res.render('user/index');
+  res.render('user/index', {email: null});
 })
 
 router.get('/login',(req, res) => {
@@ -21,6 +23,9 @@ router.get('/login',(req, res) => {
     return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path:'email'}]:[]});
   }else if(errKey === 'server-error'){
     errorMsg = "There was a server error."
+  }else if(errKey === 'password-changed'){
+    errorMsg = "The password has been changed"
+    return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path:'email'}]:[]});
   }
   return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[]});
 });
@@ -95,12 +100,12 @@ router.get('/forgotpassword', (req, res) => {
   res.render('user/forgotPassword', {errors : null});
 })
 
-router.get('/verifyotp', (req, res) => {
-  res.render('user/verifyOtp', {errors : null, email: null} );
-})
+// router.get('/verifyotp', (req, res) => {
+//   res.render('user/verifyOtp', {errors : null, email: null} );
+// })
 
-router.get('/resetPassword', (req, res) => {
-  res.render('user/resetPassword', {errors: null});
-})
+// router.get('/resetPassword', (req, res) => {
+//   res.render('user/resetPassword', {errors: [], email: null});
+// })
 
 module.exports = router;

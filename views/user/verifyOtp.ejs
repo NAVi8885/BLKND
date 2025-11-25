@@ -75,16 +75,15 @@
                         <div class="mb-4">
                             <label class="form-label text-center d-block">Enter OTP Code</label>
                             <div class="d-flex justify-content-center">
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
-                                <input type="text" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" name="otp1" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" name="otp2" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" name="otp3" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" name="otp4" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" name="otp5" class="form-control otp-input" maxlength="1" required>
+                                <input type="text" name="otp6" class="form-control otp-input" maxlength="1" required>
                             </div>
                         </div>
                         <input type="hidden" name="email" value="<%= email || '' %>" />
-                        <input type="hidden" name="otp" id="otpValue">
                         <button type="submit" class="btn btn-dark btn-lg w-100 mb-3">Verify OTP</button>
 
                         <div class="text-center">
