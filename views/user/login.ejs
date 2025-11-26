@@ -26,7 +26,7 @@
             </div>         
             <div class="card shadow-sm">
                 <div class="card-body p-5">
-                                            <% if (errors && errors.length> 0) {
+                        <% if (errors && errors.length> 0) {
                             const error = errors.find(err => ['fullName', 'email', 'phoneNumber', 'password','confirmPassword'].includes(err.path)) ;
                             if(error) {%>
                             <div class="validation-wrapper mb-3">
@@ -37,7 +37,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <% } } %>
+                        <% } } %>
                     <form method="POST" action="/login">
                         <div class="mb-3">
                             <label class="form-label">Email Address</label>

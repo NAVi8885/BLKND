@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const verifyUser = require('../../middlewares/authentication/userAuth');
+const {optionalVerify, verifyRequired} = require('../../middlewares/authentication/userAuth');
 const jwt = require('jsonwebtoken');
+const User = require('../../models/userSchema');
 
 
 
-router.get('/index', verifyUser,(req, res) => {
-  res.render('user/index', {email: null});
+router.get('/index', optionalVerify,async (req, res) => {
+  res.render('user/index',{user: req.user});
 })
 
 router.get('/login',(req, res) => {
@@ -77,7 +78,7 @@ router.get('/auth/google/login/callback',(req, res, next) => {
     const msg = info?.message || 'server-error';
     return res.redirect(`/login?error=${encodeURIComponent(msg)}`);
     }
-
+    // creating the cookie for google sign in
     const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{ expiresIn: '1h' });
     console.log(token);
 
@@ -107,5 +108,12 @@ router.get('/forgotpassword', (req, res) => {
 // router.get('/resetPassword', (req, res) => {
 //   res.render('user/resetPassword', {errors: [], email: null});
 // })
+
+router.get('/profile', verifyRequired, (req, res) => {
+  if(!req.user) {
+    return res.redirect('/login')
+  }
+  res.render('user/profile', {user: req.user});
+})
 
 module.exports = router;
