@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express();
 const { validateUserReg, validateUserLogin } = require("../../middlewares/validation/userValidator");
-const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword } = require('../../controller/userController');
+const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile } = require('../../controller/userController');
 
 
 // User Login
@@ -21,5 +21,9 @@ router.post('/verifyOtp', verifyOtp);
 
 // reset password
 router.post('/resetpassword', resetPassword);
+
+// updates profile
+router.post('/savechanges', updateProfile);
+
 
 module.exports = router;

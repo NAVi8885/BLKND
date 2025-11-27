@@ -8,12 +8,8 @@ const optionalVerify = async (req, res, next) => {
         try{
             const verify = await jwt.verify(token, process.env.SECRET_KEY);
             const user = await User.findById(verify._id);
-            // if (!user) {
-            //     res.clearCookie('token');
-            //     return res.render('user/login', {errors: [{ msg: "Account not found. Please login again.", path: "email" }]})
-            // }
-
             req.user = user;
+            
             next();
         }catch(err){
             console.log("error happened at user-verify in userauth :", err)
@@ -29,20 +25,20 @@ const verifyRequired = async(req, res, next) => {
     }
     try{
         const verify = await jwt.verify(token, process.env.SECRET_KEY);
-        console.log('token: ', verify);
+        // console.log('token: ', verify);
         
         const user = await User.findById(verify._id);
-        // if (!user) {
-        //     res.clearCookie('token');
-        //     return res.render('user/login', {errors: [{ msg: "Account not found. Please login again.", path: "email" }]})
-        // }
+        if (!user) {
+            res.clearCookie('token');
+            return res.render('user/login', {errors: [{ msg: "Account not found. Please login again.", path: "email" }]})
+        }
 
         req.user = user;
+
         next();
     }catch(err){
         console.log("error happened at user-verify in userauth :", err)
     }
-    next();
 }
 module.exports = {
     optionalVerify,

@@ -55,7 +55,7 @@ router.get('/auth/google/signup/callback',(req, res, next) => {
   passport.authenticate('google-signup',(err, user, info) =>{
     if(!user){
       // info.message sent from passport.js
-      const msg = info?.message || 'server-error';
+      const msg = info?.message;
       return res.redirect(`/login?error=${encodeURIComponent(msg)}`);
     }
 
@@ -79,7 +79,7 @@ router.get('/auth/google/login/callback',(req, res, next) => {
     return res.redirect(`/login?error=${encodeURIComponent(msg)}`);
     }
     // creating the cookie for google sign in
-    const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{ expiresIn: '1h' });
+    const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{ expiresIn: '7d' });
     console.log(token);
 
     res.cookie('token', token,{
@@ -115,5 +115,7 @@ router.get('/profile', verifyRequired, (req, res) => {
   }
   res.render('user/profile', {user: req.user});
 })
+
+
 
 module.exports = router;

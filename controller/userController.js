@@ -2,6 +2,8 @@ const {hash, verify} = require('@node-rs/argon2');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 const { sendOtpEmail } = require('../utils/otpApp');
+const { name } = require('ejs');
+const { log } = require('console');
 
 
 
@@ -48,7 +50,7 @@ const loginUser = async (req, res) => {
             return res.render('user/login', {errors:[{msg:"Incorrect password", path:"password"}]})
         }
 
-        const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{expiresIn:'1h'});
+        const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{expiresIn:'7d'});
         // console.log(token);
 
         res.cookie('token', token,{
@@ -159,11 +161,30 @@ const resetPassword = async(req, res) => {
     }
 }
 
+const updateProfile = async (req, res) => {
+    try {
+        const {name, email, phoneNumber, gender} = req.body;
+        const user = await User.findOneAndUpdate({email}, {
+                $set: {
+                    name:name,
+                    email:email,
+                    phoneNumber:phoneNumber,
+                    gender:gender
+                }
+            });
+
+        return res.render('user/profile', {user});
+    } catch (error) {
+        console.log("error happened at update profile / usercontroller",error)
+    }
+}
+
 module.exports = {
     userRegister,
     loginUser,
     logoutUser,
     forgotPassword,
     verifyOtp,
-    resetPassword
+    resetPassword,
+    updateProfile
 };

@@ -23,6 +23,10 @@ passport.use('google-signup',new GoogleStrategy({
   callbackURL: process.env.GOOGLE_SIGNUP_CALLBACK_URL
 },
 async (accessToken, refreshToken, profile, done) => {
+  let photo = null;
+  if (profile.photos && profile.photos.length > 0) {
+    photo = profile.photos[0].value + "?sz=200";
+  }
   const newUser ={
     name: profile.displayName,
     email: profile.emails[0].value,
@@ -30,7 +34,7 @@ async (accessToken, refreshToken, profile, done) => {
     password: null,
     googleId: profile.id,
     loginType: 'google',
-    profilePic: profile.photos[0].value
+    profilePic: photo
   };
 
     // USER CREATION THROUGH GMAIL \\

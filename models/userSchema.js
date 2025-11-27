@@ -13,8 +13,7 @@ const userSchema = new Schema({
         required: true
     },
     phoneNumber: {
-        type: Number,
-        unique: true,
+        type: Number
     },
     password: {
         type: String,
@@ -42,8 +41,13 @@ const userSchema = new Schema({
     otpExpiry:{
         type: Date,
         default: null
+    },
+    gender:{
+        type: String,
+        enum:['null','male', 'female'],
+        default: 'null'
     }
-
+    
 }, {
     timestamps: true
 })
