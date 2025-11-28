@@ -53,7 +53,34 @@ const validateUserLogin = [
     }
 ]
 
+const validateUpdateUser = [
+    body('name')
+    .notEmpty().withMessage("Name connot be empty")
+    .isLength({ min: 3 , max: 20 }).withMessage("Name be have between 3- 20 letters"),
+
+    body('email')
+    .isEmail().withMessage("Email is required"),
+
+    body('phoneNumber')
+    .notEmpty().withMessage("Phone number cannot be empty")
+    .isLength({min:10,max:13}).withMessage("Enter a valid number"),
+
+    async(req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('user/profile', {
+                errors: errors.array(),
+                user: req.user,
+                openModal: 'editDetailsModal',      // tell the view which modal to open
+                oldInput: req.body                  // to refill form fields
+            });
+        }
+        next();
+    }
+]
+ 
 module.exports = {
     validateUserReg,
-    validateUserLogin
+    validateUserLogin,
+    validateUpdateUser
 };

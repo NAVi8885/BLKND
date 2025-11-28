@@ -113,7 +113,7 @@ router.get('/profile', verifyRequired, (req, res) => {
   if(!req.user) {
     return res.redirect('/login')
   }
-  res.render('user/profile', {user: req.user});
+  res.render('user/profile', {user: req.user, errors: null, oldInput: null});
 })
 
 

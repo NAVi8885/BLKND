@@ -4,7 +4,8 @@ const app = express();
 const session = require('express-session')
 const path = require('path');
 const cookieParser = require('cookie-parser');
-
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
 
 
 const userGetRouter = require('./routes/user/userGetRoutes');

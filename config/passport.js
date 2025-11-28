@@ -27,7 +27,7 @@ async (accessToken, refreshToken, profile, done) => {
   if (profile.photos && profile.photos.length > 0) {
     photo = profile.photos[0].value + "?sz=200";
   }
-  const newUser ={
+  const newUser = {
     name: profile.displayName,
     email: profile.emails[0].value,
     phoneNumber: null,

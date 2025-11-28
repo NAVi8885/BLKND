@@ -8,6 +8,7 @@ const optionalVerify = async (req, res, next) => {
         try{
             const verify = await jwt.verify(token, process.env.SECRET_KEY);
             const user = await User.findById(verify._id);
+            
             req.user = user;
             
             next();
@@ -40,7 +41,7 @@ const verifyRequired = async(req, res, next) => {
         console.log("error happened at user-verify in userauth :", err)
     }
 }
-module.exports = {
+module.exports = { 
     optionalVerify,
     verifyRequired
 }

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express();
-const { validateUserReg, validateUserLogin } = require("../../middlewares/validation/userValidator");
-const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile } = require('../../controller/userController');
+const { validateUserReg, validateUserLogin, validateUpdateUser } = require("../../middlewares/validation/userValidator");
+const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage } = require('../../controller/userController');
+const { verifyRequired } = require('../../middlewares/authentication/userAuth');
 
 
 // User Login
@@ -23,7 +24,9 @@ router.post('/verifyOtp', verifyOtp);
 router.post('/resetpassword', resetPassword);
 
 // updates profile
-router.post('/savechanges', updateProfile);
+router.post('/savechanges', verifyRequired, validateUpdateUser, updateProfile);
 
+// update profile image
+router.post('/updateprofile', verifyRequired, updateProfileImage);
 
 module.exports = router;

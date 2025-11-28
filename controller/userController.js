@@ -50,7 +50,7 @@ const loginUser = async (req, res) => {
             return res.render('user/login', {errors:[{msg:"Incorrect password", path:"password"}]})
         }
 
-        const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{expiresIn:'7d'});
+        const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY, {expiresIn:'7d'});
         // console.log(token);
 
         res.cookie('token', token,{
@@ -164,7 +164,7 @@ const resetPassword = async(req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const {name, email, phoneNumber, gender} = req.body;
-        const user = await User.findOneAndUpdate({email}, {
+        const user = await User.findByIdAndUpdate(req.user._id, {
                 $set: {
                     name:name,
                     email:email,
@@ -172,10 +172,22 @@ const updateProfile = async (req, res) => {
                     gender:gender
                 }
             });
-
-        return res.render('user/profile', {user});
+            console.log(user);
+            
+        return res.redirect('/profile');
     } catch (error) {
-        console.log("error happened at update profile / usercontroller",error)
+        console.log("error happened at update-profile / usercontroller",error)
+    }
+}
+
+const updateProfileImage = async (req, res) => {
+    try {
+        const user = req.user;
+        
+        if(req.file) user.profilePhoto = `/uploads/profile/${req.file.filename}`
+
+    } catch (error) {
+        console.log("error happened at user controller / updateprofileimage");
     }
 }
 
@@ -186,5 +198,6 @@ module.exports = {
     forgotPassword,
     verifyOtp,
     resetPassword,
-    updateProfile
+    updateProfile,
+    updateProfileImage
 };
