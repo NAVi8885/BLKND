@@ -4,8 +4,6 @@ const app = express();
 const session = require('express-session')
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const multer  = require('multer')
-const upload = multer({ dest: 'uploads/' })
 
 
 const userGetRouter = require('./routes/user/userGetRoutes');
@@ -40,6 +38,7 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.set('views' , 'views');
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/',userGetRouter);
 app.use('/',userPostRouter);

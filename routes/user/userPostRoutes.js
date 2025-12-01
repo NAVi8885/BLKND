@@ -3,6 +3,7 @@ const router = express();
 const { validateUserReg, validateUserLogin, validateUpdateUser } = require("../../middlewares/validation/userValidator");
 const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage } = require('../../controller/userController');
 const { verifyRequired } = require('../../middlewares/authentication/userAuth');
+const upload = require('../../config/multer');
 
 
 // User Login
@@ -27,6 +28,6 @@ router.post('/resetpassword', resetPassword);
 router.post('/savechanges', verifyRequired, validateUpdateUser, updateProfile);
 
 // update profile image
-router.post('/updateprofile', verifyRequired, updateProfileImage);
+router.post('/updateprofile', verifyRequired, upload.single('avatar'), updateProfileImage);
 
 module.exports = router;

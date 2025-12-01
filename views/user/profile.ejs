@@ -354,9 +354,22 @@
                                         <div class="text-muted small">Current profile picture</div>
                         </div>
 
+                        <% if (errors && errors.length> 0) {
+                            const error = errors.find(err => ['file'].includes(err.path)) ;
+                            if(error) {%>
+                                <div class="validation-wrapper mb-3">
+                                    <div class="validation-error">
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        <span>
+                                            <%= error.msg %>
+                                        </span>
+                                    </div>
+                                </div>
+                        <% } } %>
+
                         <div class="mb-3">
                             <label class="form-label">Upload new image</label>
-                            <input type="file" class="form-control" name="avatar" accept="image/*" required>
+                            <input type="file" class="form-control" name="avatar" accept="image/png, image/jpeg, image/jpg, image/webp" required>
                         </div>
 
                     </div>

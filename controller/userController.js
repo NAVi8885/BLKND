@@ -2,8 +2,6 @@ const {hash, verify} = require('@node-rs/argon2');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 const { sendOtpEmail } = require('../utils/otpApp');
-const { name } = require('ejs');
-const { log } = require('console');
 
 
 
@@ -50,7 +48,7 @@ const loginUser = async (req, res) => {
             return res.render('user/login', {errors:[{msg:"Incorrect password", path:"password"}]})
         }
 
-        const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY, {expiresIn:'7d'});
+        const token = jwt.sign({ id: user._id.toString(), email: user.email }, process.env.SECRET_KEY, {expiresIn:'7d'});
         // console.log(token);
 
         res.cookie('token', token,{
@@ -181,15 +179,23 @@ const updateProfile = async (req, res) => {
 }
 
 const updateProfileImage = async (req, res) => {
-    try {
-        const user = req.user;
-        
-        if(req.file) user.profilePhoto = `/uploads/profile/${req.file.filename}`
-
-    } catch (error) {
-        console.log("error happened at user controller / updateprofileimage");
+  try {
+    if (!req.file) {
+      return res.render('user/profile',{errors: [{msg:"Image not found", path:"file"}]});
     }
-}
+
+    const profilePhoto = `/uploads/profile/${req.file.filename}`;
+
+    await User.findByIdAndUpdate(req.user._id, {
+      $set: { profilePic: profilePhoto }
+    });
+
+    return res.redirect('/profile');
+  } catch (error) {
+    console.log("error happened at user controller / updateprofileimage", error);
+    // return res.redirect('/profile');
+  }
+};
 
 module.exports = {
     userRegister,

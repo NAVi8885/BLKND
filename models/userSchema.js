@@ -45,7 +45,7 @@ const userSchema = new Schema({
     gender:{
         type: String,
         enum:['null','male', 'female'],
-        default: 'null'
+        default: 'Not Specified'
     }
     
 }, {
