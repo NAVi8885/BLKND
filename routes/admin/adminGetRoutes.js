@@ -1,4 +1,5 @@
 const express = require('express');
+const Product = require('../../models/product');
 const router = express.Router();
 
 router.get('/adminlogin',(req, res) => {
@@ -9,5 +10,28 @@ router.get('/dashboard',(req, res) => {
     res.render('admin/dashboard');
 })
 
+router.get('/products', async (req, res) => {
+    const products = await Product.find() 
+    res.render('admin/products', {products});
+})
 
+router.get('/orders', (req, res) => {
+    res.render('admin/orders');
+})
+
+router.get('/customers', (req, res) => {
+    res.render('admin/customers');
+})
+
+router.get('/coupons', (req, res) => {
+    res.render('admin/coupons');
+})
+
+router.get('/analytics', (req, res) => {
+    res.render('admin/analytics');
+})
+
+router.get('/settings', (req, res) => {
+    res.render('admin/settings');
+})
 module.exports = router;

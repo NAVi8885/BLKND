@@ -1,34 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin • Customers</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    :root{--side:260px}
-    body{background:#f8f9fa}
-    .sidebar{position:fixed;inset:0 auto 0 0;width:var(--side);background:#d8d8d8da;border-right:1px solid #e9ecef;padding:20px;overflow-y:auto}
-    .nav-aside .nav-link{color:#212529;padding:10px 12px;border-radius:8px;display:flex;gap:10px}
-    .nav-aside .nav-link.active, .nav-aside .nav-link:hover { background:#000000da; color: #f8f9fa; font-weight: 500;}
-    .content{margin-left:var(--side)}
-    .topbar { position: sticky; top:0; z-index:10; background:#d8d8d8; border-bottom:1px solid #e9ecef; text-align: center; padding: 10px 0; font-size: 1.50rem; }
-    .avatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
-    .tag{background:#f1f3f5;border-radius:20px;padding:.15rem .6rem;font-size:.8rem}
-    @media(max-width:992px){.sidebar{transform:translateX(-100%);transition:transform .3s; z-index: 1000;}.sidebar.show{transform:translateX(0)}.content{margin-left:0}}
+    :root {
+      --side: 260px
+    }
+
+    body {
+      background: #f8f9fa
+    }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--side);
+      background: #d8d8d8da;
+      border-right: 1px solid #e9ecef;
+      padding: 20px;
+      overflow-y: auto
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: var(--dark);
+      text-decoration: none;
+    }
+
+    .nav-aside .nav-link {
+      color: #212529;
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-aside .nav-link.active,
+    .nav-aside .nav-link:hover {
+      background: #000000da;
+      color: #f8f9fa;
+      font-weight: 500;
+    }
+
+    .content {
+      margin-left: var(--side)
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #d8d8d8;
+      border-bottom: 1px solid #e9ecef;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 1.50rem;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover
+    }
+
+    .tag {
+      background: #f1f3f5;
+      border-radius: 20px;
+      padding: .15rem .6rem;
+      font-size: .8rem
+    }
+
+    @media(max-width:992px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform .3s;
+        z-index: 1000;
+      }
+
+      .sidebar.show {
+        transform: translateX(0)
+      }
+
+      .content {
+        margin-left: 0
+      }
+    }
   </style>
 </head>
+
 <body>
   <aside id="sidebar" class="sidebar">
-    <a href="dashboard.html" class="h4 text-decoration-none d-block mb-3 fw-bold text-dark">BLKND Admin</a>
+    <a href="/dashboard" class="brand h4 d-block mb-3">BLKND Admin</a>
     <nav class="nav nav-pills flex-column nav-aside">
-      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-      <a class="nav-link" href="orders.html"><i class="fa-solid fa-receipt"></i> Orders</a>
-      <a class="nav-link" href="products.html"><i class="fa-solid fa-shirt"></i> Products</a>
-      <a class="nav-link active" href="customers.html"><i class="fa-solid fa-user-group"></i> Customers</a>
-      <a class="nav-link" href="coupons.html"><i class="fa-solid fa-ticket"></i> Coupons</a>
-      <a class="nav-link" href="analytics.html"><i class="fa-solid fa-chart-line"></i> Analytics</a>
-      <a class="nav-link" href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a class="nav-link active " href="/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+      <a class="nav-link" href="/orders"><i class="fa-solid fa-receipt"></i> Orders</a>
+      <a class="nav-link" href="/products"><i class="fa-solid fa-shirt"></i> Products</a>
+      <a class="nav-link" href="/customers"><i class="fa-solid fa-user-group"></i> Customers</a>
+      <a class="nav-link" href="/coupons"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a class="nav-link" href="/analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+      <a class="nav-link" href="/settings"><i class="fa-solid fa-gear"></i> Settings</a>
     </nav>
   </aside>
 
@@ -37,12 +115,16 @@
       <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between py-2">
           <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')"><i class="fa-solid fa-bars"></i></button>
+            <button class="btn btn-outline-secondary d-lg-none"
+              onclick="document.getElementById('sidebar').classList.toggle('show')"><i
+                class="fa-solid fa-bars"></i></button>
             <span class="fw-bold">Customers</span>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-file-export me-1"></i> Export CSV</button>
-            <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#segmentModal"><i class="fa-solid fa-filter me-1"></i> Save segment</button>
+            <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-file-export me-1"></i> Export
+              CSV</button>
+            <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#segmentModal"><i
+                class="fa-solid fa-filter me-1"></i> Save segment</button>
           </div>
         </div>
       </div>
@@ -69,7 +151,11 @@
             <div class="col-md-2">
               <label class="form-label">Country</label>
               <select class="form-select">
-                <option>Any</option><option>India</option><option>USA</option><option>UK</option><option>UAE</option>
+                <option>Any</option>
+                <option>India</option>
+                <option>USA</option>
+                <option>UK</option>
+                <option>UAE</option>
               </select>
             </div>
             <div class="col-md-2">
@@ -79,7 +165,8 @@
             <div class="col-md-3">
               <label class="form-label">Last order</label>
               <div class="input-group">
-                <input type="date" class="form-control"><span class="input-group-text">to</span><input type="date" class="form-control">
+                <input type="date" class="form-control"><span class="input-group-text">to</span><input type="date"
+                  class="form-control">
               </div>
             </div>
             <div class="col-12 col-md-3 ms-auto">
@@ -94,7 +181,8 @@
           <table class="table align-middle table-hover mb-0">
             <thead class="table-light">
               <tr>
-                <th style="width:36px"><input type="checkbox" onclick="document.querySelectorAll('.row-check').forEach(c=>c.checked=this.checked)"></th>
+                <th style="width:36px"><input type="checkbox"
+                    onclick="document.querySelectorAll('.row-check').forEach(c=>c.checked=this.checked)"></th>
                 <th>Customer</th>
                 <th>Email</th>
                 <th>Orders</th>
@@ -109,7 +197,8 @@
                 <td><input type="checkbox" class="row-check"></td>
                 <td>
                   <div class="d-flex align-items-center gap-2">
-                    <img class="avatar" src="https://ui-avatars.com/api/?name=Jane+Smith&background=212529&color=fff" alt="">
+                    <img class="avatar" src="https://ui-avatars.com/api/?name=Jane+Smith&background=212529&color=fff"
+                      alt="">
                     <div>
                       <div class="fw-semibold">Jane Smith</div>
                       <div class="small text-muted">Kochi, IN</div>
@@ -123,8 +212,10 @@
                 <td><span class="tag">VIP</span> <span class="tag">Email</span></td>
                 <td class="text-nowrap">
                   <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i class="fa-regular fa-paper-plane"></i></button>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas"
+                      data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i
+                        class="fa-regular fa-paper-plane"></i></button>
                     <button class="btn btn-outline-danger"><i class="fa-solid fa-user-slash"></i></button>
                   </div>
                 </td>
@@ -133,7 +224,8 @@
                 <td><input type="checkbox" class="row-check"></td>
                 <td>
                   <div class="d-flex align-items-center gap-2">
-                    <img class="avatar" src="https://ui-avatars.com/api/?name=Arjun+Das&background=212529&color=fff" alt="">
+                    <img class="avatar" src="https://ui-avatars.com/api/?name=Arjun+Das&background=212529&color=fff"
+                      alt="">
                     <div>
                       <div class="fw-semibold">Arjun Das</div>
                       <div class="small text-muted">Thiruvananthapuram, IN</div>
@@ -147,8 +239,10 @@
                 <td><span class="tag">New</span></td>
                 <td class="text-nowrap">
                   <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i class="fa-regular fa-paper-plane"></i></button>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas"
+                      data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i
+                        class="fa-regular fa-paper-plane"></i></button>
                     <button class="btn btn-outline-danger"><i class="fa-solid fa-user-slash"></i></button>
                   </div>
                 </td>
@@ -157,7 +251,8 @@
                 <td><input type="checkbox" class="row-check"></td>
                 <td>
                   <div class="d-flex align-items-center gap-2">
-                    <img class="avatar" src="https://ui-avatars.com/api/?name=Wei+Chen&background=212529&color=fff" alt="">
+                    <img class="avatar" src="https://ui-avatars.com/api/?name=Wei+Chen&background=212529&color=fff"
+                      alt="">
                     <div>
                       <div class="fw-semibold">Wei Chen</div>
                       <div class="small text-muted">Shanghai, CN</div>
@@ -171,8 +266,10 @@
                 <td><span class="tag">Email</span></td>
                 <td class="text-nowrap">
                   <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i class="fa-regular fa-paper-plane"></i></button>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas"
+                      data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
+                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i
+                        class="fa-regular fa-paper-plane"></i></button>
                     <button class="btn btn-outline-danger"><i class="fa-solid fa-user-slash"></i></button>
                   </div>
                 </td>
@@ -207,7 +304,9 @@
   <div class="modal fade" id="segmentModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Save segment</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-header">
+          <h5 class="modal-title">Save segment</h5><button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
         <div class="modal-body">
           <label class="form-label">Segment name</label>
           <input class="form-control" placeholder="e.g., High LTV Kerala">
@@ -228,13 +327,19 @@
   <div class="modal fade" id="messageModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Message customer</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-          <div class="mb-3"><label class="form-label">Subject</label><input class="form-control" placeholder="Subject"></div>
-          <div class="mb-3"><label class="form-label">Message</label><textarea class="form-control" rows="5" placeholder="Write your message"></textarea></div>
-          <div class="form-check"><input class="form-check-input" type="checkbox" id="bcc"><label class="form-check-label" for="bcc">BCC me</label></div>
+        <div class="modal-header">
+          <h5 class="modal-title">Message customer</h5><button class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-footer"><button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button><button class="btn btn-dark">Send</button></div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Subject</label><input class="form-control" placeholder="Subject">
+          </div>
+          <div class="mb-3"><label class="form-label">Message</label><textarea class="form-control" rows="5"
+              placeholder="Write your message"></textarea></div>
+          <div class="form-check"><input class="form-check-input" type="checkbox" id="bcc"><label
+              class="form-check-label" for="bcc">BCC me</label></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline-secondary"
+            data-bs-dismiss="modal">Close</button><button class="btn btn-dark">Send</button></div>
       </div>
     </div>
   </div>
@@ -254,16 +359,33 @@
         </div>
       </div>
       <div class="row g-2 mb-3">
-        <div class="col-4"><div class="border rounded p-2 text-center"><div class="small text-muted">Orders</div><div class="fw-bold">8</div></div></div>
-        <div class="col-4"><div class="border rounded p-2 text-center"><div class="small text-muted">LTV</div><div class="fw-bold">$742</div></div></div>
-        <div class="col-4"><div class="border rounded p-2 text-center"><div class="small text-muted">AOV</div><div class="fw-bold">$93</div></div></div>
+        <div class="col-4">
+          <div class="border rounded p-2 text-center">
+            <div class="small text-muted">Orders</div>
+            <div class="fw-bold">8</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="border rounded p-2 text-center">
+            <div class="small text-muted">LTV</div>
+            <div class="fw-bold">$742</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="border rounded p-2 text-center">
+            <div class="small text-muted">AOV</div>
+            <div class="fw-bold">$93</div>
+          </div>
+        </div>
       </div>
       <div class="card mb-3">
         <div class="card-header fw-semibold">Details</div>
         <div class="card-body">
-          <div class="d-flex justify-content-between"><span>Phone</span><span class="fw-semibold">+91 98xxxxxx10</span></div>
+          <div class="d-flex justify-content-between"><span>Phone</span><span class="fw-semibold">+91 98xxxxxx10</span>
+          </div>
           <div class="d-flex justify-content-between"><span>Country</span><span class="fw-semibold">India</span></div>
-          <div class="d-flex justify-content-between"><span>Created</span><span class="fw-semibold">Jan 12, 2024</span></div>
+          <div class="d-flex justify-content-between"><span>Created</span><span class="fw-semibold">Jan 12, 2024</span>
+          </div>
           <div class="mt-2"><span class="tag">VIP</span> <span class="tag">Email</span></div>
         </div>
       </div>
@@ -271,16 +393,34 @@
         <div class="card-header fw-semibold">Recent orders</div>
         <div class="table-responsive">
           <table class="table align-middle mb-0">
-            <thead class="table-light"><tr><th>Order</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+            <thead class="table-light">
+              <tr>
+                <th>Order</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Status</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr><td>#12345</td><td>Oct 20</td><td>$149.98</td><td><span class="badge text-bg-success">Paid</span></td></tr>
-              <tr><td>#12341</td><td>Oct 10</td><td>$79.99</td><td><span class="badge text-bg-danger">Refunded</span></td></tr>
+              <tr>
+                <td>#12345</td>
+                <td>Oct 20</td>
+                <td>$149.98</td>
+                <td><span class="badge text-bg-success">Paid</span></td>
+              </tr>
+              <tr>
+                <td>#12341</td>
+                <td>Oct 10</td>
+                <td>$79.99</td>
+                <td><span class="badge text-bg-danger">Refunded</span></td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
       <div class="d-flex gap-2 mt-3">
-        <button class="btn btn-dark w-50" data-bs-toggle="modal" data-bs-target="#messageModal"><i class="fa-regular fa-paper-plane me-1"></i> Message</button>
+        <button class="btn btn-dark w-50" data-bs-toggle="modal" data-bs-target="#messageModal"><i
+            class="fa-regular fa-paper-plane me-1"></i> Message</button>
         <button class="btn btn-outline-danger w-50"><i class="fa-solid fa-user-slash me-1"></i> Block</button>
       </div>
     </div>
@@ -288,4 +428,5 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

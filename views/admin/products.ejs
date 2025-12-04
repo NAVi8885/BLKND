@@ -1,32 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin • Products</title>
+  <link rel="stylesheet" href="/public/css/errorStyle.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    :root{--side:260px}
-    .sidebar{position:fixed;inset:0 auto 0 0;width:var(--side);background:#d8d8d8da;border-right:1px solid #e9ecef;padding:20px;overflow-y:auto}
-    .nav-aside .nav-link{color:#212529;padding:10px 12px;border-radius:8px;display:flex;gap:10px}
-    .nav-aside .nav-link.active, .nav-aside .nav-link:hover { background:#000000da; color: #f8f9fa; font-weight: 500;}
-    .content{margin-left:var(--side)}
-    .topbar { position: sticky; top:0; z-index:10; background:#d8d8d8; border-bottom:1px solid #e9ecef; text-align: center; padding: 10px 0; font-size: 1.50rem; }
-    .thumb{width:48px;height:48px;border-radius:6px;object-fit:cover}
-    @media(max-width:992px){.sidebar{transform:translateX(-100%);transition:transform .3s; z-index: 1000;}.sidebar.show{transform:translateX(0)}.content{margin-left:0}}
+    :root { --side: 260px; }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: var(--side);
+      background: #d8d8d8da;
+      border-right: 1px solid #e9ecef;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: #212529;
+      text-decoration: none;
+    }
+
+    .nav-aside .nav-link {
+      color: #212529;
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-aside .nav-link.active,
+    .nav-aside .nav-link:hover {
+      background: #000000da;
+      color: #f8f9fa;
+      font-weight: 500;
+    }
+
+    .content { margin-left: var(--side); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #d8d8d8;
+      border-bottom: 1px solid #e9ecef;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 1.5rem;
+    }
+
+    .thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform .3s;
+        z-index: 1000;
+      }
+      .sidebar.show { transform: translateX(0); }
+      .content { margin-left: 0; }
+    }
+
+    .modal-dialog-scrollable .modal-body {
+      max-height: calc(100vh - 200px); /* viewport height minus header+footer */
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
   <aside id="sidebar" class="sidebar">
-    <a href="dashboard.html" class="h4 text-decoration-none d-block mb-3 fw-bold text-dark">BLKND Admin</a>
+    <a href="/dashboard" class="brand h4 d-block mb-3">BLKND Admin</a>
     <nav class="nav nav-pills flex-column nav-aside">
-      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-      <a class="nav-link" href="orders.html"><i class="fa-solid fa-receipt"></i> Orders</a>
-      <a class="nav-link active" href="products.html"><i class="fa-solid fa-shirt"></i> Products</a>
-      <a class="nav-link" href="customers.html"><i class="fa-solid fa-user-group"></i> Customers</a>
-      <a class="nav-link" href="coupons.html"><i class="fa-solid fa-ticket"></i> Coupons</a>
-      <a class="nav-link" href="analytics.html"><i class="fa-solid fa-chart-line"></i> Analytics</a>
-      <a class="nav-link" href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a>
+      <a class="nav-link" href="/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+      <a class="nav-link" href="/orders"><i class="fa-solid fa-receipt"></i> Orders</a>
+      <a class="nav-link active" href="/products"><i class="fa-solid fa-shirt"></i> Products</a>
+      <a class="nav-link" href="/customers"><i class="fa-solid fa-user-group"></i> Customers</a>
+      <a class="nav-link" href="/coupons"><i class="fa-solid fa-ticket"></i> Coupons</a>
+      <a class="nav-link" href="/analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+      <a class="nav-link" href="/settings"><i class="fa-solid fa-gear"></i> Settings</a>
     </nav>
   </aside>
 
@@ -35,104 +98,146 @@
       <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between py-2">
           <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')"><i class="fa-solid fa-bars"></i></button>
+            <button class="btn btn-outline-secondary d-lg-none"
+                    type="button"
+                    onclick="document.getElementById('sidebar').classList.toggle('show')">
+              <i class="fa-solid fa-bars"></i>
+            </button>
             <span class="fw-bold">Products</span>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <a id="add" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa-solid fa-plus me-1"></i> New product</a>
-            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-file-import me-1"></i> Import</button>
-            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-file-export me-1"></i> Export</button>
+            <button id="addProductBtn"
+                    class="btn btn-dark btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#productModal"
+                    type="button">
+              <i class="fa-solid fa-plus me-1"></i> New product
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" type="button">
+              <i class="fa-solid fa-file-import me-1"></i> Import
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" type="button">
+              <i class="fa-solid fa-file-export me-1"></i> Export
+            </button>
           </div>
         </div>
       </div>
     </header>
 
     <section class="container-fluid py-3" id="inventory">
+      <!-- Filters -->
       <div class="card mb-3">
         <div class="card-body">
           <form class="row g-2 align-items-end">
-            <div class="col-md-4"><label class="form-label">Search</label><input type="search" class="form-control" placeholder="Title, SKU"></div>
-            <div class="col-md-2"><label class="form-label">Category</label><select class="form-select"><option>All</option><option>Women</option><option>Men</option><option>Accessories</option><option>Shoes</option></select></div>
-            <div class="col-md-2"><label class="form-label">Status</label><select class="form-select"><option>All</option><option>Active</option><option>Draft</option><option>Archived</option></select></div>
-            <div class="col-md-2"><label class="form-label">Inventory</label><select class="form-select"><option>All</option><option>In stock</option><option>Low stock</option><option>Out of stock</option></select></div>
-            <div class="col-md-2"><button class="btn btn-dark w-100" type="button"><i class="fa-solid fa-filter me-1"></i> Apply</button></div>
+            <div class="col-md-4">
+              <label class="form-label">Search</label>
+              <input type="search" class="form-control" placeholder="Title, SKU">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Category</label>
+              <select class="form-select">
+                <option>All</option>
+                <option>Women</option>
+                <option>Men</option>
+                <option>Accessories</option>
+                <option>Shoes</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Status</label>
+              <select class="form-select">
+                <option>All</option>
+                <option>Active</option>
+                <option>Draft</option>
+                <option>Archived</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Inventory</label>
+              <select class="form-select">
+                <option>All</option>
+                <option>In stock</option>
+                <option>Low stock</option>
+                <option>Out of stock</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-dark w-100" type="button">
+                <i class="fa-solid fa-filter me-1"></i> Apply
+              </button>
+            </div>
           </form>
         </div>
       </div>
 
+      <!-- Products table -->
       <div class="card">
         <div class="table-responsive">
           <table class="table align-middle table-hover mb-0">
             <thead class="table-light">
               <tr>
-                <th style="width:36px"><input type="checkbox" onclick="document.querySelectorAll('.row-check').forEach(c=>c.checked=this.checked)"></th>
-                <th>Product</th><th>SKU</th><th>Price</th><th>Inventory</th><th>Status</th><th style="width:110px">Actions</th>
+                <th style="width:36px">
+                  <input type="checkbox"
+                         onclick="document.querySelectorAll('.row-check').forEach(c=>c.checked=this.checked)">
+                </th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Inventory</th>
+                <th>Status</th>
+                <th style="width:110px">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><input type="checkbox" class="row-check"></td>
-                <td class="d-flex align-items-center gap-2">
-                  <img class="thumb" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=64" alt="">
-                  <div>
-                    <div class="fw-semibold">Classic White Shirt</div>
-                    <div class="small text-muted">Shirts • Men</div>
-                  </div>
-                </td>
-                <td>KA-001</td>
-                <td>$49.99</td>
-                <td>124</td>
-                <td><span class="badge text-bg-success">Active</span></td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa-regular fa-pen-to-square"></i></button>
-                    <button class="btn btn-outline-secondary"><i class="fa-solid fa-boxes-stacked"></i></button>
-                    <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="row-check"></td>
-                <td class="d-flex align-items-center gap-2">
-                  <img class="thumb" src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=64" alt="">
-                  <div>
-                    <div class="fw-semibold">Denim Jacket</div>
-                    <div class="small text-muted">Jackets • Women</div>
-                  </div>
-                </td>
-                <td>KA-002</td>
-                <td>$89.99</td>
-                <td>28</td>
-                <td><span class="badge text-bg-warning">Low</span></td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa-regular fa-pen-to-square"></i></button>
-                    <button class="btn btn-outline-secondary"><i class="fa-solid fa-boxes-stacked"></i></button>
-                    <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="row-check"></td>
-                <td class="d-flex align-items-center gap-2">
-                  <img class="thumb" src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=64" alt="">
-                  <div>
-                    <div class="fw-semibold">Casual Sneakers</div>
-                    <div class="small text-muted">Shoes • Men</div>
-                  </div>
-                </td>
-                <td>KA-004</td>
-                <td>$79.99</td>
-                <td>0</td>
-                <td><span class="badge text-bg-secondary">Out</span></td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#productModal"><i class="fa-regular fa-pen-to-square"></i></button>
-                    <button class="btn btn-outline-secondary"><i class="fa-solid fa-boxes-stacked"></i></button>
-                    <button class="btn btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
-                  </div>
-                </td>
-              </tr>
+              <% if (products && products.length > 0) { %>
+                <% products.forEach(function(p) { %>
+                  <tr>
+                    <td><input type="checkbox" class="row-check"></td>
+                    <td class="d-flex align-items-center gap-2">
+                      <img class="thumb"
+                           src="<%= p.image || 'https://via.placeholder.com/64x64?text=BLKND' %>" alt="">
+                      <div>
+                        <div class="fw-semibold"><%= p.name %></div>
+                        <div class="small text-muted">
+                          <%= p.category %>
+                          <% if (p.availableSizes && p.availableSizes.length) { %>
+                            • Sizes: <%= p.availableSizes.join(', ') %>
+                          <% } %>
+                        </div>
+                      </div>
+                    </td>
+                    <td>₹<%= p.price.toFixed ? p.price.toFixed(2) : p.price %></td>
+                    <td><%= p.stock %></td>
+                    <td>
+                      <% if (p.status === 'Active') { %>
+                        <span class="badge text-bg-success">Active</span>
+                      <% } else if (p.status === 'Draft') { %>
+                        <span class="badge text-bg-secondary">Draft</span>
+                      <% } else { %>
+                        <span class="badge text-bg-dark"><%= p.status %></span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary" type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#productModal"
+                                data-product-id="<%= p._id %>">
+                          <i class="fa-regular fa-pen-to-square"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" type="button">
+                          <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    No products found. Click “New product” to add one.
+                  </td>
+                </tr>
+              <% } %>
             </tbody>
           </table>
         </div>
@@ -144,7 +249,7 @@
               <option>Deactivate</option>
               <option>Delete</option>
             </select>
-            <button class="btn btn-sm btn-outline-secondary">Apply</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button">Apply</button>
           </div>
           <ul class="pagination pagination-sm mb-0">
             <li class="page-item disabled"><a class="page-link">Prev</a></li>
@@ -162,92 +267,291 @@
   <div class="modal fade" id="productModal" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Product</h5>
-          <button class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="nav nav-tabs mb-3" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-general" type="button">General</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-inventory" type="button">Inventory</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-media" type="button">Media</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button">SEO</button></li>
-          </ul>
-          <div class="tab-content">
-            <div class="tab-pane fade show active" id="tab-general">
-              <div class="row g-3">
-                <div class="col-md-8">
-                  <label class="form-label">Title</label>
-                  <input class="form-control" placeholder="Product title">
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Status</label>
-                  <select class="form-select"><option>Active</option><option>Draft</option><option>Archived</option></select>
-                </div>
-                <div class="col-12">
-                  <label class="form-label">Description</label>
-                  <textarea class="form-control" rows="4" placeholder="Detail about the product"></textarea>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Category</label>
-                  <select class="form-select"><option>Women</option><option>Men</option><option>Accessories</option><option>Shoes</option></select>
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Price</label>
-                  <input type="number" step="0.01" class="form-control" placeholder="0.00">
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">Compare‑at price</label>
-                  <input type="number" step="0.01" class="form-control" placeholder="0.00">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Variants (comma separated)</label>
-                  <input class="form-control" placeholder="Size: S,M,L; Color: Black,White">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Tags</label>
-                  <input class="form-control" placeholder="casual, cotton, summer">
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane fade" id="tab-inventory">
-              <div class="row g-3">
-                <div class="col-md-4"><label class="form-label">SKU</label><input class="form-control" placeholder="KA-XXX"></div>
-                <div class="col-md-4"><label class="form-label">Barcode</label><input class="form-control" placeholder="EAN/UPC"></div>
-                <div class="col-md-4"><label class="form-label">Stock</label><input type="number" class="form-control" value="0"></div>
-                <div class="col-md-4"><label class="form-label">Safety stock</label><input type="number" class="form-control" value="10"></div>
-                <div class="col-md-4"><label class="form-label">Weight (kg)</label><input type="number" step="0.01" class="form-control" value="0.5"></div>
-                <div class="col-md-4"><label class="form-label">HSN / Tax code</label><input class="form-control" placeholder="HSN/Code"></div>
-              </div>
-            </div>
-            <div class="tab-pane fade" id="tab-media">
-              <div class="border rounded p-4 text-center">
-                <i class="fa-regular fa-image fa-2x text-muted mb-2"></i>
-                <p class="text-muted mb-1">Drag & drop images here, or click to upload</p>
-                <button class="btn btn-outline-secondary btn-sm">Upload</button>
-              </div>
-            </div>
-            <div class="tab-pane fade" id="tab-seo">
-              <div class="row g-3">
-                <div class="col-12"><label class="form-label">Page title</label><input class="form-control" placeholder="SEO title"></div>
-                <div class="col-12"><label class="form-label">Meta description</label><textarea class="form-control" rows="3" placeholder="Up to 160 characters"></textarea></div>
-                <div class="col-12"><label class="form-label">URL handle</label><div class="input-group"><span class="input-group-text">/products/</span><input class="form-control" placeholder="slug-here"></div></div>
-              </div>
-            </div>
+        <!-- IMPORTANT: form with multipart for req.file -->
+        <form id="productForm"
+              action="/admin/products"
+              method="POST"
+              enctype="multipart/form-data">
+          <div class="modal-header">
+            <h5 class="modal-title">Product</h5>
+            <button class="btn-close" data-bs-dismiss="modal" type="button"></button>
           </div>
-        </div>
-        <div class="modal-footer">
-          <div class="me-auto form-check">
-            <input class="form-check-input" type="checkbox" id="trackInv" checked>
-            <label class="form-check-label" for="trackInv">Track inventory</label>
+
+          <div class="modal-body">
+            <ul class="nav nav-tabs mb-3" role="tablist">
+              <li class="nav-item">
+                <button class="nav-link active"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-general"
+                        type="button">
+                  General
+                </button>
+              </li>
+              <li class="nav-item">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-media"
+                        type="button">
+                  Media
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <!-- GENERAL TAB -->
+              <div class="tab-pane fade show active" id="tab-general">
+                <div class="row g-3">
+                  <div class="col-md-8">
+                    <label class="form-label">Title</label>
+                    <input class="form-control"
+                           name="name"
+                           placeholder="Product title"
+                           required>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status" required>
+                      <option value="Active">Active</option>
+                      <option value="Draft">Draft</option>
+                      <option value="Archived">Archived</option>
+                    </select>
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control"
+                              name="description"
+                              rows="4"
+                              placeholder="Detail about the product"
+                              required></textarea>
+                  </div>
+                  
+                  <!-- tags-->
+                  <div class="col-md-6">
+                    <label class="form-label">Tags</label>
+                    <input class="form-control"
+                           name="tags"
+                           placeholder="casual, cotton, summer">
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" name="category" required>
+                      <option value="women">Women</option>
+                      <option value="men">Men</option>
+                      <option value="accessories">Accessories</option>
+                      <option value="unisex">Unisex</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label">Price</label>
+                    <input type="number"
+                           step="0.01"
+                           class="form-control"
+                           name="price"
+                           placeholder="0.00"
+                           required>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label">Base stock</label>
+                    <input type="number"
+                           step="1"
+                           class="form-control"
+                           name="stock"
+                           placeholder="0"
+                           required>
+                  </div>
+                  
+                  <!-- Sizes -->
+                  <div class="col-12" id="sizesContainer">
+                    <label class="form-label">Available sizes</label>
+                    <div class="d-flex flex-wrap gap-2">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input size-checkbox" type="checkbox" name="sizes" id="sizeXS" value="XS">
+                        <label class="form-check-label" for="sizeXS">XS</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input size-checkbox" type="checkbox" name="sizes" id="sizeS" value="S">
+                        <label class="form-check-label" for="sizeS">S</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input size-checkbox" type="checkbox" name="sizes" id="sizeM" value="M">
+                        <label class="form-check-label" for="sizeM">M</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input size-checkbox" type="checkbox" name="sizes" id="sizeL" value="L">
+                        <label class="form-check-label" for="sizeL">L</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input size-checkbox" type="checkbox" name="sizes" id="sizeXL" value="XL">
+                        <label class="form-check-label" for="sizeXL">XL</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Colors -->
+                  <div class="col-12">
+                    <label class="form-label">Available colors</label>
+
+                    <!-- List of colors that have been added -->
+                    <div id="colorList" class="d-flex flex-wrap gap-2 mb-2">
+                      <!-- badges will be injected here by JS -->
+                    </div>
+
+                    <div class="border rounded p-2">
+                      <div class="row g-2 align-items-center">
+                        <div class="col-md-4">
+                          <label class="form-label mb-1">Color name</label>
+                          <input type="text"
+                                 class="form-control form-control-sm"
+                                 id="colorNameInput"
+                                 placeholder="e.g. Forest Green">
+                        </div>
+                        <div class="col-md-3">
+                          <label class="form-label mb-1">Color code</label>
+                          <input type="color"
+                                 class="form-control form-control-color"
+                                 id="colorCodeInput"
+                                 value="#000000"
+                                 title="Pick color">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                          <button type="button"
+                                  class="btn btn-sm btn-outline-primary w-100"
+                                  id="addColorBtn">
+                            Add color
+                          </button>
+                        </div>
+                      </div>
+                      <small class="text-muted d-block mt-1">
+                        Add one or more colors. Each color will be saved with its name and hex code.
+                      </small>
+
+                      <!-- Hidden field that actually goes to the backend -->
+                      <input type="hidden" name="colorsJson" id="colorsJson">
+                    </div>
+                  </div>
+                </div> <!-- closes .row g-3 -->
+              </div> <!-- closes #tab-general -->
+
+              <!-- MEDIA TAB -->
+              <div class="tab-pane fade" id="tab-media">
+                <div class="border rounded p-4 text-center">
+                  <i class="fa-regular fa-image fa-2x text-muted mb-2"></i>
+                  <p class="text-muted mb-2">
+                    Upload a main image for this product.
+                  </p>
+                  <!-- This name MUST match what multer expects for req.file -->
+                  <div class="row justify-content-center">
+                    <div class="col-md-6">
+                      <input type="file"
+                             name="images"
+                             class="form-control"
+                             accept="image/*"
+                             multiple>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> <!-- closes .tab-content -->
+          </div> <!-- closes .modal-body -->
+
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+            <button class="btn btn-dark" type="submit">Save product</button>
           </div>
-          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button class="btn btn-dark">Save product</button>
-        </div>
+        </form>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (function () {
+      const colorListEl = document.getElementById('colorList');
+      const colorsJsonInput = document.getElementById('colorsJson');
+      const addColorBtn = document.getElementById('addColorBtn');
+      const colorNameInput = document.getElementById('colorNameInput');
+      const colorCodeInput = document.getElementById('colorCodeInput');
+      const productModal = document.getElementById('productModal');
+
+      if (!colorListEl || !colorsJsonInput) return;
+
+      let colors = []; // [{ name, code }, ...]
+
+      function renderColors() {
+        colorListEl.innerHTML = '';
+
+        colors.forEach((c, index) => {
+          const badge = document.createElement('span');
+          badge.className = 'badge rounded-pill border d-flex align-items-center gap-2 px-2 py-1 me-1 mb-1';
+          badge.innerHTML = `
+            <span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${c.code};border:1px solid #ccc;"></span>
+            <span>${c.name}</span>
+            <button type="button" class="btn-close btn-sm ms-1" data-index="${index}" aria-label="Remove"></button>
+          `;
+          colorListEl.appendChild(badge);
+        });
+
+        // Sync hidden input with current colors array
+        colorsJsonInput.value = JSON.stringify(colors);
+      }
+
+      // Add color button
+      if (addColorBtn) {
+        addColorBtn.addEventListener('click', function () {
+          const name = (colorNameInput.value || '').trim();
+          const code = (colorCodeInput.value || '').trim();
+
+          if (!name || !code) {
+            // You can later add better UI validation
+            return;
+          }
+
+          colors.push({ name, code });
+
+          colorNameInput.value = '';
+          renderColors();
+        });
+      }
+
+      // Remove color when clicking the "x" button
+      colorListEl.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-close');
+        if (!btn) return;
+
+        const index = parseInt(btn.getAttribute('data-index'), 10);
+        if (!Number.isNaN(index)) {
+          colors.splice(index, 1);
+          renderColors();
+        }
+      });
+
+      // Reset colors when the modal is opened for "New product"
+      if (productModal) {
+        productModal.addEventListener('show.bs.modal', function (event) {
+          const triggerButton = event.relatedTarget;
+
+          // Very basic logic:
+          // If opened via "New product" button (no data-product-id), reset colors.
+          const isNew = !triggerButton || !triggerButton.getAttribute('data-product-id');
+
+          if (isNew) {
+            colors = [];
+            colorNameInput.value = '';
+            colorCodeInput.value = '#000000';
+            renderColors();
+          } else {
+            // For Edit mode, you can later preload existing colors here
+            // by putting them as data-attributes or via AJAX.
+          }
+        });
+      }
+    })();
+  </script>
+
 </body>
 </html>

@@ -193,7 +193,6 @@ const updateProfileImage = async (req, res) => {
     return res.redirect('/profile');
   } catch (error) {
     console.log("error happened at user controller / updateprofileimage", error);
-    // return res.redirect('/profile');
   }
 };
 

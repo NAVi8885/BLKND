@@ -109,6 +109,12 @@ router.get('/forgotpassword', (req, res) => {
 //   res.render('user/resetPassword', {errors: [], email: null});
 // })
 
+
+///////////\\\\\\\\\\\\\
+//USER PROFILE SECTION\\
+///////////\\\\\\\\\\\\\
+
+
 router.get('/profile', verifyRequired, (req, res) => {
   if(!req.user) {
     return res.redirect('/login')
@@ -116,6 +122,21 @@ router.get('/profile', verifyRequired, (req, res) => {
   res.render('user/profile', {user: req.user, errors: null, oldInput: null});
 })
 
+router.get('/userorders', verifyRequired, (req, res) => {
+  if(!req.user) {
+    return res.redirect('/login')
+  }
+  res.render('user/profileOrder', {user: req.user, errors: null, oldInput: null});  
+})
+///////////\\\\\\\\\\\\\
+//USER PROFILE SECTION\\
+///////////\\\\\\\\\\\\\
 
+router.get('/shop', (req, res) => {
+  res.render('user/shop');
+})
 
+router.get('/productdetails', (req, res) => {
+  res.render('user/singleProduct');
+})
 module.exports = router;

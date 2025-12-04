@@ -13,8 +13,55 @@
         .profile-sidebar .nav-link { color: #212529; padding: 12px 20px; border-radius: 6px; margin-bottom: 5px; }
         .profile-sidebar .nav-link:hover { background-color: #e9ecef; }
         .profile-sidebar .nav-link.active { background-color: #212529; color: #fff; }
-        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
-        .order-card { border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .profile-section {
+            text-align: center;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto;
+        }
+
+        .profile-avatar,
+        .avatar-initial {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #111;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 44px;
+            font-weight: 600;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            top: 5%;
+            right: 0%;
+            width: 32px;
+            height: 32px;
+            background: #000;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 0.7rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+            transition: all .2s ease;
+        }
+
+        .avatar-edit-btn:hover {
+            transform: scale(1.1);
+            background: #222;
+        }
     </style>
 </head>
 <body>
@@ -28,8 +75,16 @@
                 </div>
                 <div><span>Free shipping on orders over $50</span></div>
                 <div>
-                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
-                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                    <% if(!user){ %>
+                        <div>
+                            <a href="/login" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
+                            <a href="/signup" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                        </div>
+                    <% } else {%>
+                        <div>
+                            <p style="margin-bottom: 0rem;"><%= user.name %></p>
+                        </div>
+                    <% } %>
                 </div>
             </div>
         </div>
@@ -37,22 +92,22 @@
     
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
         <div class="container">
-            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">KAIRA</a>
+            <a class="navbar-brand" href="/index" style="font-size: 28px; font-weight: 700;">BLKND</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/index">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
                 </ul>
                 <div class="nav-icons d-flex align-items-center">
                     <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
-                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
-                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
-                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                    <a href="/profile" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="/wishlist" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="/cart" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
                         <i class="fas fa-shopping-cart"></i>
                         <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
                     </a>
@@ -79,8 +134,8 @@
             <h1 class="mb-2">My Orders</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item"><a href="profile.html">Profile</a></li>
+                    <li class="breadcrumb-item"><a href="/index">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
                     <li class="breadcrumb-item active">Orders</li>
                 </ol>
             </nav>
@@ -91,29 +146,51 @@
         <div class="row">
             <div class="col-lg-3">
                 <div class="profile-sidebar">
-                    <div class="text-center mb-4">
-                        <img src="https://ui-avatars.com/api/?name=John+Doe&size=120&background=212529&color=fff" class="profile-avatar mb-3" alt="Profile">
-                        <h5>John Doe</h5>
-                        <p class="text-muted small">john.doe@example.com</p>
+                    <div class="profile-section text-center">
+                        <div class="profile-avatar-wrapper">
+
+                            <% if (user.profilePic) { %>
+                                <img src="<%= user.profilePic %>" class="profile-avatar" alt="Profile">
+                            <% } else { %>
+                                <div class="avatar-initial">
+                                    <%= user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase() %>
+                                </div>
+                                <% } %>
+
+                                <button class="avatar-edit-btn" data-bs-toggle="modal"data-bs-target="#changePhotoModal">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                        </div>
+
+                        <h5 class="mt-3 fw-bold">
+                            <%= user.name %>
+                        </h5>
+                        <p class="text-muted small mb-1">
+                            <%= user.email %>
+                        </p>
+                        <p class="text-muted small">
+                            <%= user.phoneNumber || "No phone added" %>
+                        </p>
                     </div>
-                    
+
+
                     <nav class="nav flex-column">
-                        <a class="nav-link" href="profile.html">
+                        <a class="nav-link active" href="/profile">
                             <i class="fas fa-user me-2"></i> Profile
                         </a>
-                        <a class="nav-link active" href="profileOrder.html">
+                        <a class="nav-link" href="/userorders">
                             <i class="fas fa-shopping-bag me-2"></i> Orders
                         </a>
-                        <a class="nav-link" href="profileAddress.html">
+                        <a class="nav-link" href="/profileAddress">
                             <i class="fas fa-map-marker-alt me-2"></i> Addresses
                         </a>
-                        <a class="nav-link" href="profileSetting.html">
+                        <a class="nav-link" href="/profileSetting">
                             <i class="fas fa-cog me-2"></i> Settings
                         </a>
-                        <a class="nav-link" href="wishlist.html">
+                        <a class="nav-link" href="/wishlist">
                             <i class="fas fa-heart me-2"></i> Wishlist
                         </a>
-                        <a class="nav-link" href="login.html">
+                        <a class="nav-link" href="/logout">
                             <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
                     </nav>
