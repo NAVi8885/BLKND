@@ -4,6 +4,7 @@ const passport = require('passport');
 const {optionalVerify, verifyRequired} = require('../../middlewares/authentication/userAuth');
 const jwt = require('jsonwebtoken');
 const User = require('../../models/userSchema');
+const Product = require('../../models/product');
 
 
 
@@ -132,8 +133,9 @@ router.get('/userorders', verifyRequired, (req, res) => {
 //USER PROFILE SECTION\\
 ///////////\\\\\\\\\\\\\
 
-router.get('/shop', (req, res) => {
-  res.render('user/shop');
+router.get('/shop', verifyRequired, async(req, res) => {
+  const products = await Product.find();
+  res.render('user/shop', {products, user: req.user});
 })
 
 router.get('/productdetails', (req, res) => {

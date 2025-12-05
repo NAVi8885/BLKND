@@ -69,6 +69,7 @@
         transition: transform .3s;
         z-index: 1000;
       }
+  
       .sidebar.show { transform: translateX(0); }
       .content { margin-left: 0; }
     }
@@ -193,8 +194,10 @@
                   <tr>
                     <td><input type="checkbox" class="row-check"></td>
                     <td class="d-flex align-items-center gap-2">
-                      <img class="thumb"
-                           src="<%= p.image || 'https://via.placeholder.com/64x64?text=BLKND' %>" alt="">
+                      <img
+                        src="<%= products.image && products.image.length ? products.image[0] : '/images/placeholder.png' %>"
+                        alt="<%= products.name %>"
+                        >
                       <div>
                         <div class="fw-semibold"><%= p.name %></div>
                         <div class="small text-muted">
@@ -430,12 +433,12 @@
                         Add one or more colors. Each color will be saved with its name and hex code.
                       </small>
 
-                      <!-- Hidden field that actually goes to the backend -->
+                      <!-- Hidden field that goes to the backend -->
                       <input type="hidden" name="colorsJson" id="colorsJson">
                     </div>
                   </div>
-                </div> <!-- closes .row g-3 -->
-              </div> <!-- closes #tab-general -->
+                </div> 
+              </div> 
 
               <!-- MEDIA TAB -->
               <div class="tab-pane fade" id="tab-media">
@@ -482,17 +485,44 @@
 
       let colors = []; // [{ name, code }, ...]
 
+      const lower = colors.name   
+
       function renderColors() {
         colorListEl.innerHTML = '';
 
         colors.forEach((c, index) => {
+
           const badge = document.createElement('span');
           badge.className = 'badge rounded-pill border d-flex align-items-center gap-2 px-2 py-1 me-1 mb-1';
           badge.innerHTML = `
-            <span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${c.code};border:1px solid #ccc;"></span>
-            <span>${c.name}</span>
-            <button type="button" class="btn-close btn-sm ms-1" data-index="${index}" aria-label="Remove"></button>
-          `;
+  <div style="
+    display:flex;
+    align-items:center;
+    gap:6px;
+  ">
+    <span style="
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      background:${c.code};
+      border:1px solid #ccc;
+      display:inline-block;
+    "></span>
+
+    <span style="color:#000; font-size:14px;">
+      ${c.name}
+    </span>
+
+    <button 
+      type="button" 
+      class="btn-close btn-sm" 
+      data-index="${index}" 
+      aria-label="Remove"
+      style="margin-left:4px;">
+    </button>
+  </div>
+`;
+
           colorListEl.appendChild(badge);
         });
 
@@ -508,6 +538,15 @@
 
           if (!name || !code) {
             // You can later add better UI validation
+            return;
+          }
+
+          const lower = name.toLowerCase();
+
+          const exists = colors.some(c => c.name.toLowerCase() === lower);
+
+          if(exists) {
+            alert(`color "${name}" already exists`);
             return;
           }
 

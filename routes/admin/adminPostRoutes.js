@@ -12,7 +12,6 @@ router.post('/adminLogin',validateAdminLogin, adminLogin);
 
 router.post('/logout', adminLogout);
 
-
 const productMulter = createMulter('products')
 router.post('/admin/products', verifyAdmin, productMulter.array('images', 6), addProducts);
 
