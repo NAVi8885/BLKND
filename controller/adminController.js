@@ -1,7 +1,6 @@
 const argon2 = require('@node-rs/argon2');
 const Admin = require('../models/adminSchema');
 const jwt = require('jsonwebtoken');
-const { findByIdAndUpdate } = require('../models/product');
 const Product = require('../models/product');
 
 
@@ -36,10 +35,11 @@ const adminLogout= async (req, res) => {
     return res.redirect('admin/adminLogin');
 }
 
-const addProducts = async (req, res) => {
+// create or update a product based on if the product id is available or not 
+
+const upsertProducts = async (req, res) => {
     try {
-        console.log(req.body);
-        const { name, status, description, category, price, stock, tags, sizes, colorsJson} = req.body;
+        const { productId, name, status, description, category, price, stock, tags, sizes, colorsJson, existingImagesJson } = req.body;
         if (!name || !status || !description || !category  || !price || !stock) {
             return res.render('admin/product', {errors: [{msg:"Missing required fields", path:"name"}]});
         }
@@ -59,28 +59,47 @@ const addProducts = async (req, res) => {
 
         let colorsArray = [];
         if (colorsJson && typeof colorsJson === 'string') {
-            try {
-            const parsed = JSON.parse(colorsJson);  // <= THIS is your '[{"name":"black","code":"#000000"}]'
-
-                if (Array.isArray(parsed)) {
-                    colorsArray = parsed
-                    .filter(c => c && typeof c.name === 'string' && typeof c.code === 'string')
-                    .map(c => ({
-                    name: c.name.trim(),
-                    code: c.code.trim().toUpperCase()}));
-                }
-            } catch (e) {
-                console.log('Failed to parse colorsJson:', e);
+            const parsed = JSON.parse(colorsJson);
+            if (Array.isArray(parsed)) {
+                colorsArray = parsed
+                .filter(c => c && typeof c.name === 'string' && typeof c.code === 'string')
+                .map(c => ({
+                name: c.name.trim(),
+                code: c.code.trim().toUpperCase()}));
             }
         }
         
-        if (!req.files || req.files.length === 0) {
-            return res.render('admin/products', {errors: [{msg:"Image not found", path:"file"}]});
+        let existingImages = [];
+        if ( existingImagesJson && typeof existingImagesJson === 'string') {
+            const parsed = JSON.parse(existingImagesJson);
+            if(Array.isArray(parsed)) {
+                existingImages = parsed.filter((img) => img && img.url).map((img) => String(img.url));
+            }
         }
 
-        let productPics = req.files.map(file => `/uploads/products/${file.filename}`);
+        let newImages = [];
+        if(req.files && req.files.length > 0) {
+            newImages = req.files.map((file) => `/uploads/products/${file.filename}`);
+        }
 
-        const productAdded = new Product({
+        let finalImages = [];
+        if(productId) {
+            finalImages = [...existingImages, ...newImages];
+            if(finalImages.length === 0){
+                return res.render('admin/products', {
+                    errors: [{ msg: "At least one image is required", path: "file"}]
+                });
+            }
+        }else {
+            finalImages = [...newImages];
+            if(finalImages.length === 0){
+                return res.render('admin/products', {
+                    errors: [{ msg: "image not found", path: "file"}]
+                });
+            }
+        }
+
+        const productAdded = {
             name: name.trim(),
             status,
             description,
@@ -88,25 +107,95 @@ const addProducts = async (req, res) => {
             price: Number(price),
             stock: Number(stock),
             size: sizesArray,
-            image: productPics,
+            image: finalImages,
             colors: colorsArray,
             tags: tagsArray
-        })
+        };
 
         console.log('PRODUCT TO SAVE:',productAdded);
+        if(productId){
+            await Product.findByIdAndUpdate(
+                productId,
+                { $set: productAdded }                
+            );
+        }else{
+            await Product.create(productAdded);
+        }
 
-        await productAdded.save();
         return res.redirect('/products');
-
     } catch (error) {
         console.log("error happened at admin controller/ add product: ", error);
     }
 }
 
+const deleteProduct = async(req, res) => {
+    try {
+        await Product.findByIdAndDelete(req.params.id);
+        res.redirect('/products');
+    } catch(error) {
+        console.log('error happened at deleteproduct/ admincontroller ', error);
+    }
+}
+
+const getProductsPage = async (req, res) => {
+  try {
+    const {
+      search = '',
+      category = 'all',
+      status = 'all',
+      inventory = 'all',
+    } = req.query;
+
+    const query = {};
+
+    // Text search on name 
+    if (search && search.trim() !== '') {
+      const regex = new RegExp(search.trim(), 'i'); 
+      query.$or = [
+        { name: regex }
+      ];
+    }
+
+    // Category filter
+    if (category && category !== 'all') {
+      query.category = category;
+    }
+
+    // Status filter
+    if (status && status !== 'all') {
+      query.status = status;
+    }
+
+    // Inventory filter
+    if (inventory && inventory !== 'all') {
+      if (inventory === 'in_stock') {
+        query.stock = { $gt: 0 };
+      } else if (inventory === 'low_stock') {
+        query.stock = { $gt: 0, $lte: 5 };
+      } else if (inventory === 'out_of_stock') {
+        query.stock = 0;
+      }
+    }
+
+    const products = await Product
+      .find(query)
+      .sort({ createdAt: -1 });
+
+    return res.render('admin/products', {
+      products,
+      filters: { search, category, status, inventory },
+    });
+  } catch (error) {
+    console.error('error happened at the product filter', error);
+  }
+};
+
 module.exports = {
     adminLogin,
     adminLogout,
-    addProducts
+    upsertProducts,
+    deleteProduct,
+    getProductsPage
 }
 
     
