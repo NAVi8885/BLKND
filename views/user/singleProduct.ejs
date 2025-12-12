@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Detail - BLKND</title>
+    <title><%= product.name %> - BLKND</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,6 +14,22 @@
         .thumbnail:hover { opacity: 0.7; }
         .product-price { font-size: 32px; font-weight: 700; color: #212529; }
         .btn-add-cart { padding: 15px 40px; font-size: 16px; }
+
+        /* Extra responsiveness without changing existing styles */
+        @media (max-width: 992px) {
+          .product-image { height: 450px; }
+        }
+
+        @media (max-width: 768px) {
+          .page-header { padding: 60px 0 30px; margin-bottom: 30px; }
+          .product-image { height: 350px; }
+          .thumbnail { height: 80px; }
+        }
+
+        @media (max-width: 576px) {
+          .product-image { height: 280px; }
+          .thumbnail { height: 70px; }
+        }
     </style>
 </head>
 <body>
@@ -27,8 +43,8 @@
                 </div>
                 <div><span>Free shipping on orders over $50</span></div>
                 <div>
-                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
-                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                    <a href="/login" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
+                    <a href="/signup" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
                 </div>
             </div>
         </div>
@@ -36,24 +52,26 @@
     
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
         <div class="container">
-            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">KAIRA</a>
+            <a class="navbar-brand" href="/" style="font-size: 28px; font-weight: 700;">BLKND</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
                 </ul>
                 <div class="nav-icons d-flex align-items-center">
                     <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
-                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
-                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
-                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                    <a href="/profile" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="/wishlist" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="/cart" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
                         <i class="fas fa-shopping-cart"></i>
-                        <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
+                        <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">
+                            <%= typeof cartCount !== 'undefined' ? cartCount : 0 %>
+                        </span>
                     </a>
                 </div>
             </div>
@@ -66,7 +84,9 @@
                 <div class="modal-body">
                     <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
                     <div class="mt-4">
-                        <input type="search" class="form-control form-control-lg" placeholder="Search products...">
+                        <form action="/search" method="get">
+                          <input name="q" type="search" class="form-control form-control-lg" placeholder="Search products...">
+                        </form>
                     </div>
                 </div>
             </div>
@@ -76,10 +96,10 @@
     <div class="page-header">
         <div class="container">
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item"><a href="shop.html">Shop</a></li>
-                    <li class="breadcrumb-item active">Product Detail</li>
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+                    <li class="breadcrumb-item active"><%= product.name %></li>
                 </ol>
             </nav>
         </div>
@@ -87,74 +107,150 @@
 
     <div class="container mb-5">
         <div class="row">
-            <div class="col-md-1">
-                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200" class="thumbnail" alt="Thumbnail">
-                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200" class="thumbnail" alt="Thumbnail">
-                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200" class="thumbnail" alt="Thumbnail">
+            <div class="col-md-1 col-3 order-2 order-md-1 mt-3 mt-md-0">
+                <% if (product.image && product.image.length) { %>
+                  <% product.image.forEach(function(imgUrl, index) { %>
+                    <img 
+                      src="<%= imgUrl %>" 
+                      class="thumbnail img-fluid" 
+                      alt="Thumbnail <%= index + 1 %>" 
+                      data-full="<%= imgUrl %>">
+                  <% }); %>
+                <% } else { %>
+                  <!-- Fallback thumbnails if no product images -->
+                  <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200" class="thumbnail img-fluid" alt="Thumbnail">
+                  <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200" class="thumbnail img-fluid" alt="Thumbnail">
+                  <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200" class="thumbnail img-fluid" alt="Thumbnail">
+                <% } %>
             </div>
-            <div class="col-md-5">
-                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600" class="product-image w-100" alt="Product">
+            <div class="col-md-5 col-12 order-1 order-md-2">
+                <img 
+                  src="<%= (product.image && product.image.length) ? product.image[0] : 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600' %>" 
+                  class="product-image w-100 img-fluid" 
+                  alt="<%= product.name %>" 
+                  id="mainProductImage">
             </div>
-            <div class="col-md-6">
-                <h2 class="mb-3">Classic White Shirt</h2>
+            <div class="col-md-6 col-12 order-3 mt-4 mt-md-0">
+                <h2 class="mb-3"><%= product.name %></h2>
+
                 <div class="mb-3">
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star-half-alt text-warning"></i>
-                    <span class="ms-2 text-muted">(128 reviews)</span>
+                    <% 
+                      const rating = typeof averageRating !== 'undefined' ? averageRating : 4.5;
+                      const fullStars = Math.floor(rating);
+                      const hasHalf = rating - fullStars >= 0.5;
+                    %>
+                    <% for (let i = 0; i < fullStars; i++) { %>
+                      <i class="fas fa-star text-warning"></i>
+                    <% } %>
+                    <% if (hasHalf) { %>
+                      <i class="fas fa-star-half-alt text-warning"></i>
+                    <% } %>
+                    <% for (let i = fullStars + (hasHalf ? 1 : 0); i < 5; i++) { %>
+                      <i class="far fa-star text-warning"></i>
+                    <% } %>
+                    <span class="ms-2 text-muted">(
+                      <%= typeof reviewCount !== 'undefined' ? reviewCount : 0 %> reviews
+                    )</span>
                 </div>
-                <p class="product-price mb-4">$49.99</p>
-                <p class="text-muted">A timeless classic white shirt perfect for any occasion. Made from premium cotton fabric with a comfortable fit and elegant design.</p>
+
+                <p class="product-price mb-4">
+                  $<%= product.price %>
+                </p>
+
+                <p class="text-muted">
+                  <%= product.shortDescription || 'A premium product with elevated comfort and modern design.' %>
+                </p>
                 
-                <div class="mb-4">
-                    <h6>Size:</h6>
-                    <div class="btn-group" role="group">
-                        <input type="radio" class="btn-check" name="size" id="sizeXS">
-                        <label class="btn btn-outline-dark" for="sizeXS">XS</label>
+                <form action="/cart/add" method="post">
+                  <input type="hidden" name="productId" value="<%= product._id %>">
+
+                  <div class="mb-4">
+                      <h6>Size:</h6>
+                      <div class="btn-group" role="group">
+                          <% if (product.sizes && product.sizes.length) { %>
+                            <% product.sizes.forEach(function(size, index) { %>
+                              <input 
+                                type="radio" 
+                                class="btn-check" 
+                                name="size" 
+                                id="size<%= size %>" 
+                                value="<%= size %>" 
+                                <%= index === 0 ? 'checked' : '' %>>
+                              <label class="btn btn-outline-dark" for="size<%= size %>"><%= size %></label>
+                            <% }); %>
+                          <% } else { %>
+                            <!-- Fallback to XS-XL if no sizes from DB -->
+                            <% ['XS','S','M','L','XL'].forEach(function(s, index) { %>
+                              <input 
+                                type="radio" 
+                                class="btn-check" 
+                                name="size" 
+                                id="size<%= s %>" 
+                                value="<%= s %>" 
+                                <%= s === 'M' ? 'checked' : '' %>>
+                              <label class="btn btn-outline-dark" for="size<%= s %>"><%= s %></label>
+                            <% }); %>
+                          <% } %>
+                      </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                      <h6>Color:</h6>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <% if (product.colors && product.colors.length) { %>
+                            <% product.colors.forEach(function(c, index) { %>
+                                <button 
+                                type="button" 
+                                class="btn btn-light border color-btn" 
+                                style="width: 40px; height: 40px; background-color: <%= c.code %>;"
+                                data-color="<%= c.name %>">
+                            </button>
+                            <% }); %>
+                            <input type="hidden" name="color" id="selectedColorInput" value="<%= product.colors[0].name %>">
+                            <% } else { %>
+                                <!-- Fallback basic colors -->
+                                <button class="btn btn-light border" type="button" style="width: 40px; height: 40px; background-color: #fff;"></button>
+                                <button class="btn btn-light border" type="button" style="width: 40px; height: 40px; background-color: #000;"></button>
+                                <button class="btn btn-light border" type="button" style="width: 40px; height: 40px; background-color: #6c757d;"></button>
+                                <% } %>
+                        </div>
                         
-                        <input type="radio" class="btn-check" name="size" id="sizeS">
-                        <label class="btn btn-outline-dark" for="sizeS">S</label>
-                        
-                        <input type="radio" class="btn-check" name="size" id="sizeM" checked>
-                        <label class="btn btn-outline-dark" for="sizeM">M</label>
-                        
-                        <input type="radio" class="btn-check" name="size" id="sizeL">
-                        <label class="btn btn-outline-dark" for="sizeL">L</label>
-                        
-                        <input type="radio" class="btn-check" name="size" id="sizeXL">
-                        <label class="btn btn-outline-dark" for="sizeXL">XL</label>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <h6>Color:</h6>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-light border" style="width: 40px; height: 40px; background-color: #fff;"></button>
-                        <button class="btn btn-light border" style="width: 40px; height: 40px; background-color: #000;"></button>
-                        <button class="btn btn-light border" style="width: 40px; height: 40px; background-color: #6c757d;"></button>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <h6>Quantity:</h6>
-                    <div class="input-group w-auto">
-                        <button class="btn btn-outline-dark" type="button">-</button>
-                        <input type="text" class="form-control text-center" value="1" style="width: 60px;">
-                        <button class="btn btn-outline-dark" type="button">+</button>
-                    </div>
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <a href="cart.html" class="btn btn-dark btn-add-cart">Add to Cart</a>
-                    <a href="wishlist.html" class="btn btn-outline-dark btn-add-cart"><i class="fas fa-heart"></i></a>
-                </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                      <h6>Quantity:</h6>
+                      <div class="input-group w-auto">
+                          <button class="btn btn-outline-dark" type="button" id="qtyMinus">-</button>
+                          <input 
+                            type="text" 
+                            class="form-control text-center" 
+                            value="1" 
+                            name="quantity" 
+                            id="quantityInput" 
+                            style="width: 60px;">
+                          <button class="btn btn-outline-dark" type="button" id="qtyPlus">+</button>
+                      </div>
+                  </div>
+                  
+                  <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-dark btn-add-cart">Add to Cart</button>
+                      <a href="/wishlist/add/<%= product._id %>" class="btn btn-outline-dark btn-add-cart"><i class="fas fa-heart"></i></a>
+                  </div>
+                </form>
                 
                 <div class="mt-4">
-                    <p><strong>SKU:</strong> KA-001</p>
-                    <p><strong>Category:</strong> Shirts</p>
-                    <p><strong>Tags:</strong> Fashion, Casual, Men</p>
+                    <p><strong>SKU:</strong> <%= product.sku || 'N/A' %></p>
+                    <p><strong>Category:</strong> <%= product.category || 'Uncategorized' %></p>
+                    <p>
+                      <strong>Tags:</strong>
+                      <% if (product.tags && product.tags.length) { %>
+                        <% product.tags.forEach(function(tag, index) { %>
+                          <%= tag %><%= index < product.tags.length - 1 ? ', ' : '' %>
+                        <% }); %>
+                      <% } else { %>
+                        None
+                      <% } %>
+                    </p>
                 </div>
             </div>
         </div>
@@ -166,23 +262,39 @@
                         <a class="nav-link active" data-bs-toggle="tab" href="#description">Description</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#reviews">Reviews (128)</a>
+                        <a class="nav-link" data-bs-toggle="tab" href="#reviews">
+                          Reviews (<%= typeof reviewCount !== 'undefined' ? reviewCount : 0 %>)
+                        </a>
                     </li>
                 </ul>
                 
                 <div class="tab-content">
                     <div id="description" class="tab-pane fade show active">
                         <h5>Product Description</h5>
-                        <p>Experience ultimate comfort and style with our Classic White Shirt. Crafted from premium cotton fabric, this shirt offers a perfect blend of elegance and practicality. The tailored fit ensures a flattering silhouette while providing freedom of movement.</p>
-                        <h6>Features:</h6>
-                        <ul>
-                            <li>100% Premium Cotton</li>
-                            <li>Machine Washable</li>
-                            <li>Wrinkle Resistant</li>
-                            <li>Classic Fit</li>
-                            <li>Available in Multiple Sizes</li>
-                        </ul>
+                        <p>
+                          <%= product.description || 'No additional description available for this product.' %>
+                        </p>
+
+                        <% if (product.features && product.features.length) { %>
+                          <h6>Features:</h6>
+                          <ul>
+                            <% product.features.forEach(function(feat) { %>
+                              <li><%= feat %></li>
+                            <% }); %>
+                          </ul>
+                        <% } else { %>
+                          <h6>Features:</h6>
+                          <ul>
+                              <li>Premium quality materials</li>
+                              <li>Comfortable everyday fit</li>
+                              <li>Durable construction</li>
+                              <li>Easy to care for</li>
+                              <li>Available in multiple sizes</li>
+                          </ul>
+                        <% } %>
                     </div>
+
+                    <!-- Keep reviews static for now, can be made dynamic later -->
                     <div id="reviews" class="tab-pane fade">
                         <h5>Customer Reviews</h5>
                         <div class="border-bottom pb-3 mb-3">
@@ -222,22 +334,22 @@
     <footer style="background-color: #212529; color: #fff; padding: 60px 0 20px;">
         <div class="container">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-3 mb-3 mb-md-0">
                     <h5>KAIRA</h5>
                     <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 mb-3 mb-md-0">
                     <h5>Quick Links</h5>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><a href="about.html" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
-                        <li style="margin-bottom: 10px;"><a href="shop.html" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
-                        <li style="margin-bottom: 10px;"><a href="contact.html" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/about" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/shop" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/contact" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
                     </ul>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 mb-3 mb-md-0">
                     <h5>Customer Service</h5>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><a href="profile.html" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/profile" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
@@ -258,5 +370,75 @@
     </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // Thumbnail click -> change main image
+      (function () {
+        const mainImage = document.getElementById('mainProductImage');
+        const thumbnails = document.querySelectorAll('.thumbnail[data-full]');
+        thumbnails.forEach(function (thumb) {
+          thumb.addEventListener('click', function () {
+            const newSrc = this.getAttribute('data-full');
+            if (newSrc && mainImage) {
+              mainImage.src = newSrc;
+            }
+          });
+        });
+      })();
+
+      // Quantity increment / decrement
+      (function () {
+        const minusBtn = document.getElementById('qtyMinus');
+        const plusBtn = document.getElementById('qtyPlus');
+        const qtyInput = document.getElementById('quantityInput');
+
+        if (!qtyInput) return;
+
+        function parseQty() {
+          const val = parseInt(qtyInput.value, 10);
+          if (isNaN(val) || val < 1) return 1;
+          return val;
+        }
+
+        if (minusBtn) {
+          minusBtn.addEventListener('click', function () {
+            let q = parseQty();
+            if (q > 1) {
+              qtyInput.value = q - 1;
+            }
+          });
+        }
+
+        if (plusBtn) {
+          plusBtn.addEventListener('click', function () {
+            let q = parseQty();
+            qtyInput.value = q + 1;
+          });
+        }
+      })();
+
+      // Color selection (only if you use color buttons)
+      (function () {
+        const colorButtons = document.querySelectorAll('.color-btn');
+        const colorInput = document.getElementById('selectedColorInput');
+        if (!colorButtons.length || !colorInput) return;
+
+        colorButtons.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const selected = this.getAttribute('data-color');
+            if (!selected) return;
+            colorInput.value = selected;
+
+            colorButtons.forEach(b => b.classList.remove('border-dark'));
+            this.classList.add('border-dark');
+          });
+        });
+
+        // mark first as selected visually
+        if (colorButtons[0]) {
+          colorButtons[0].classList.add('border-dark');
+        }
+      })();
+    </script>
 </body>
 </html>
