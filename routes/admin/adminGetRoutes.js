@@ -26,6 +26,9 @@ router.get('/orders', (req, res) => {
     res.render('admin/orders');
 })
 
+router.get('/categories', (req, res) => {
+    res.render('admin/categories');
+})
 router.get('/customers', (req, res) => {
     res.render('admin/customers');
 })

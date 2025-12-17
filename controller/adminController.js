@@ -141,9 +141,9 @@ const getProductsPage = async (req, res) => {
   try {
     const {
       search = '',
-      category = 'all',
-      status = 'all',
-      inventory = 'all',
+      category = '',
+      status = '',
+      inventory = '',
     } = req.query;
 
     const query = {};
@@ -155,15 +155,21 @@ const getProductsPage = async (req, res) => {
         { name: regex }
       ];
     }
-
     // Category filter
     if (category && category !== 'all') {
-      query.category = category;
-    }
+        const allowedCategories = ['men', 'women', 'unisex', 'accessories'];
 
+        if (allowedCategories.includes(category)) {
+            query.category = category;
+        }
+    }
     // Status filter
     if (status && status !== 'all') {
-      query.status = status;
+        const allowedStatus = ['active', 'draft', 'archived'];
+
+        if (allowedStatus.includes(status)) {
+        query.status = status;
+        }
     }
 
     // Inventory filter

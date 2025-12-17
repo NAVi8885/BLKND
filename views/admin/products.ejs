@@ -100,6 +100,7 @@
       <a class="nav-link" href="/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
       <a class="nav-link" href="/orders"><i class="fa-solid fa-receipt"></i> Orders</a>
       <a class="nav-link active" href="/products"><i class="fa-solid fa-shirt"></i> Products</a>
+      <a class="nav-link" href="/categories"><i class="fa-solid fa-layer-group"></i> Categories</a>
       <a class="nav-link" href="/customers"><i class="fa-solid fa-user-group"></i> Customers</a>
       <a class="nav-link" href="/coupons"><i class="fa-solid fa-ticket"></i> Coupons</a>
       <a class="nav-link" href="/analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
@@ -182,10 +183,10 @@
               </select>
             </div>
 
-            <!-- Apply button -->
+            <!-- Search button -->
             <div class="col-md-2 d-flex justify-content-end">
               <button type="submit" class="btn btn-dark w-100">
-                <i class="fa-solid fa-filter me-2"></i>Apply
+                <i class="fa-solid fa-filter me-2"></i>Search
               </button>
             </div>
           </form>
@@ -336,9 +337,9 @@
                   <div class="col-md-4">
                     <label class="form-label">Status</label>
                     <select class="form-select" name="status" required>
-                      <option value="Active">Active</option>
-                      <option value="Draft">Draft</option>
-                      <option value="Archived">Archived</option>
+                      <option value="active">Active</option>
+                      <option value="draft">Draft</option>
+                      <option value="archived">Archived</option>
                     </select>
                   </div>
 

@@ -138,9 +138,9 @@ router.get('/shop', verifyRequired, async(req, res) => {
   res.render('user/shop', {products, user: req.user});
 })
 
-router.get('/product/:id', async (req, res) => {
+router.get('/product/:id', verifyRequired, async (req, res) => {
   const product = await Product.findById(req.params.id).lean();
-  res.render('user/singleProduct', {product});
+  res.render('user/singleProduct', {product, user: req.user});
 });
 
 module.exports = router;
