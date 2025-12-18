@@ -19,7 +19,7 @@ const productSchema = new Schema({
     category: {
         type: String,
         required: true,
-        enum: ["men", "women", "unisex", "accessories"],   
+        enum: ["men", "women", "unisex", "accessories"],
         default: "unisex"
     },
     description: {

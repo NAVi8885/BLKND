@@ -2,6 +2,7 @@ const argon2 = require('@node-rs/argon2');
 const Admin = require('../models/adminSchema');
 const jwt = require('jsonwebtoken');
 const Product = require('../models/product');
+const Category = require('../models/categorySchema');
 
 
 const adminLogin = async (req, res) => {
@@ -196,12 +197,56 @@ const getProductsPage = async (req, res) => {
   }
 };
 
+const createCategory = async (req, res) => {
+    try {
+        const {main} = req.body;
+
+    if (!main || !main.trim()) {
+        const error = "Please enter the category name"
+        return res.render('admin/categories',{error});
+    }
+
+    const exists = await Category.findOne({ main: main.trim() });
+    if (exists) {
+        return res.render('admin/categories');
+    }
+    const categories = await Category.create({
+        main: main.trim(),
+    })
+
+    return res.render('admin/categories', {categories})
+    } catch (error) {
+        console.log("error happened at creating category",error);        
+    }
+}
+
+const addSubCategory = async (req, res) => {
+    try{
+        const {id} = req.params;
+        const sub = req.body;
+
+        if (!sub || !sub.trim()) {
+            return res.redirect('/categories');
+        }
+
+        await Category.findByIdAndUpdate(
+        id,
+        { $addToSet: { sub: sub.trim() } }, // prevents duplicates
+        );
+
+    return res.redirect('/categories');
+  }catch(error){
+    console.log("error happened at adding subcategory",error)
+  }
+}
 module.exports = {
     adminLogin,
     adminLogout,
     upsertProducts,
     deleteProduct,
-    getProductsPage
+    getProductsPage,
+    createCategory,
+    addSubCategory
 }
 
     

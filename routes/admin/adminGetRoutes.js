@@ -2,6 +2,7 @@ const express = require('express');
 const Product = require('../../models/product');
 const { deleteProduct, getProductsPage } = require('../../controller/adminController');
 const verifyAdmin = require('../../middlewares/authentication/adminAuth');
+const Category = require('../../models/categorySchema');
 const router = express.Router();
 
 router.get('/adminlogin',(req, res) => {
@@ -26,9 +27,11 @@ router.get('/orders', (req, res) => {
     res.render('admin/orders');
 })
 
-router.get('/categories', (req, res) => {
-    res.render('admin/categories');
+router.get('/categories', async (req, res) => {
+    const categories = await Category.find().sort({createdAt: -1});
+    res.render('admin/categories', {categories, error: null})
 })
+
 router.get('/customers', (req, res) => {
     res.render('admin/customers');
 })
