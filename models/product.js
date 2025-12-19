@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { type } = require('node:os');
 const { Schema } = mongoose;
 
 const colorSchema = new mongoose.Schema({
@@ -19,8 +20,9 @@ const productSchema = new Schema({
     category: {
         type: String,
         required: true,
-        enum: ["men", "women", "unisex", "accessories"],
-        default: "unisex"
+    },
+    subcategory: {
+        type: String
     },
     description: {
         type: String,

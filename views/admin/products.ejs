@@ -94,6 +94,7 @@
 </head>
 
 <body>
+  
   <aside id="sidebar" class="sidebar">
     <a href="/dashboard" class="brand h4 d-block mb-3">BLKND Admin</a>
     <nav class="nav nav-pills flex-column nav-aside">
@@ -352,15 +353,43 @@
                     <input class="form-control" name="tags" placeholder="casual, cotton, summer">
                   </div>
 
-                  <div class="col-md-4">
-                    <label class="form-label">Category</label>
-                    <select class="form-select" name="category" required>
-                      <option value="women">Women</option>
-                      <option value="men">Men</option>
-                      <option value="accessories">Accessories</option>
-                      <option value="unisex">Unisex</option>
-                    </select>
-                  </div>
+                  <!-- MAIN CATEGORY -->
+<div class="col-md-4">
+  <label class="form-label">Category</label>
+  <select
+    class="form-select"
+    id="mainCategory"
+    name="category"
+    required
+  >
+    <option value="">Select category</option>
+
+    <% categories.forEach(cat => { %>
+      <option
+        value="<%= cat.main %>"
+        data-subs='<%- JSON.stringify(cat.sub || []) %>'
+      >
+        <%= cat.main %>
+      </option>
+    <% }) %>
+  </select>
+</div>
+
+<!-- SUB CATEGORY -->
+<div class="col-md-4">
+  <label class="form-label">Sub Category</label>
+  <select
+    class="form-select"
+    id="subCategory"
+    name="subCategory"
+    disabled
+    required
+  >
+    <option value="">Select sub category</option>
+    <!-- the list is dynamically shiwn from the script tag -->
+  </select>
+</div>
+
 
                   <div class="col-md-4">
                     <label class="form-label">Price</label>
@@ -816,6 +845,46 @@
 
     })();
   </script>
+
+
+
+<script>
+(function () {
+  const mainSelect = document.getElementById('mainCategory');
+  const subSelect = document.getElementById('subCategory');
+
+  if (!mainSelect || !subSelect) return;
+
+  mainSelect.addEventListener('change', function () {
+    const selectedOption = this.options[this.selectedIndex];
+    const subsRaw = selectedOption.getAttribute('data-subs');
+
+    subSelect.innerHTML = '<option value="">Select sub category</option>';
+
+    if (!subsRaw) {
+      subSelect.disabled = true;
+      return;
+    }
+
+    const subs = JSON.parse(subsRaw);
+
+    if (!Array.isArray(subs) || subs.length === 0) {
+      subSelect.disabled = true;
+      return;
+    }
+
+    subs.forEach(sub => {
+      const option = document.createElement('option');
+      option.value = sub;
+      option.textContent = sub;
+      subSelect.appendChild(option);
+    });
+
+    subSelect.disabled = false;
+  });
+})();
+</script>
+
 </body>
 
 </html>

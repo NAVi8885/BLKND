@@ -1,6 +1,6 @@
 const express = require('express');
 const Product = require('../../models/product');
-const { deleteProduct, getProductsPage } = require('../../controller/adminController');
+const { deleteProduct, getProductsPage, deleteCategory, deleteSub } = require('../../controller/adminController');
 const verifyAdmin = require('../../middlewares/authentication/adminAuth');
 const Category = require('../../models/categorySchema');
 const router = express.Router();
@@ -14,8 +14,10 @@ router.get('/dashboard',(req, res) => {
 })
 
 router.get('/products', async (req, res) => {
-    const products = await Product.find();
-    res.render('admin/products', {products, filters: null});
+    // const products = await Product.find();
+    // const categories = await Category.find().lean();
+    // res.render('admin/products', { products, categories, filters: null });
+    res.redirect('admin/products');
 })
 
 router.get('/admin/products/delete/:id', verifyAdmin, deleteProduct);
@@ -31,6 +33,10 @@ router.get('/categories', async (req, res) => {
     const categories = await Category.find().sort({createdAt: -1});
     res.render('admin/categories', {categories, error: null})
 })
+
+router.get('/admin/categories/delete/:id', verifyAdmin, deleteCategory);
+
+router.get('/admin/categories/deletesub', verifyAdmin, deleteSub);
 
 router.get('/customers', (req, res) => {
     res.render('admin/customers');

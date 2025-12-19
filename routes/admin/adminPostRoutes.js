@@ -17,4 +17,5 @@ router.post('/admin/products', verifyAdmin, productMulter.array('images', 6), up
 
 router.post('/admin/categories/add_category', verifyAdmin, createCategory);
 router.post('/admin/categories/add_subcategory/:id',verifyAdmin, addSubCategory)
+
 module.exports = router;

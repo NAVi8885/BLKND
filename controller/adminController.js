@@ -37,13 +37,12 @@ const adminLogout= async (req, res) => {
 }
 
 // create or update a product based on if the product id is available or not 
-
 const upsertProducts = async (req, res) => {
     try {
-        const { productId, name, status, description, category, price, stock, tags, sizes, colorsJson, existingImagesJson } = req.body;
-        if (!name || !status || !description || !category  || !price || !stock) {
-            return res.render('admin/product', {errors: [{msg:"Missing required fields", path:"name"}]});
-        }
+        const { productId, name, status, description, category, subCategory, price, stock, tags, sizes, colorsJson, existingImagesJson } = req.body;
+        // if (!name || !status || !description || category || !subCategory  || !price || !stock) {
+        //     return res.render('admin/products', {filters:null ,products: null ,categories:null ,  errors: [{msg:"Missing required fields", path:"name"}]});
+        // }
 
         // making tags seperate
         let tagsArray = [];
@@ -105,6 +104,7 @@ const upsertProducts = async (req, res) => {
             status,
             description,
             category,
+            subcategory: subCategory,
             price: Number(price),
             stock: Number(stock),
             size: sizesArray,
@@ -157,6 +157,8 @@ const getProductsPage = async (req, res) => {
       ];
     }
     // Category filter
+
+
     if (category && category !== 'all') {
         const allowedCategories = ['men', 'women', 'unisex', 'accessories'];
 
@@ -164,6 +166,8 @@ const getProductsPage = async (req, res) => {
             query.category = category;
         }
     }
+
+
     // Status filter
     if (status && status !== 'all') {
         const allowedStatus = ['active', 'draft', 'archived'];
@@ -188,14 +192,17 @@ const getProductsPage = async (req, res) => {
       .find(query)
       .sort({ createdAt: -1 });
 
+    const categories = await Category.find().lean();
+
     return res.render('admin/products', {
       products,
+      categories,
       filters: { search, category, status, inventory },
     });
   } catch (error) {
     console.error('error happened at the product filter', error);
   }
-};
+}
 
 const createCategory = async (req, res) => {
     try {
@@ -203,18 +210,23 @@ const createCategory = async (req, res) => {
 
     if (!main || !main.trim()) {
         const error = "Please enter the category name"
+        console.log(error);
+        
         return res.render('admin/categories',{error});
     }
 
     const exists = await Category.findOne({ main: main.trim() });
     if (exists) {
-        return res.render('admin/categories');
+        console.log("category already exists");
+
+        return res.render('admin/categories', {categories});
     }
     const categories = await Category.create({
         main: main.trim(),
     })
 
-    return res.render('admin/categories', {categories})
+    return res.redirect('/categories');
+
     } catch (error) {
         console.log("error happened at creating category",error);        
     }
@@ -223,7 +235,7 @@ const createCategory = async (req, res) => {
 const addSubCategory = async (req, res) => {
     try{
         const {id} = req.params;
-        const sub = req.body;
+        const {sub} = req.body;
 
         if (!sub || !sub.trim()) {
             return res.redirect('/categories');
@@ -235,10 +247,50 @@ const addSubCategory = async (req, res) => {
         );
 
     return res.redirect('/categories');
+
   }catch(error){
     console.log("error happened at adding subcategory",error)
   }
 }
+
+const deleteCategory = async (req, res) => {
+    try {
+        await Category.findByIdAndDelete(req.params.id);
+        return res.redirect('/categories');
+    } catch (error) {
+        console.log("error happened at deleting category",error)
+    }
+}
+
+const deleteSub = async (req, res) => {
+    try {
+        const {categoryId, index}= req.query;
+        if (!categoryId || index === undefined) {
+            return console.log("no category selected to delete");
+        }
+
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return console.log("category not found");
+            
+        }
+
+        const i = Number(index);
+        if (Number.isNaN(i) || i < 0 || i >= category.sub.length) {
+            return console.log("invalid index number");
+            
+        }
+
+        category.sub.splice(i, 1);
+        await category.save();
+
+        return res.redirect('/categories');
+    } catch (error) {
+        console.log("error happened at delete subcategory", error);
+    }
+}
+
+
 module.exports = {
     adminLogin,
     adminLogout,
@@ -246,7 +298,9 @@ module.exports = {
     deleteProduct,
     getProductsPage,
     createCategory,
-    addSubCategory
+    addSubCategory,
+    deleteCategory,
+    deleteSub
 }
 
     
