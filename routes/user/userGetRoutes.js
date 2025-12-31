@@ -5,6 +5,7 @@ const {optionalVerify, verifyRequired} = require('../../middlewares/authenticati
 const jwt = require('jsonwebtoken');
 const User = require('../../models/userSchema');
 const Product = require('../../models/product');
+const Category = require('../../models/categorySchema');
 
 
 
@@ -135,7 +136,8 @@ router.get('/userorders', verifyRequired, (req, res) => {
 
 router.get('/shop', verifyRequired, async(req, res) => {
   const products = await Product.find();
-  res.render('user/shop', {products, user: req.user});
+  const categories = await Category.find().lean();
+  res.render('user/shop', {products, categories, user: req.user});
 })
 
 router.get('/product/:id', verifyRequired, async (req, res) => {

@@ -16,7 +16,7 @@ const adminLogin = async (req, res) => {
 
         if(!checkPass) return res.render('admin/adminLogin', {errors: [{msg:"Incorrect password", path: "password"}]});
 
-        const token = jwt.sign({id: adminExist._id}, process.env.SECRET_KEY,{expiresIn:'1h'});
+        const token = jwt.sign({id: adminExist._id}, process.env.SECRET_KEY,{expiresIn:'2d'});
         console.log(token);
 
         res.cookie('token', token,{
@@ -290,6 +290,25 @@ const deleteSub = async (req, res) => {
     }
 }
 
+const updateCategory = async (req, res) => {
+  const { id } = req.params;
+  const { main, sub } = req.body;
+
+  let subs = [];
+  try {
+    subs = JSON.parse(sub);
+  } catch {
+    subs = [];
+  }
+
+  await Category.findByIdAndUpdate(id, {
+    main: main.trim(),
+    sub: subs
+  });
+
+  res.redirect("/categories");
+}
+
 
 module.exports = {
     adminLogin,
@@ -300,7 +319,8 @@ module.exports = {
     createCategory,
     addSubCategory,
     deleteCategory,
-    deleteSub
+    deleteSub,
+    updateCategory
 }
 
     

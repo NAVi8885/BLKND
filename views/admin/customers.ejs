@@ -189,93 +189,57 @@
                 <th>Orders</th>
                 <th>LTV</th>
                 <th>Last order</th>
-                <th>Tags</th>
                 <th style="width:140px">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><input type="checkbox" class="row-check"></td>
-                <td>
-                  <div class="d-flex align-items-center gap-2">
-                    <img class="avatar" src="https://ui-avatars.com/api/?name=Jane+Smith&background=212529&color=fff"
-                      alt="">
-                    <div>
-                      <div class="fw-semibold">Jane Smith</div>
-                      <div class="small text-muted">Kochi, IN</div>
-                    </div>
-                  </div>
-                </td>
-                <td>jane@example.com</td>
-                <td>8</td>
-                <td>$742</td>
-                <td>Oct 20, 2025</td>
-                <td><span class="tag">VIP</span> <span class="tag">Email</span></td>
-                <td class="text-nowrap">
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas"
-                      data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i
-                        class="fa-regular fa-paper-plane"></i></button>
-                    <button class="btn btn-outline-danger"><i class="fa-solid fa-user-slash"></i></button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="row-check"></td>
-                <td>
-                  <div class="d-flex align-items-center gap-2">
-                    <img class="avatar" src="https://ui-avatars.com/api/?name=Arjun+Das&background=212529&color=fff"
-                      alt="">
-                    <div>
-                      <div class="fw-semibold">Arjun Das</div>
-                      <div class="small text-muted">Thiruvananthapuram, IN</div>
-                    </div>
-                  </div>
-                </td>
-                <td>arjun@example.com</td>
-                <td>3</td>
-                <td>$188</td>
-                <td>Oct 20, 2025</td>
-                <td><span class="tag">New</span></td>
-                <td class="text-nowrap">
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas"
-                      data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i
-                        class="fa-regular fa-paper-plane"></i></button>
-                    <button class="btn btn-outline-danger"><i class="fa-solid fa-user-slash"></i></button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox" class="row-check"></td>
-                <td>
-                  <div class="d-flex align-items-center gap-2">
-                    <img class="avatar" src="https://ui-avatars.com/api/?name=Wei+Chen&background=212529&color=fff"
-                      alt="">
-                    <div>
-                      <div class="fw-semibold">Wei Chen</div>
-                      <div class="small text-muted">Shanghai, CN</div>
-                    </div>
-                  </div>
-                </td>
-                <td>wei@example.com</td>
-                <td>5</td>
-                <td>$512</td>
-                <td>Oct 19, 2025</td>
-                <td><span class="tag">Email</span></td>
-                <td class="text-nowrap">
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas"
-                      data-bs-target="#viewCustomer"><i class="fa-regular fa-eye"></i></button>
-                    <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal"><i
-                        class="fa-regular fa-paper-plane"></i></button>
-                    <button class="btn btn-outline-danger"><i class="fa-solid fa-user-slash"></i></button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+  <% customers.forEach( customer => { %>
+    <tr>
+      <td><input type="checkbox" class="row-check"></td>
+
+      <td>
+        <div class="d-flex align-items-center gap-2">
+          <img class="avatar"
+            src="">
+          <div>
+            <div class="fw-semibold"><%= customer.name %></div>
+            <div class="small text-muted">
+              <%= customer.city %>, <%= customer.country %>
+            </div>
+          </div>
+        </div>
+      </td>
+
+      <td><%= customer.email %></td>
+      <td><%= customer.orders.length %></td>
+      <td>$<%= customer.orders.reduce((s,o)=>s+o.total,0) %></td>
+      <td>
+        <%= customer.orders.at(-1)?.createdAt?.toDateString() || '—' %>
+      </td>
+
+      <td class="text-nowrap">
+        <div class="btn-group btn-group-sm">
+          <button
+            class="btn btn-outline-secondary view-btn"
+            data-customer='<%- JSON.stringify(customer) %>'
+            data-bs-toggle="offcanvas"
+            data-bs-target="#viewCustomer">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+
+          <button class="btn btn-outline-secondary">
+            <i class="fa-regular fa-paper-plane"></i>
+          </button>
+
+          <button class="btn btn-outline-danger">
+            <i class="fa-solid fa-user-slash"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+  <% }) %>
+</tbody>
+
           </table>
         </div>
         <div class="card-footer d-flex justify-content-between align-items-center">

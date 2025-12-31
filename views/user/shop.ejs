@@ -26,6 +26,21 @@
             .filter-sidebar { position: static; margin-bottom: 20px; }
             .product-card img { height: 220px; }
         }
+        .filter-sidebar {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+.zara-category-link {
+  text-decoration: none;
+  color: #000;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+}
+
+.zara-category-link:hover {
+  text-decoration: underline;
+}
+
     </style>
 </head>
 
@@ -119,30 +134,88 @@
         <div class="row">
 
             <!-- SIDEBAR -->
-            <div class="col-lg-3">
-                <div class="filter-sidebar">
+<div class="col-lg-3">
+  <aside class="filter-sidebar">
 
-                    <h5 class="mb-3">Categories</h5>
-                    <div class="list-group mb-4">
-                        <a href="#" class="list-group-item list-group-item-action">All Products</a>
-                        <a href="#" class="list-group-item list-group-item-action">Women</a>
-                        <a href="#" class="list-group-item list-group-item-action">Men</a>
-                        <a href="#" class="list-group-item list-group-item-action">Accessories</a>
-                        <a href="#" class="list-group-item list-group-item-action">Shoes</a>
-                    </div>
+    <!-- CATEGORIES (ZARA STYLE) -->
+    <div class="mb-5">
 
-                    <h5 class="mb-3">Price Range</h5>
-                    <input type="range" class="form-range" min="0" max="500" step="10">
+      <% categories.forEach(cat => { %>
+        <div class="mb-4">
 
-                    <h5 class="mb-3 mt-4">Size</h5>
-                    <div class="form-check"><input class="form-check-input" type="checkbox"> XS</div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox"> S</div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox"> M</div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox"> L</div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox"> XL</div>
+          <!-- Main Category -->
+          <div
+            class="text-uppercase fw-semibold mb-2"
+            style="font-size:13px; letter-spacing:1px;"
+          >
+            <%= cat.main %>
+          </div>
 
-                </div>
-            </div>
+          <!-- Sub Categories -->
+          <ul class="list-unstyled m-0 p-0">
+            <% cat.sub.forEach(sub => { %>
+              <li class="mb-1">
+                <a
+                  href="/shop?category=<%= encodeURIComponent(sub) %>"
+                  class="zara-category-link"
+                >
+                  <%= sub %>
+                </a>
+              </li>
+            <% }) %>
+          </ul>
+
+        </div>
+      <% }) %>
+
+    </div>
+
+    <!-- PRICE RANGE -->
+    <div class="mb-5">
+      <div class="fw-semibold mb-3">Price</div>
+      <input
+        type="range"
+        class="form-range"
+        min="0"
+        max="500"
+        step="10"
+      >
+    </div>
+
+    <!-- SIZE -->
+    <div>
+      <div class="fw-semibold mb-3">Size</div>
+
+      <div class="form-check mb-1">
+        <input class="form-check-input" type="checkbox" id="sizeXS">
+        <label class="form-check-label" for="sizeXS">XS</label>
+      </div>
+
+      <div class="form-check mb-1">
+        <input class="form-check-input" type="checkbox" id="sizeS">
+        <label class="form-check-label" for="sizeS">S</label>
+      </div>
+
+      <div class="form-check mb-1">
+        <input class="form-check-input" type="checkbox" id="sizeM">
+        <label class="form-check-label" for="sizeM">M</label>
+      </div>
+
+      <div class="form-check mb-1">
+        <input class="form-check-input" type="checkbox" id="sizeL">
+        <label class="form-check-label" for="sizeL">L</label>
+      </div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="sizeXL">
+        <label class="form-check-label" for="sizeXL">XL</label>
+      </div>
+
+    </div>
+
+  </aside>
+</div>
+
 
             <!-- PRODUCT LIST -->
             <div class="col-lg-9">
@@ -160,9 +233,9 @@
                 <!-- DYNAMIC PRODUCT GRID -->
                 <div class="row">
 
-                    <% if (products && products.length > 0) { console.log(products)%>
+                    <% if (products && products.length > 0) { %>
 
-                        <% products.forEach((products, index) =>{ console.log("img",products.image[0])%>
+                        <% products.forEach((products, index) =>{ %>
                             <div class="col-6 col-md-4">
                                 <div class="card product-card">
 

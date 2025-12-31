@@ -48,7 +48,7 @@ const loginUser = async (req, res) => {
             return res.render('user/login', {errors:[{msg:"Incorrect password", path:"password"}]})
         }
 
-        const token = jwt.sign({ id: user._id.toString(), email: user.email }, process.env.SECRET_KEY, {expiresIn:'7d'});
+        const token = jwt.sign({ id: user._id.toString(), email: user.email }, process.env.SECRET_KEY, {expiresIn:'2d'});
         // console.log(token);
 
         res.cookie('token', token,{
