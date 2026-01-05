@@ -19,4 +19,6 @@ router.post('/admin/categories/add_category', verifyAdmin, createCategory);
 router.post('/admin/categories/add_subcategory/:id',verifyAdmin, addSubCategory);
 router.post('/admin/categories/edit_category/:id', verifyAdmin, updateCategory);
 
+
+
 module.exports = router;

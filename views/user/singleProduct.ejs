@@ -225,7 +225,7 @@
           <%= product.shortDescription || 'A premium product with elevated comfort and modern design.' %>
         </p>
 
-        <form action="/cart/add" method="post">
+        <form action="/cart/add/<%= product._id %>" method="post">
           <input type="hidden" name="productId" value="<%= product._id %>">
 
           <% const allSizes=['XS', 'S' , 'M' , 'L' , 'XL' ]; %>
@@ -295,9 +295,6 @@
         </form>
 
         <div class="mt-4">
-          <p><strong>SKU:</strong>
-            <%= product.sku || 'N/A' %>
-          </p>
           <p><strong>Category:</strong>
             <%= product.category || 'Uncategorized' %>
           </p>
@@ -335,26 +332,6 @@
             <p>
               <%= product.description || 'No additional description available for this product.' %>
             </p>
-
-            <% if (product.features && product.features.length) { %>
-              <h6>Features:</h6>
-              <ul>
-                <% product.features.forEach(function(feat) { %>
-                  <li>
-                    <%= feat %>
-                  </li>
-                  <% }); %>
-              </ul>
-              <% } else { %>
-                <h6>Features:</h6>
-                <ul>
-                  <li>Premium quality materials</li>
-                  <li>Comfortable everyday fit</li>
-                  <li>Durable construction</li>
-                  <li>Easy to care for</li>
-                  <li>Available in multiple sizes</li>
-                </ul>
-                <% } %>
           </div>
 
           <!-- Keep reviews static for now, can be made dynamic later -->
@@ -398,7 +375,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-3 mb-3 mb-md-0">
-          <h5>KAIRA</h5>
+          <h5>BLKND</h5>
           <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
         </div>
         <div class="col-md-3 mb-3 mb-md-0">
@@ -431,7 +408,7 @@
       </div>
       <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
       <div class="text-center">
-        <p style="color: #adb5bd;">&copy; 2025 Kaira. All rights reserved.</p>
+        <p style="color: #adb5bd;">&copy; 2025 BLKND. All rights reserved.</p>
       </div>
     </div>
   </footer>

@@ -145,4 +145,5 @@ router.get('/product/:id', verifyRequired, async (req, res) => {
   res.render('user/singleProduct', {product, user: req.user});
 });
 
+
 module.exports = router;
