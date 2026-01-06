@@ -1,8 +1,8 @@
 const {hash, verify} = require('@node-rs/argon2');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
+const Cart = require('../models/cart');
 const { sendOtpEmail } = require('../utils/otpApp');
-
 
 
 
@@ -196,6 +196,49 @@ const updateProfileImage = async (req, res) => {
   }
 };
 
+const addToCart = async(req, res) =>{
+    try {
+        const userId = req.user.id;
+        const { productId } = req.body;
+        
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ success: false, message:'Product not found' });
+
+        let cart = await Cart.findOne({ user: userId });
+        
+        if (!cart) {
+            cart = new Cart({
+                user: userId,
+                products: [],
+                subTotal: 0,
+                shipping: 0,
+                total: 0
+            });
+            await cart.save();
+        }
+
+        const existingProduct = cart.products.find(item => item.product.equals(productId));
+
+        if (existingProduct) {
+            return res.json({success: false, message: 'Product already added to cart ⚠️'})
+        } else {
+                cart.products.push({
+                product: productId,
+                price: product.price,
+                totalPrice: product.price,
+            });
+        }
+
+       
+        cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
+        cart.shipping = 45;
+        cart.total = cart.coupon? ((cart.subTotal + cart.shipping) * (100 - cart.couponDiscount)) / 100: cart.subTotal + cart.shipping;
+        await cart.save();
+    } catch (error) {
+        console.log("error happened at addtocart",error)
+    }
+}
+
 module.exports = {
     userRegister,
     loginUser,
@@ -204,5 +247,6 @@ module.exports = {
     verifyOtp,
     resetPassword,
     updateProfile,
-    updateProfileImage
+    updateProfileImage,
+    addToCart
 };
