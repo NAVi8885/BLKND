@@ -225,7 +225,7 @@
           <%= product.shortDescription || 'A premium product with elevated comfort and modern design.' %>
         </p>
 
-        <form action="/cart/add/<%= product._id %>" method="post">
+        <form action="/add-to-cart" method="post">
           <input type="hidden" name="productId" value="<%= product._id %>">
 
           <% const allSizes=['XS', 'S' , 'M' , 'L' , 'XL' ]; %>
@@ -274,7 +274,6 @@
                           style="width: 40px; height: 40px; background-color: #6c757d;"></button>
                         <% } %>
               </div>
-
             </div>
 
             <div class="mb-4">

@@ -2,6 +2,7 @@ const {hash, verify} = require('@node-rs/argon2');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 const Cart = require('../models/cart');
+const Product = require('../models/product');
 const { sendOtpEmail } = require('../utils/otpApp');
 
 
@@ -196,48 +197,69 @@ const updateProfileImage = async (req, res) => {
   }
 };
 
-const addToCart = async(req, res) =>{
-    try {
-        const userId = req.user.id;
-        const { productId } = req.body;
-        
-        const product = await Product.findById(productId);
-        if (!product) return res.status(404).json({ success: false, message:'Product not found' });
-
-        let cart = await Cart.findOne({ user: userId });
-        
-        if (!cart) {
-            cart = new Cart({
-                user: userId,
-                products: [],
-                subTotal: 0,
-                shipping: 0,
-                total: 0
-            });
-            await cart.save();
-        }
-
-        const existingProduct = cart.products.find(item => item.product.equals(productId));
-
-        if (existingProduct) {
-            return res.json({success: false, message: 'Product already added to cart ⚠️'})
-        } else {
-                cart.products.push({
-                product: productId,
-                price: product.price,
-                totalPrice: product.price,
-            });
-        }
-
-       
-        cart.subTotal = cart.products.reduce((sum, item) => sum + item.totalPrice, 0);
-        cart.shipping = 45;
-        cart.total = cart.coupon? ((cart.subTotal + cart.shipping) * (100 - cart.couponDiscount)) / 100: cart.subTotal + cart.shipping;
-        await cart.save();
-    } catch (error) {
-        console.log("error happened at addtocart",error)
+const addToCart = async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+    
+    if (!productId) {
+      return res.render('user/cart', { message: "Product ID is required" });
     }
-}
+    
+    if (!quantity || quantity < 1) {
+      return res.render('user/cart', { message: "Quantity must be at least 1" });
+    }
+    
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.render('user/cart', { message: "Product not found" });
+    }
+    
+    // Check if product has stock
+    if (product.stock < quantity) {
+      return res.render('user/cart', { message: "Insufficient stock available" });
+    }
+    
+    let cart = await Cart.findOne({ userId: req.user._id });
+    
+    if (!cart) {
+      const subTotal = product.price * quantity;
+      cart = await Cart.create({
+        userId: req.user._id,
+        items: [{ productId, quantity }],
+        subTotal: subTotal,
+        total: subTotal
+      });
+    } else {
+      // Check if product already in cart
+      const existingItem = cart.items.find(item => item.productId.toString() === productId);
+      
+      if (existingItem) {
+        // Update quantity if product already exists
+        const totalQuantity = existingItem.quantity + quantity;
+        if (product.stock < totalQuantity) {
+          return res.render('user/cart', { message: "Insufficient stock for requested quantity"});
+        }
+        existingItem.quantity = totalQuantity;
+      } else {
+        cart.items.push({ productId, quantity });
+      }
+      
+      let newSubTotal = 0;
+      for (let item of cart.items) {
+        const prod = await Product.findById(item.productId);
+        newSubTotal += prod.price * item.quantity;
+      }
+      
+      cart.subTotal = newSubTotal;
+      cart.total = newSubTotal + (cart.shipping || 0) - (cart.couponDiscount || 0);
+      
+      await cart.save();
+    }
+  } catch (error) {
+    console.log("error happened at addToCart controller", error);
+  }
+};
+
 
 module.exports = {
     userRegister,

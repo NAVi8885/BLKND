@@ -23,7 +23,6 @@ const cartSchema = new Schema({
     }],
     subTotal: {
         type: Number,
-        required: true
     },
     shipping: {
         type: Number,
@@ -42,7 +41,6 @@ const cartSchema = new Schema({
     },
     total: {
         type: Number,
-        required: true
     }
 },{timestamps: true});
 

@@ -35,7 +35,6 @@ router.get('/categories', async (req, res) => {
     res.render('admin/categories', {categories, error: null})
 })
 
-
 router.get('/admin/categories/delete/:id', verifyAdmin, deleteCategory);
 
 router.get('/admin/categories/deletesub', verifyAdmin, deleteSub);

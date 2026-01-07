@@ -32,6 +32,6 @@ router.post('/savechanges', verifyRequired, validateUpdateUser, updateProfile);
 const profileUpload = createMulter('profile');
 router.post('/updateprofile', verifyRequired, profileUpload.single('avatar'), updateProfileImage);
 
-router.post('/cart/add', verifyRequired, addToCart);
+router.post('/add-to-cart', verifyRequired, addToCart);
 
 module.exports = router;
