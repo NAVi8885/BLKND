@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/userSchema');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
+const { getCart } = require('../../controller/userController');
 
 
 
@@ -145,8 +146,6 @@ router.get('/product/:id', verifyRequired, async (req, res) => {
   res.render('user/singleProduct', {product, user: req.user});
 });
 
-router.get('user/cart', async (req, res) => {
-  res.render('user/cart',{cart, message})
-});
+router.get('/cart', verifyRequired, getCart);
 
 module.exports = router;

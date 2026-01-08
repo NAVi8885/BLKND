@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express();
 const { validateUserReg, validateUserLogin, validateUpdateUser } = require("../../middlewares/validation/userValidator");
-const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart } = require('../../controller/userController');
+const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart } = require('../../controller/userController');
 const { verifyRequired } = require('../../middlewares/authentication/userAuth');
 const upload = require('../../config/multer');
 const createMulter = require('../../config/multer');
@@ -32,6 +32,9 @@ router.post('/savechanges', verifyRequired, validateUpdateUser, updateProfile);
 const profileUpload = createMulter('profile');
 router.post('/updateprofile', verifyRequired, profileUpload.single('avatar'), updateProfileImage);
 
+// gets cart 
 router.post('/add-to-cart', verifyRequired, addToCart);
 
+// updates cart
+router.post('/cart/update/:id', verifyRequired, updateCart)
 module.exports = router;

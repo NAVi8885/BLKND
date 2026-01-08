@@ -237,7 +237,7 @@
                 <% allSizes.forEach(function(size, index) { const available=product.size && product.size.includes(size);
                   %>
 
-                  <input type="radio" class="btn-check" name="size" id="size<%= size %>" value="<%= size %>"
+                  <input type="radio" class="btn-check" name="selectedSize" id="size<%= size %>" value="<%= size %>"
                     <%=available ? '' : 'disabled' %>
                   <%= available && index===0 ? 'checked' : '' %>
                     >
@@ -263,7 +263,7 @@
                       style="width: 40px; height: 40px; background-color: <%= c.code %>;" data-color="<%= c.name %>">
                     </button>
                     <% }); %>
-                      <input type="hidden" name="color" id="selectedColorInput" value="<%= product.colors[0].name %>">
+                      <input type="hidden" name="selectedColor" id="selectedColorInput" value="<%= product.colors[0].name %>">
                       <% } else { %>
                         <!-- Fallback basic colors -->
                         <button class="btn btn-light border" type="button"

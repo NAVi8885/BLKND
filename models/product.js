@@ -8,8 +8,7 @@ const colorSchema = new mongoose.Schema({
     code: {
         type: String, required: true
     }, 
-},
-  { _id: false } );
+},{ _id: false });
 
 const productSchema = new Schema({
     name: {

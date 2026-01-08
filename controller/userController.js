@@ -199,66 +199,93 @@ const updateProfileImage = async (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
-    
-    if (!productId) {
-      return res.render('user/cart', { message: "Product ID is required" });
+    const { productId, quantity, selectedSize, selectedColor } = req.body;
+
+    if (!productId || !quantity) {
+      return res.status(400).send("Missing required fields");
     }
-    
-    if (!quantity || quantity < 1) {
-      return res.render('user/cart', { message: "Quantity must be at least 1" });
+
+    if (!selectedSize || !selectedColor) {
+      return res.status(400).send('Size and color are required');
     }
-    
+
+
     const product = await Product.findById(productId);
-    if (!product) {
-      return res.render('user/cart', { message: "Product not found" });
-    }
-    
-    // Check if product has stock
-    if (product.stock < quantity) {
-      return res.render('user/cart', { message: "Insufficient stock available" });
-    }
-    
-    let cart = await Cart.findOne({ userId: req.user._id });
-    
-    if (!cart) {
-      const subTotal = product.price * quantity;
-      cart = await Cart.create({
-        userId: req.user._id,
-        items: [{ productId, quantity }],
-        subTotal: subTotal,
-        total: subTotal
-      });
-    } else {
-      // Check if product already in cart
-      const existingItem = cart.items.find(item => item.productId.toString() === productId);
-      
-      if (existingItem) {
-        // Update quantity if product already exists
-        const totalQuantity = existingItem.quantity + quantity;
-        if (product.stock < totalQuantity) {
-          return res.render('user/cart', { message: "Insufficient stock for requested quantity"});
-        }
-        existingItem.quantity = totalQuantity;
-      } else {
-        cart.items.push({ productId, quantity });
-      }
-      
-      let newSubTotal = 0;
-      for (let item of cart.items) {
-        const prod = await Product.findById(item.productId);
-        newSubTotal += prod.price * item.quantity;
-      }
-      
-      cart.subTotal = newSubTotal;
-      cart.total = newSubTotal + (cart.shipping || 0) - (cart.couponDiscount || 0);
-      
-      await cart.save();
-    }
-  } catch (error) {
-    console.log("error happened at addToCart controller", error);
+  if (!product) return res.status(404).send("Product not found");
+
+  if (product.stock < quantity)
+    return res.status(400).send("Insufficient stock");
+
+  let cart = await Cart.findOne({ userId: req.user._id });
+  if (!cart) cart = new Cart({ userId: req.user._id, items: [] });
+
+  const item = cart.items.find(i =>
+    i.productId.equals(productId) &&
+    i.selectedSize === selectedSize &&
+    i.selectedColor === selectedColor
+  );
+
+  if (item) {
+    item.quantity += quantity;
+  } else {
+    cart.items.push({ productId, quantity, selectedSize, selectedColor });
+  }
+
+  await cart.save();
+  res.redirect('/cart');
+  } catch (err) {
+    console.error("addToCart error:", err);
+    res.status(500).send("Server error");
   }
 };
+
+const getCart = async (req, res) => {
+  const cart = await Cart.findOne({ userId: req.user._id })
+    .populate('items.productId');
+
+  if (!cart || cart.items.length === 0) {
+    return res.render('user/cart', {
+      cart: { items: [], subtotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 }
+    });
+  }
+
+  let subTotal = 0;
+  let totalItems = 0;
+
+  const items = cart.items.map(item => {
+    subTotal += item.productId.price * item.quantity;
+    totalItems += item.quantity;
+    return item;
+  });
+
+  const tax = subTotal * 0.04;
+  const shipping = subTotal >= 100 ? 0 : 100;
+  const total = subTotal + tax + shipping;
+
+  res.render('user/cart', {
+    cart: { items, subTotal, tax, shipping, total, totalItems }
+  });
+};
+
+  const updateCart = async (req, res) => {
+  const { itemId } = req.params;
+  const { action } = req.body;
+
+  const cart = await Cart.findOne({ userId: req.user._id })
+    .populate('items.productId');
+
+  const item = cart.items.id(itemId);
+  if (!item) return res.json({ success: false });
+
+  if (action === 'increase') item.quantity += 1;
+  if (action === 'decrease' && item.quantity > 1) item.quantity -= 1;
+
+  await cart.save();
+
+  // Recalculate totals exactly like getCart
+};
+
+
 
 
 module.exports = {
@@ -270,5 +297,7 @@ module.exports = {
     resetPassword,
     updateProfile,
     updateProfileImage,
-    addToCart
+    addToCart,
+    getCart,
+    updateCart
 };
