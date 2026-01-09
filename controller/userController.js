@@ -211,32 +211,32 @@ const addToCart = async (req, res) => {
 
 
     const product = await Product.findById(productId);
-  if (!product) return res.status(404).send("Product not found");
+    if (!product) return res.status(404).send("Product not found");
 
-  if (product.stock < quantity)
-    return res.status(400).send("Insufficient stock");
+    if (product.stock < quantity)
+      return res.status(400).send("Insufficient stock");
 
-  let cart = await Cart.findOne({ userId: req.user._id });
-  if (!cart) cart = new Cart({ userId: req.user._id, items: [] });
+    let cart = await Cart.findOne({ userId: req.user._id });
+    if (!cart) cart = new Cart({ userId: req.user._id, items: [] });
 
-  const item = cart.items.find(i =>
-    i.productId.equals(productId) &&
-    i.selectedSize === selectedSize &&
-    i.selectedColor === selectedColor
-  );
+    const item = cart.items.find(i =>
+      i.productId.equals(productId) &&
+      i.selectedSize === selectedSize &&
+      i.selectedColor === selectedColor
+    );
 
-  if (item) {
-    item.quantity += quantity;
-  } else {
-    cart.items.push({ productId, quantity, selectedSize, selectedColor });
-  }
+    if (item) {
+      item.quantity += quantity;
+    } else {
+      cart.items.push({ productId, quantity, selectedSize, selectedColor });
+    }
 
-  await cart.save();
-  res.redirect('/cart');
-  } catch (err) {
-    console.error("addToCart error:", err);
-    res.status(500).send("Server error");
-  }
+    await cart.save();
+      res.redirect('/cart');
+    } catch (err) {
+      console.error("addToCart error:", err);
+      res.status(500).send("Server error");
+    }
 };
 
 const getCart = async (req, res) => {
@@ -245,7 +245,7 @@ const getCart = async (req, res) => {
 
   if (!cart || cart.items.length === 0) {
     return res.render('user/cart', {
-      cart: { items: [], subtotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 }
+      cart: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 }
     });
   }
 
@@ -267,23 +267,152 @@ const getCart = async (req, res) => {
   });
 };
 
-  const updateCart = async (req, res) => {
-  const { itemId } = req.params;
-  const { action } = req.body;
+const updateCart = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { itemId } = req.params;
+    const { action } = req.body;
 
-  const cart = await Cart.findOne({ userId: req.user._id })
-    .populate('items.productId');
+    const cart = await Cart.findOne({ userId })
+      .populate('items.productId');
 
-  const item = cart.items.id(itemId);
-  if (!item) return res.json({ success: false });
+    if (!cart) {
+      return res.json({ success: false, message: 'Cart not found' });
+    }
 
-  if (action === 'increase') item.quantity += 1;
-  if (action === 'decrease' && item.quantity > 1) item.quantity -= 1;
+    const item = cart.items.id(itemId);
+    if (!item) {
+      return res.json({ success: false, message: 'Item not found' });
+    }
 
-  await cart.save();
+    const product = item.productId;
 
-  // Recalculate totals exactly like getCart
+    /* ===============================
+       UPDATE QUANTITY
+    ================================ */
+    if (action === 'increase') {
+      if (product.stock <= item.quantity) {
+        return res.json({
+          success: false,
+          message: 'Stock limit reached'
+        });
+      }
+      item.quantity += 1;
+    }
+
+    if (action === 'decrease') {
+      if (item.quantity <= 1) {
+        return res.json({
+          success: false,
+          message: 'Minimum quantity reached'
+        });
+      }
+      item.quantity -= 1;
+    }
+
+    /* ===============================
+       RECALCULATE TOTALS
+    ================================ */
+    let subTotal = 0;
+    let count = 0;
+
+    cart.items.forEach(i => {
+      subTotal += i.productId.price * i.quantity;
+      count += i.quantity;
+    });
+
+    const tax = +(subTotal * 0.04).toFixed(2);
+    const shipping = subTotal >= 100 ? 0 : 100;
+    const total = +(subTotal + tax + shipping).toFixed(2);
+
+    cart.subTotal = subTotal;
+    cart.tax = tax;
+    cart.shipping = shipping;
+    cart.total = total;
+
+    await cart.save();
+
+    /* ===============================
+       RESPONSE FOR AJAX
+    ================================ */
+    res.json({
+      success: true,
+      item: {
+        id: item._id,
+        quantity: item.quantity
+      },
+      cart: {
+        subTotal,
+        tax,
+        shipping,
+        total,
+        count
+      }
+    });
+
+  } catch (err) {
+    console.error('UPDATE CART ERROR:', err);
+    res.status(500).json({ success: false });
+  }
 };
+
+const removeFromCart = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { itemId } = req.params;
+
+    const cart = await Cart.findOne({ userId })
+      .populate('items.productId');
+
+    if (!cart) {
+      return res.json({ success: false, message: 'Cart not found' });
+    }
+
+    const item = cart.items.id(itemId);
+    if (!item) {
+      return res.json({ success: false, message: 'Item not found' });
+    }
+
+    // Remove item
+    cart.items.pull(itemId);
+
+    // Recalculate totals
+    let subTotal = 0;
+    let count = 0;
+
+    cart.items.forEach(i => {
+      subTotal += i.productId.price * i.quantity;
+      count += i.quantity;
+    });
+
+    const tax = +(subTotal * 0.04).toFixed(2);
+    const shipping = subTotal >= 100 ? 0 : 100;
+    const total = +(subTotal + tax + shipping).toFixed(2);
+
+    cart.subTotal = subTotal;
+    cart.tax = tax;
+    cart.shipping = shipping;
+    cart.total = total;
+
+    await cart.save();
+
+    res.json({
+      success: true,
+      cart: {
+        subTotal,
+        tax,
+        shipping,
+        total,
+        count
+      }
+    });
+
+  } catch (err) {
+    console.error('REMOVE CART ERROR:', err);
+    res.status(500).json({ success: false });
+  }
+};
+
 
 
 
@@ -299,5 +428,6 @@ module.exports = {
     updateProfileImage,
     addToCart,
     getCart,
-    updateCart
+    updateCart,
+    removeFromCart
 };

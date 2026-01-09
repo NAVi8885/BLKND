@@ -148,4 +148,4 @@ router.get('/product/:id', verifyRequired, async (req, res) => {
 
 router.get('/cart', verifyRequired, getCart);
 
-module.exports = router;
+module.exports = router; 
