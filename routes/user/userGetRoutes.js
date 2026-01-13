@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/userSchema');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
-const { getCart, getCheckout } = require('../../controller/userController');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress } = require('../../controller/userController');
 const { asyncWrapProviders } = require('async_hooks');
 
 
@@ -127,6 +127,13 @@ router.get('/userorders', verifyRequired, (req, res) => {
   res.render('user/profileOrder', {user: req.user, errors: null, oldInput: null});  
 });
 
+router.get('/useraddress', verifyRequired, (req, res) => {
+  res.render('user/profileAddress', {user: req.user })
+});
+
+router.get('/usersetting', verifyRequired, (req, res) => {
+  res.render('user/profileSetting', {user: req.user})
+})
 ///////////\\\\\\\\\\\\\
 //USER PROFILE SECTION\\
 ///////////\\\\\\\\\\\\\
@@ -154,4 +161,10 @@ router.get('/contact', optionalVerify, async (req, res) => {
 
 router.get('/checkout', verifyRequired, getCheckout);
 
+router.get('/profileAddress', verifyRequired, getAddress);
+
+// Action Buttons
+router.get('/address/delete/:id', verifyRequired, deleteAddress);
+
+router.get('/address/setdefault/:id', verifyRequired, setDefaultAddress);
 module.exports = router;

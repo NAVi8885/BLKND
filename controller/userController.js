@@ -444,7 +444,115 @@ const getCheckout = async (req, res) => {
     }
 };
 
+const getAddress = async (req, res) => {
+  try{
+      const userId = req.user._id;
+        // Sort: Default address first, then by creation date
+        const addresses = await Address.find({ userId }).sort({ isDefault: -1, createdAt: -1 });
+        
+        res.render('user/profileAddress', { 
+            user: req.user, 
+            addresses: addresses,
+            reqPage: 'profile' // For navbar highlighting
+        });
+  } catch(error){
+    console.log("error happened at getAddress", error)
+  }
+}
 
+const addAddress = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { label, name, phone, line1, line2, city, state, pincode, isDefault } = req.body;
+
+        // If 'isDefault' is checked, unset all other default addresses for this user
+        if (isDefault) {
+            await Address.updateMany({ userId }, { $set: { isDefault: false } });
+        }
+
+        const newAddress = new Address({
+            userId,
+            label,
+            name,
+            phone,
+            line1,
+            line2,
+            city,
+            state,
+            pincode,
+            isDefault: isDefault === 'true' // Checkbox sends string "true"
+        });
+
+        // first addres is first set as default
+        const count = await Address.countDocuments({ userId });
+        if (count === 0) {
+            newAddress.isDefault = true;
+        }
+
+        await newAddress.save();
+        res.redirect('/profileAddress');
+
+    } catch (error) {
+        console.error("Error adding address:", error);
+        res.status(500).send("Server Error");
+    }
+};
+
+const editAddress = async (req, res) => {
+    try {
+        const { id } = req.params; // ID comes from the URL
+        const userId = req.user._id;
+        const { label, name, phone, line1, line2, city, state, pincode, isDefault } = req.body;
+
+        const updateData = { label, name, phone, line1, line2, city, state, pincode };
+
+        // If setting as default, unset others first
+        if (isDefault) {
+            updateData.isDefault = true;
+            await Address.updateMany({ userId }, { $set: { isDefault: false } });
+        } else {
+             updateData.isDefault = false;
+        }
+
+        await Address.findByIdAndUpdate({ _id: id, userId }, { $set: updateData });
+        res.redirect('/profileAddress');
+
+    } catch (error) {
+        console.error("Error editing address:", error);
+        res.redirect('/profileAddress');
+    }
+};
+
+const deleteAddress = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        
+        await Address.findOneAndDelete({ _id: id, userId });
+        res.redirect('/profileAddress');
+    } catch (error) {
+        console.error("Error deleting address:", error);
+        res.redirect('/profileAddress');
+    }
+};
+
+const setDefaultAddress = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+
+        // Set's all user's addresses to false
+        await Address.updateMany({ userId }, { $set: { isDefault: false } });
+
+        // Set's the selected one to true
+        await Address.findByIdAndUpdate({ _id: id, userId }, { $set: { isDefault: true } });
+
+        res.redirect('/profileAddress');
+    } catch (error) {
+        console.error("Error setting default address:", error);
+        res.redirect('/profileAddress');
+    }
+};
 
 module.exports = {
     userRegister,
@@ -459,5 +567,11 @@ module.exports = {
     getCart,
     updateCart,
     removeFromCart,
-    getCheckout
+    getCheckout,
+    getAddress,
+    addAddress,
+    editAddress,
+    deleteAddress,
+    setDefaultAddress
+
 };

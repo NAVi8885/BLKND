@@ -13,49 +13,85 @@
         .profile-sidebar .nav-link { color: #212529; padding: 12px 20px; border-radius: 6px; margin-bottom: 5px; }
         .profile-sidebar .nav-link:hover { background-color: #e9ecef; }
         .profile-sidebar .nav-link.active { background-color: #212529; color: #fff; }
-        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
+        .profile-section {
+            text-align: center;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto;
+        }
+
+        .profile-avatar,
+        .avatar-initial {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #111;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 44px;
+            font-weight: 600;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            top: 5%;
+            right: 0%;
+            width: 32px;
+            height: 32px;
+            background: #000;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #fff;
+            font-size: 0.7rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+            transition: all .2s ease;
+        }
+
+        .avatar-edit-btn:hover {
+            transform: scale(1.1);
+            background: #222;
+        }
         .address-card { border: 2px solid #dee2e6; border-radius: 8px; padding: 20px; margin-bottom: 20px; position: relative; }
         .address-card.default { border-color: #212529; }
     </style>
 </head>
 <body>
-    <div class="top-nav text-white" style="background-color: #212529; padding: 10px 0; font-size: 14px;">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top"
+        style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
         <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-facebook"></i></a>
-                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-instagram"></i></a>
-                    <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
-                </div>
-                <div><span>Free shipping on orders over $50</span></div>
-                <div>
-                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
-                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <div class="container">
-            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">KAIRA</a>
+            <a class="navbar-brand" href="/index" style="font-size: 28px; font-weight: 700;">BLKND</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/index">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
                 </ul>
                 <div class="nav-icons d-flex align-items-center">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
-                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
-                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
-                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal"
+                        style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
+                    <a href="/profile" style="color: #212529; font-size: 18px; margin-left: 20px;"><i
+                            class="fas fa-user"></i></a>
+                    <a href="/wishlist" style="color: #212529; font-size: 18px; margin-left: 20px;"><i
+                            class="fas fa-heart"></i></a>
+                    <a href="/cart" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
                         <i class="fas fa-shopping-cart"></i>
-                        <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
+                        <span
+                            style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
                     </a>
                 </div>
             </div>
@@ -80,8 +116,8 @@
             <h1 class="mb-2">My Addresses</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item"><a href="profile.html">Profile</a></li>
+                    <li class="breadcrumb-item"><a href="/index">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
                     <li class="breadcrumb-item active">Addresses</li>
                 </ol>
             </nav>
@@ -92,29 +128,47 @@
         <div class="row">
             <div class="col-lg-3">
                 <div class="profile-sidebar">
-                    <div class="text-center mb-4">
-                        <img src="https://ui-avatars.com/api/?name=John+Doe&size=120&background=212529&color=fff" class="profile-avatar mb-3" alt="Profile">
-                        <h5>John Doe</h5>
-                        <p class="text-muted small">john.doe@example.com</p>
+                    <div class="profile-section text-center">
+                        <div class="profile-avatar-wrapper">
+
+                            <% if (user.profilePic) { %>
+                                <img src="<%= user.profilePic %>" class="profile-avatar" alt="Profile">
+                            <% } else { %>
+                                <div class="avatar-initial">
+                                    <%= user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase() %>
+                                </div>
+                                <% } %>
+
+                                <button class="avatar-edit-btn" data-bs-toggle="modal" data-bs-target="#changePhotoModal">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                        </div>
+
+                        <h5 class="mt-3 fw-bold">
+                            <%= user.name %>
+                        </h5>
+                        <p class="text-muted small mb-1">
+                            <%= user.email %>
+                        </p>
+                        <p class="text-muted small">
+                            <%= user.phoneNumber || "No phone added" %>
+                        </p>
                     </div>
                     
                     <nav class="nav flex-column">
-                        <a class="nav-link" href="profile.html">
+                        <a class="nav-link" href="/profile">
                             <i class="fas fa-user me-2"></i> Profile
                         </a>
-                        <a class="nav-link" href="profileOrder.html">
+                        <a class="nav-link" href="/userorders">
                             <i class="fas fa-shopping-bag me-2"></i> Orders
                         </a>
-                        <a class="nav-link active" href="profileAddress.html">
+                        <a class="nav-link active" href="/useraddress">
                             <i class="fas fa-map-marker-alt me-2"></i> Addresses
                         </a>
-                        <a class="nav-link" href="profileSetting.html">
+                        <a class="nav-link" href="/usersetting">
                             <i class="fas fa-cog me-2"></i> Settings
                         </a>
-                        <a class="nav-link" href="wishlist.html">
-                            <i class="fas fa-heart me-2"></i> Wishlist
-                        </a>
-                        <a class="nav-link" href="login.html">
+                        <a class="nav-link" href="/logout">
                             <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
                     </nav>
@@ -126,43 +180,58 @@
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h4 class="mb-0">Saved Addresses</h4>
-                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                            <button class="btn btn-dark" onclick="openAddModal()" data-bs-toggle="modal" data-bs-target="#addressModal">
                                 <i class="fas fa-plus me-2"></i> Add New Address
                             </button>
                         </div>
+                    
+                        <% if (addresses && addresses.length > 0) { %>
+                            <% addresses.forEach(addr => { %>
+                                <div class="address-card <%= addr.isDefault ? 'default' : '' %>">
+                                    
+                                    <% if (addr.isDefault) { %>
+                                        <span class="badge bg-dark position-absolute top-0 end-0 m-3">Default</span>
+                                    <% } %>
+                                    
+                                    <h5><%= addr.label || 'Address' %></h5>
+                                    
+                                    <p class="mb-1"><strong><%= addr.name %></strong></p>
+                                    <p class="mb-1">
+                                        <%= addr.line1 %>
+                                        <%= addr.line2 ? ', ' + addr.line2 : '' %>
+                                    </p>
+                                    <p class="mb-1">
+                                        <%= addr.city %>, <%= addr.state %> <%= addr.pincode %>
+                                    </p>
+                                    <p class="mb-3">Phone: <%= addr.phone %></p>
+                                
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button class="btn btn-outline-dark btn-sm" 
+                                            onclick="openEditModal('<%= JSON.stringify(addr).replace(/'/g, "\\'") %>')"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#addressModal">
+                                            Edit
+                                        </button>
+                                    
+                                        <% if (!addr.isDefault) { %>
+                                            <form action="/address/setdefault/<%= addr._id %>" method="GET" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-dark btn-sm">Set as Default</button>
+                                            </form>
+                                        <% } %>
+                                        
+                                        <form action="/address/delete/<%= addr._id %>" method="GET" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                        </form>
+                                    </div>
+                                
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <p class="text-muted">No saved addresses found.</p>
+                            </div>
+                        <% } %>
                         
-                        <div class="address-card default">
-                            <span class="badge bg-dark position-absolute top-0 end-0 m-3">Default</span>
-                            <h5>Home</h5>
-                            <p class="mb-1"><strong>John Doe</strong></p>
-                            <p class="mb-1">123 Main Street, Apartment 4B</p>
-                            <p class="mb-1">Kochi, Kerala 682001</p>
-                            <p class="mb-3">Phone: +91 9876543210</p>
-                            <button class="btn btn-outline-dark btn-sm me-2">Edit</button>
-                            <button class="btn btn-outline-danger btn-sm">Delete</button>
-                        </div>
-                        
-                        <div class="address-card">
-                            <h5>Office</h5>
-                            <p class="mb-1"><strong>John Doe</strong></p>
-                            <p class="mb-1">456 Business Park, Floor 3</p>
-                            <p class="mb-1">Thiruvananthapuram, Kerala 695001</p>
-                            <p class="mb-3">Phone: +91 9876543210</p>
-                            <button class="btn btn-outline-dark btn-sm me-2">Edit</button>
-                            <button class="btn btn-outline-dark btn-sm me-2">Set as Default</button>
-                            <button class="btn btn-outline-danger btn-sm">Delete</button>
-                        </div>
-                        
-                        <div class="address-card">
-                            <h5>Parent's Home</h5>
-                            <p class="mb-1"><strong>John Doe</strong></p>
-                            <p class="mb-1">789 Garden Road</p>
-                            <p class="mb-1">Kozhikode, Kerala 673001</p>
-                            <p class="mb-3">Phone: +91 9876543210</p>
-                            <button class="btn btn-outline-dark btn-sm me-2">Edit</button>
-                            <button class="btn btn-outline-dark btn-sm me-2">Set as Default</button>
-                            <button class="btn btn-outline-danger btn-sm">Delete</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -170,82 +239,102 @@
     </div>
 
     <!-- Add Address Modal -->
-    <div class="modal fade" id="addAddressModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Address</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Address Label</label>
-                            <input type="text" class="form-control" placeholder="e.g., Home, Office" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Full Name</label>
-                                <input type="text" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Street Address</label>
-                            <input type="text" class="form-control" placeholder="House number and street name" required>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">City</label>
-                                <input type="text" class="form-control" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">State</label>
-                                <select class="form-select" required>
-                                    <option value="">Select State</option>
-                                    <option>Kerala</option>
-                                    <option>Tamil Nadu</option>
-                                    <option>Karnataka</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">ZIP Code</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="setDefault">
-                            <label class="form-check-label" for="setDefault">Set as default address</label>
-                        </div>
-                        <button type="submit" class="btn btn-dark w-100">Save Address</button>
-                    </form>
-                </div>
+    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addressModalLabel">Add New Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            
+            <form id="addressForm" action="/address/add" method="POST">
+                <div class="modal-body">
+                    
+                    <input type="hidden" name="addressId" id="addressId">
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Address Type</label>
+                            <input type="text" class="form-control" name="label" id="addr_label" placeholder="e.g., Home, Office">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" name="name" id="addr_name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" class="form-control" name="phone" id="addr_phone" required pattern="[0-9]{10}" title="Enter a valid 10-digit number">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 1 *</label>
+                        <input type="text" class="form-control" name="line1" id="addr_line1" placeholder="House No, Building, Apartment" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 2</label>
+                        <input type="text" class="form-control" name="line2" id="addr_line2" placeholder="Street, Area, Landmark (Optional)">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control" name="city" id="addr_city" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">State *</label>
+                            <select class="form-select" name="state" id="addr_state" required>
+                                <option value="">Select State</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Pincode *</label>
+                            <input type="text" class="form-control" name="pincode" id="addr_pincode" required pattern="[0-9]{6}">
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="isDefault" id="addr_isDefault" value="true">
+                        <label class="form-check-label" for="addr_isDefault">
+                            Set as default address
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-dark" id="submitBtn">Save Address</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
     <footer style="background-color: #212529; color: #fff; padding: 60px 0 20px;">
         <div class="container">
             <div class="row">
                 <div class="col-md-3">
-                    <h5>KAIRA</h5>
+                    <h5>BLKND</h5>
                     <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
                 </div>
                 <div class="col-md-3">
                     <h5>Quick Links</h5>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><a href="about.html" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
-                        <li style="margin-bottom: 10px;"><a href="shop.html" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
-                        <li style="margin-bottom: 10px;"><a href="contact.html" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/about" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/shop" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/contact" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h5>Customer Service</h5>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><a href="profile.html" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/profile" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
@@ -260,11 +349,50 @@
             </div>
             <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
             <div class="text-center">
-                <p style="color: #adb5bd;">&copy; 2025 Kaira. All rights reserved.</p>
+                <p style="color: #adb5bd;">&copy; 2025 BLKND. All rights reserved.</p>
             </div>
         </div>
     </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function openAddModal() {
+        // Reset form
+        document.getElementById('addressForm').reset();
+        document.getElementById('addressId').value = '';
+        
+        // Set styling for Add mode
+        document.getElementById('addressModalLabel').innerText = 'Add New Address';
+        document.getElementById('submitBtn').innerText = 'Save Address';
+        
+        // Set Action URL (Adjust route as needed)
+        document.getElementById('addressForm').action = '/address/add';
+    }
+
+    function openEditModal(addressJson) {
+        const address = JSON.parse(addressJson);
+
+        // Populate fields matching your Schema
+        document.getElementById('addressId').value = address._id;
+        document.getElementById('addr_label').value = address.label || '';
+        document.getElementById('addr_name').value = address.name;
+        document.getElementById('addr_phone').value = address.phone;
+        document.getElementById('addr_line1').value = address.line1;
+        document.getElementById('addr_line2').value = address.line2 || '';
+        document.getElementById('addr_city').value = address.city;
+        document.getElementById('addr_state').value = address.state;
+        document.getElementById('addr_pincode').value = address.pincode;
+        
+        // Handle Checkbox
+        document.getElementById('addr_isDefault').checked = address.isDefault;
+
+        // Set styling for Edit mode
+        document.getElementById('addressModalLabel').innerText = 'Edit Address';
+        document.getElementById('submitBtn').innerText = 'Update Address';
+        
+        // Set Action URL (Adjust route to include ID)
+        document.getElementById('addressForm').action = `/address/edit/${address._id}`;
+    }
+    </script>
 </body>
 </html>
