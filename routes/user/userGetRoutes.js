@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/userSchema');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
-const { getCart } = require('../../controller/userController');
+const { getCart, getCheckout } = require('../../controller/userController');
+const { asyncWrapProviders } = require('async_hooks');
 
 
 
@@ -119,33 +120,38 @@ router.get('/forgotpassword', (req, res) => {
 
 
 router.get('/profile', verifyRequired, (req, res) => {
-  if(!req.user) {
-    return res.redirect('/login')
-  }
   res.render('user/profile', {user: req.user, errors: null, oldInput: null});
 });
 
 router.get('/userorders', verifyRequired, (req, res) => {
-  if(!req.user) {
-    return res.redirect('/login')
-  }
   res.render('user/profileOrder', {user: req.user, errors: null, oldInput: null});  
 });
+
 ///////////\\\\\\\\\\\\\
 //USER PROFILE SECTION\\
 ///////////\\\\\\\\\\\\\
 
-router.get('/shop', verifyRequired, async(req, res) => {
+router.get('/shop', optionalVerify, async(req, res) => {
   const products = await Product.find();
   const categories = await Category.find().lean();
   res.render('user/shop', {products, categories, user: req.user});
 });
 
-router.get('/product/:id', verifyRequired, async (req, res) => {
+router.get('/product/:id', optionalVerify, async (req, res) => {
   const product = await Product.findById(req.params.id).lean();
   res.render('user/singleProduct', {product, user: req.user});
 });
 
 router.get('/cart', verifyRequired, getCart);
 
-module.exports = router; 
+router.get('/about', optionalVerify, async (req, res) => {
+  res.render('user/about', {user: req.user});
+});
+
+router.get('/contact', optionalVerify, async (req, res) => {
+  res.render('user/contact', {user: req.user});
+});
+
+router.get('/checkout', verifyRequired, getCheckout);
+
+module.exports = router;

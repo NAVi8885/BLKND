@@ -3,21 +3,25 @@ const User = require('../../models/userSchema');
 
 
 const optionalVerify = async (req, res, next) => {
-    const token = req.cookies.token;
-    if(token){
-        try{
-            const verify = await jwt.verify(token, process.env.SECRET_KEY);
-            const user = await User.findById(verify._id);
-            
-            req.user = user;
-            
-            next();
-        }catch(err){
-            console.log("error happened at user-verify in userauth :", err)
-        }
-    } 
-    next();
-}
+  const token = req.cookies.token;
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const user = await User.findById(decoded._id);
+
+    if (user) {
+      req.user = user;
+    }
+  } catch (err) {
+    res.clearCookie('token');
+  }
+
+  return next();
+};
 
 const verifyRequired = async(req, res, next) => {
     const token = req.cookies.token;

@@ -24,32 +24,38 @@
                     <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
                 </div>
                 <div><span>Free shipping on orders over $50</span></div>
-                <div>
-                    <a href="login.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
-                    <a href="signup.html" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
-                </div>
+                <% if(!user){ %>
+                    <div>
+                        <a href="/login" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
+                        <a href="/signup" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                    </div>
+                <% } else {%>
+                    <div>
+                        <p style="margin-bottom: 0rem;"><%= user.name %></p>
+                    </div>
+                    <% } %>
             </div>
         </div>
     </div>
     
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
         <div class="container">
-            <a class="navbar-brand" href="index.html" style="font-size: 28px; font-weight: 700;">BLKND</a>
+            <a class="navbar-brand" href="/index" style="font-size: 28px; font-weight: 700;">BLKND</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="about.html">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/index">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
                 </ul>
                 <div class="nav-icons d-flex align-items-center">
                     <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
-                    <a href="profile.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
-                    <a href="wishlist.html" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
-                    <a href="cart.html" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                    <a href="/profile" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="/wishlist" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="/cart" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
                         <i class="fas fa-shopping-cart"></i>
                         <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
                     </a>
@@ -76,7 +82,7 @@
             <h1 class="mb-2">About Us</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/index">Home</a></li>
                     <li class="breadcrumb-item active">About</li>
                 </ol>
             </nav>
@@ -87,9 +93,9 @@
         <div class="row align-items-center mb-5">
             <div class="col-md-6">
                 <h2 class="mb-4">Our Story</h2>
-                <p>Founded in 2020, Kaira has become a leading destination for fashion enthusiasts seeking quality, style, and affordability. What started as a small boutique has grown into a trusted online fashion retailer serving customers worldwide.</p>
+                <p>Founded in 2020, BLKND has become a leading destination for fashion enthusiasts seeking quality, style, and affordability. What started as a small boutique has grown into a trusted online fashion retailer serving customers worldwide.</p>
                 <p>We believe that fashion should be accessible to everyone, which is why we carefully curate our collections to offer the latest trends at prices that won't break the bank. Our commitment to quality ensures that every piece in our store meets the highest standards.</p>
-                <p>At Kaira, we're more than just a fashion store – we're a community of style lovers who believe in expressing individuality through clothing.</p>
+                <p>At BLKND, we're more than just a fashion store – we're a community of style lovers who believe in expressing individuality through clothing.</p>
             </div>
             <div class="col-md-6">
                 <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600" class="img-fluid rounded" alt="Store">
@@ -185,21 +191,21 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-3">
-                    <h5>KAIRA</h5>
+                    <h5>BLKND</h5>
                     <p style="color: #adb5bd;">Your premier destination for fashion and style.</p>
                 </div>
                 <div class="col-md-3">
                     <h5>Quick Links</h5>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><a href="about.html" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
-                        <li style="margin-bottom: 10px;"><a href="shop.html" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
-                        <li style="margin-bottom: 10px;"><a href="contact.html" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/about" style="color: #adb5bd; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/shop" style="color: #adb5bd; text-decoration: none;">Shop</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/contact" style="color: #adb5bd; text-decoration: none;">Contact</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h5>Customer Service</h5>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><a href="profile.html" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
+                        <li style="margin-bottom: 10px;"><a href="/profile" style="color: #adb5bd; text-decoration: none;">My Account</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
@@ -214,7 +220,7 @@
             </div>
             <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
             <div class="text-center">
-                <p style="color: #adb5bd;">&copy; 2025 Kaira. All rights reserved.</p>
+                <p style="color: #adb5bd;">&copy; 2025 BLKND. All rights reserved.</p>
             </div>
         </div>
     </footer>

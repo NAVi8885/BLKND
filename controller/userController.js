@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 const Cart = require('../models/cart');
 const Product = require('../models/product');
+const Address = require('../models/address');
 const { sendOtpEmail } = require('../utils/otpApp');
 
 
@@ -66,7 +67,7 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
     res.clearCookie('token',  { httpOnly: true, sameSite: "strict" });
-    return res.redirect('user/login');
+    return res.redirect('/login');
 }
 
 const forgotPassword = async (req, res) => {
@@ -199,7 +200,8 @@ const updateProfileImage = async (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
-    const { productId, quantity, selectedSize, selectedColor } = req.body;
+    const { productId, selectedSize, selectedColor } = req.body;
+    const quantity = parseInt(req.body.quantity);
 
     if (!productId || !quantity) {
       return res.status(400).send("Missing required fields");
@@ -413,7 +415,34 @@ const removeFromCart = async (req, res) => {
   }
 };
 
+const getCheckout = async (req, res) => {
+    try {
+        const userId = req.user._id;
 
+        // 1. Fetch the user's cart and populate product details
+        const cart = await Cart.findOne({ userId }).populate('items.productId');
+
+        // If cart is empty, redirect back to shop or cart
+        if (!cart || cart.items.length === 0) {
+            return res.redirect('/shop');
+        }
+
+        // 2. Fetch user's saved addresses
+        const addresses = await Address.find({ userId });
+
+        // 3. Render the view with all necessary data
+        res.render('user/checkout', {
+            user: req.user,
+            cart: cart,
+            addresses: addresses,
+            reqPage: 'checkout' // Used for navbar active state
+        });
+
+    } catch (error) {
+        console.error("Error in getCheckout:", error);
+        res.render('user/404'); // Or handle error appropriately
+    }
+};
 
 
 
@@ -429,5 +458,6 @@ module.exports = {
     addToCart,
     getCart,
     updateCart,
-    removeFromCart
+    removeFromCart,
+    getCheckout
 };
