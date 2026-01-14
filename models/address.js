@@ -10,10 +10,6 @@ const AddressSchema = new Schema({
     label: {
         type: String
     },
-    name: {
-        type: String,
-        required: true
-    },
     phone: {
         type: String,
         required: true

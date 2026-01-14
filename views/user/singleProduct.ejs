@@ -288,8 +288,10 @@
 
             <div class="d-flex gap-2">
               <button type="submit" class="btn btn-dark btn-add-cart">Add to Cart</button>
-              <a href="/wishlist/add/<%= product._id %>" class="btn btn-outline-dark btn-add-cart"><i
-                  class="fas fa-heart"></i></a>
+    
+              <button type="submit" formaction="/add-to-wishlist" class="btn btn-outline-dark btn-add-cart">
+                  <i class="fas fa-heart"></i>
+              </button>
             </div>
         </form>
 

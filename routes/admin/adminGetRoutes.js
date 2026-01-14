@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../../models/product');
-const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory } = require('../../controller/adminController');
+const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory, getCustomers } = require('../../controller/adminController');
 const verifyAdmin = require('../../middlewares/authentication/adminAuth');
 const Category = require('../../models/categorySchema');
 const User = require('../../models/userSchema');
+const { verifyRequired } = require('../../middlewares/authentication/userAuth');
 
 router.get('/adminlogin',(req, res) => {
     res.render('admin/adminLogin',{errors:null});
@@ -39,10 +40,7 @@ router.get('/admin/categories/delete/:id', verifyAdmin, deleteCategory);
 
 router.get('/admin/categories/deletesub', verifyAdmin, deleteSub);
 
-router.get('/customers', async (req, res) => {
-    const customers = await User.find();
-    res.render('admin/customers', { customers });
-})
+router.get('/customers',verifyRequired, getCustomers);
 
 router.get('/coupons', (req, res) => {
     res.render('admin/coupons');

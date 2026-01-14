@@ -188,7 +188,7 @@
                         <% if (addresses && addresses.length > 0) { %>
                             <% addresses.forEach(addr => { %>
                                 <div class="address-card <%= addr.isDefault ? 'default' : '' %>">
-                                    
+
                                     <% if (addr.isDefault) { %>
                                         <span class="badge bg-dark position-absolute top-0 end-0 m-3">Default</span>
                                     <% } %>
@@ -257,15 +257,13 @@
                             <label class="form-label">Address Type</label>
                             <input type="text" class="form-control" name="label" id="addr_label" placeholder="e.g., Home, Office">
                         </div>
-                        <div class="col-md-8">
-                            <label class="form-label">Full Name *</label>
-                            <input type="text" class="form-control" name="name" id="addr_name" required>
-                        </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Phone Number *</label>
-                        <input type="tel" class="form-control" name="phone" id="addr_phone" required pattern="[0-9]{10}" title="Enter a valid 10-digit number">
+                        <div class="col-md-4">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" name="phone" id="addr_phone" required pattern="[0-9]{10}" title="Enter a valid 10-digit number">
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -375,7 +373,6 @@
         // Populate fields matching your Schema
         document.getElementById('addressId').value = address._id;
         document.getElementById('addr_label').value = address.label || '';
-        document.getElementById('addr_name').value = address.name;
         document.getElementById('addr_phone').value = address.phone;
         document.getElementById('addr_line1').value = address.line1;
         document.getElementById('addr_line2').value = address.line2 || '';

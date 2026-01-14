@@ -3,7 +3,7 @@ const Admin = require('../models/adminSchema');
 const jwt = require('jsonwebtoken');
 const Product = require('../models/product');
 const Category = require('../models/categorySchema');
-
+const User = require('../models/userSchema');
 
 const adminLogin = async (req, res) => {
     try{
@@ -309,6 +309,28 @@ const updateCategory = async (req, res) => {
   res.redirect("/categories");
 }
 
+const getCustomers = async (req, res) => {
+    try {
+        const customers = await User.aggregate([
+            {
+                $lookup: {
+                    from: "orders",       // The collection name for Orders (usually lowercase plural)
+                    localField: "_id",    // Field in User collection
+                    foreignField: "userId", // Field in Order collection
+                    as: "orders"          // The name of the array field to populate
+                }
+            },
+            {
+                $sort: { createdAt: -1 } // Optional: Sort customers by newest first
+            }
+        ]);
+        
+        res.render('admin/customers', { customers });
+    } catch (error) {
+        console.error("Error fetching customers:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}; 
 
 module.exports = {
     adminLogin,
@@ -320,7 +342,8 @@ module.exports = {
     addSubCategory,
     deleteCategory,
     deleteSub,
-    updateCategory
+    updateCategory,
+    getCustomers
 }
 
     

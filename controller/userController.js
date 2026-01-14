@@ -4,8 +4,9 @@ const User = require('../models/userSchema');
 const Cart = require('../models/cart');
 const Product = require('../models/product');
 const Address = require('../models/address');
+const Order = require('../models/order');
+const Wishlist = require('../models/wishlist');
 const { sendOtpEmail } = require('../utils/otpApp');
-
 
 
 const userRegister = async (req, res) => {
@@ -183,18 +184,18 @@ const updateProfile = async (req, res) => {
 const updateProfileImage = async (req, res) => {
   try {
     if (!req.file) {
-      return res.render('user/profile',{errors: [{msg:"Image not found", path:"file"}]});
+        return res.render('user/profile',{errors: [{msg:"Image not found", path:"file"}]});
     }
 
     const profilePhoto = `/uploads/profile/${req.file.filename}`;
 
     await User.findByIdAndUpdate(req.user._id, {
-      $set: { profilePic: profilePhoto }
+        $set: { profilePic: profilePhoto }
     });
 
     return res.redirect('/profile');
   } catch (error) {
-    console.log("error happened at user controller / updateprofileimage", error);
+        console.log("error happened at user controller / updateprofileimage", error);
   }
 };
 
@@ -211,7 +212,6 @@ const addToCart = async (req, res) => {
       return res.status(400).send('Size and color are required');
     }
 
-
     const product = await Product.findById(productId);
     if (!product) return res.status(404).send("Product not found");
 
@@ -221,52 +221,73 @@ const addToCart = async (req, res) => {
     let cart = await Cart.findOne({ userId: req.user._id });
     if (!cart) cart = new Cart({ userId: req.user._id, items: [] });
 
-    const item = cart.items.find(i =>
+    // Add or Update Item
+    const itemIndex = cart.items.findIndex(i =>
       i.productId.equals(productId) &&
       i.selectedSize === selectedSize &&
       i.selectedColor === selectedColor
     );
 
-    if (item) {
-      item.quantity += quantity;
+    if (itemIndex > -1) {
+      cart.items[itemIndex].quantity += quantity;
     } else {
       cart.items.push({ productId, quantity, selectedSize, selectedColor });
     }
 
+    // Populate to get prices for calculation
+    await cart.populate('items.productId');
+
+    let subTotal = 0;
+    
+    // Filter out invalid items just in case
+    cart.items = cart.items.filter(item => item.productId != null);
+
+    cart.items.forEach(item => {
+      subTotal += item.productId.price * item.quantity;
+    });
+
+    //  Update Cart Fields
+    cart.subTotal = subTotal;
+    cart.tax = subTotal * 0.04; // 4% Tax
+    cart.shipping = subTotal >= 100 ? 0 : 100; // Free shipping over 100
+    cart.total = cart.subTotal + cart.tax + cart.shipping;
+
+    // Save the Cart with calculated totals
     await cart.save();
-      res.redirect('/cart');
-    } catch (err) {
+    
+    res.redirect('/cart');
+    
+  } catch (err) {
       console.error("addToCart error:", err);
       res.status(500).send("Server error");
-    }
+  }
 };
 
 const getCart = async (req, res) => {
-  const cart = await Cart.findOne({ userId: req.user._id })
-    .populate('items.productId');
+    const cart = await Cart.findOne({ userId: req.user._id }).populate('items.productId');
 
-  if (!cart || cart.items.length === 0) {
-    return res.render('user/cart', {
-      cart: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 }
+    if (!cart || cart.items.length === 0) {
+        return res.render('user/cart', {
+            cart: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 }
+        });
+    }
+
+    let subTotal = 0;
+    let totalItems = 0;
+
+    const items = cart.items.map(item => {
+        subTotal += item.productId.price * item.quantity;
+        totalItems += item.quantity;
+        return item;
     });
-  }
 
-  let subTotal = 0;
-  let totalItems = 0;
+    const tax = +(subTotal * 0.04).toFixed(2);
+    const shipping = subTotal >= 100 ? 0 : 100;
+    const total = +(subTotal + tax + shipping).toFixed(2);
 
-  const items = cart.items.map(item => {
-    subTotal += item.productId.price * item.quantity;
-    totalItems += item.quantity;
-    return item;
-  });
-
-  const tax = subTotal * 0.04;
-  const shipping = subTotal >= 100 ? 0 : 100;
-  const total = subTotal + tax + shipping;
-
-  res.render('user/cart', {
-    cart: { items, subTotal, tax, shipping, total, totalItems }
-  });
+    res.render('user/cart', {
+        cart: { items, subTotal, tax, shipping, total, totalItems }
+    });
 };
 
 const updateCart = async (req, res) => {
@@ -275,16 +296,15 @@ const updateCart = async (req, res) => {
     const { itemId } = req.params;
     const { action } = req.body;
 
-    const cart = await Cart.findOne({ userId })
-      .populate('items.productId');
+    const cart = await Cart.findOne({ userId }).populate('items.productId');
 
     if (!cart) {
-      return res.json({ success: false, message: 'Cart not found' });
+        return res.json({ success: false, message: 'Cart not found' });
     }
 
     const item = cart.items.id(itemId);
     if (!item) {
-      return res.json({ success: false, message: 'Item not found' });
+        return res.json({ success: false, message: 'Item not found' });
     }
 
     const product = item.productId;
@@ -293,22 +313,22 @@ const updateCart = async (req, res) => {
        UPDATE QUANTITY
     ================================ */
     if (action === 'increase') {
-      if (product.stock <= item.quantity) {
-        return res.json({
-          success: false,
-          message: 'Stock limit reached'
-        });
-      }
+        if (product.stock <= item.quantity) {
+            return res.json({
+                success: false,
+                message: 'Stock limit reached'
+            });
+        }
       item.quantity += 1;
     }
 
     if (action === 'decrease') {
-      if (item.quantity <= 1) {
-        return res.json({
-          success: false,
-          message: 'Minimum quantity reached'
-        });
-      }
+        if (item.quantity <= 1) {
+            return res.json({
+                success: false,
+                message: 'Minimum quantity reached'
+            });
+        }
       item.quantity -= 1;
     }
 
@@ -319,8 +339,8 @@ const updateCart = async (req, res) => {
     let count = 0;
 
     cart.items.forEach(i => {
-      subTotal += i.productId.price * i.quantity;
-      count += i.quantity;
+        subTotal += i.productId.price * i.quantity;
+        count += i.quantity;
     });
 
     const tax = +(subTotal * 0.04).toFixed(2);
@@ -338,18 +358,18 @@ const updateCart = async (req, res) => {
        RESPONSE FOR AJAX
     ================================ */
     res.json({
-      success: true,
-      item: {
-        id: item._id,
-        quantity: item.quantity
-      },
-      cart: {
-        subTotal,
-        tax,
-        shipping,
-        total,
-        count
-      }
+            success: true,
+            item: {
+            id: item._id,
+            quantity: item.quantity
+        },
+        cart: {
+            subTotal,
+            tax,
+            shipping,
+            total,
+            count
+        }
     });
 
   } catch (err) {
@@ -463,7 +483,7 @@ const getAddress = async (req, res) => {
 const addAddress = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { label, name, phone, line1, line2, city, state, pincode, isDefault } = req.body;
+        const { label, phone, line1, line2, city, state, pincode, isDefault } = req.body;
 
         // If 'isDefault' is checked, unset all other default addresses for this user
         if (isDefault) {
@@ -473,7 +493,6 @@ const addAddress = async (req, res) => {
         const newAddress = new Address({
             userId,
             label,
-            name,
             phone,
             line1,
             line2,
@@ -490,7 +509,7 @@ const addAddress = async (req, res) => {
         }
 
         await newAddress.save();
-        res.redirect('/profileAddress');
+        res.redirect('/useraddress');
 
     } catch (error) {
         console.error("Error adding address:", error);
@@ -502,9 +521,9 @@ const editAddress = async (req, res) => {
     try {
         const { id } = req.params; // ID comes from the URL
         const userId = req.user._id;
-        const { label, name, phone, line1, line2, city, state, pincode, isDefault } = req.body;
+        const { label, phone, line1, line2, city, state, pincode, isDefault } = req.body;
 
-        const updateData = { label, name, phone, line1, line2, city, state, pincode };
+        const updateData = { label, phone, line1, line2, city, state, pincode };
 
         // If setting as default, unset others first
         if (isDefault) {
@@ -515,11 +534,11 @@ const editAddress = async (req, res) => {
         }
 
         await Address.findByIdAndUpdate({ _id: id, userId }, { $set: updateData });
-        res.redirect('/profileAddress');
+        res.redirect('/useraddress');
 
     } catch (error) {
         console.error("Error editing address:", error);
-        res.redirect('/profileAddress');
+        res.redirect('/useraddress');
     }
 };
 
@@ -529,10 +548,10 @@ const deleteAddress = async (req, res) => {
         const userId = req.user._id;
         
         await Address.findOneAndDelete({ _id: id, userId });
-        res.redirect('/profileAddress');
+        res.redirect('/useraddress');
     } catch (error) {
         console.error("Error deleting address:", error);
-        res.redirect('/profileAddress');
+        res.redirect('/useraddress');
     }
 };
 
@@ -547,12 +566,199 @@ const setDefaultAddress = async (req, res) => {
         // Set's the selected one to true
         await Address.findByIdAndUpdate({ _id: id, userId }, { $set: { isDefault: true } });
 
-        res.redirect('/profileAddress');
+        res.redirect('/useraddress');
     } catch (error) {
         console.error("Error setting default address:", error);
-        res.redirect('/profileAddress');
+        res.redirect('/useraddress');
     }
 };
+
+const placeOrder = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { selectedAddress, paymentMethod, orderNotes } = req.body;
+
+        // Fetch Cart
+        const cart = await Cart.findOne({ userId }).populate('items.productId');
+        if (!cart || cart.items.length === 0) {
+            return res.redirect('/shop');
+        }
+
+        let orderAddress = {};
+
+        // Handle Address Selection
+        if (selectedAddress === 'new') {
+            // Construct address from form data
+            orderAddress = {
+                name: req.body.name,
+                email: req.body.email,
+                phone: req.body.phone,
+                street: req.body.street,
+                city: req.body.city,
+                district: req.body.state, // Mapping state to district based on schema
+                pincode: req.body.pincode,
+                country: 'India', // Default
+                label: 'Home'
+            };
+        } else {
+            // Fetch existing address
+            const addressDoc = await Address.findById(selectedAddress);
+            if (!addressDoc) return res.redirect('/checkout');
+            
+            orderAddress = {
+                name: addressDoc.name,
+                email: req.user.email,
+                phone: addressDoc.phone,
+                street: `${addressDoc.line1} ${addressDoc.line2 || ''}`,
+                city: addressDoc.city,
+                district: addressDoc.state,
+                pincode: addressDoc.pincode,
+                country: 'India',
+                label: addressDoc.label
+            };
+        }
+
+        // Prepare Order Items
+        const orderItems = cart.items.map(item => ({
+            productId: item.productId._id,
+            name: item.productId.name,
+            quantity: item.quantity,
+            price: item.productId.price,
+            total: item.quantity * item.productId.price
+        }));
+
+        // Create Order Document
+        const newOrder = new Order({
+            userId,
+            address: orderAddress,
+            items: orderItems,
+            totalAmount: cart.total,
+            paymentMethod,
+            paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
+            orderStatus: 'pending',
+            deliveryInstruction: orderNotes || '',
+            orderDate: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+        });
+
+        await newOrder.save();
+
+        // Update Product Stock
+        for (const item of cart.items) {
+            await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: -item.quantity } });
+        }
+
+        // Clear Cart
+        await Cart.findOneAndUpdate({ userId }, { 
+            $set: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 } 
+        });
+
+        // Redirect to Success Page
+        res.redirect(`/ordersuccess/${newOrder._id}`);
+
+    } catch (error) {
+        console.error("Place Order Error:", error);
+        res.render('user/checkout', {
+            user: req.user,
+            cart: await Cart.findOne({ userId: req.user._id }),
+            addresses: await Address.find({ userId: req.user._id }),
+            error: "Something went wrong while placing the order."
+        });
+    }
+};
+
+const orderSuccess = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const order = await Order.findById(orderId).populate('items.productId');
+        
+        if (!order) return res.redirect('/index');
+
+        res.render('user/orderConfirmed', {
+            user: req.user,
+            order: order
+        });
+    } catch (error) {
+        console.error("Order Success Error:", error);
+        res.redirect('/index');
+    }
+};
+ 
+const addToWishlist = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId, selectedSize, selectedColor } = req.body;
+
+        // Validate  size and color are selected
+        if (!selectedSize || !selectedColor) {
+            return res.redirect(`/product/${productId}`);
+        }
+
+        let wishlist = await Wishlist.findOne({ userId });
+
+        if (!wishlist) {
+            wishlist = new Wishlist({ userId, products: [] });
+        }
+
+        // Check if exact variant (Product + Size + Color) exists
+        const productExists = wishlist.products.some(item => 
+            item.productId.toString() === productId && 
+            item.size === selectedSize && 
+            item.color === selectedColor
+        );
+
+        if (!productExists) {
+            wishlist.products.push({ 
+                productId, 
+                size: selectedSize, 
+                color: selectedColor 
+            });
+            await wishlist.save();
+        }
+
+        res.redirect('/wishlist');
+    } catch (error) {
+        console.error("Add to Wishlist Error:", error);
+        res.status(500).send("Server Error");
+    }
+};
+
+const getWishlist = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        let wishlist = await Wishlist.findOne({ userId }).populate('products.productId');
+
+        if (!wishlist) {
+            wishlist = { products: [] };
+        }
+
+        res.render('user/wishlist', {
+            user: req.user,
+            wishlist: wishlist
+        });
+    } catch (error) {
+        console.error("Get Wishlist Error:", error);
+        res.redirect('/');
+    }
+};
+
+const removeFromWishlist = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId } = req.body;
+
+        await Wishlist.findOneAndUpdate(
+            { userId },
+            { $pull: { products: { productId: productId } } }
+        );
+
+        res.redirect('/wishlist');
+    } catch (error) {
+        console.error("Remove from Wishlist Error:", error);
+        res.redirect('/wishlist');
+    }
+};
+
+
 
 module.exports = {
     userRegister,
@@ -572,6 +778,10 @@ module.exports = {
     addAddress,
     editAddress,
     deleteAddress,
-    setDefaultAddress
-
+    setDefaultAddress,
+    placeOrder,
+    orderSuccess,
+    getWishlist,
+    addToWishlist,
+    removeFromWishlist
 };

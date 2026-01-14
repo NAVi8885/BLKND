@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express();
 const { validateUserReg, validateUserLogin, validateUpdateUser } = require("../../middlewares/validation/userValidator");
-const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress } = require('../../controller/userController');
+const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress, placeOrder, addToWishlist, removeFromWishlist } = require('../../controller/userController');
 const { verifyRequired } = require('../../middlewares/authentication/userAuth');
 const upload = require('../../config/multer');
 const createMulter = require('../../config/multer');
@@ -41,9 +41,19 @@ router.post('/cart/update/:itemId', verifyRequired, updateCart);
 // removes cart 
 router.post('/cart/remove/:itemId', verifyRequired, removeFromCart);
 
+// adds to wishlist
+router.post('/add-to-wishlist', verifyRequired, addToWishlist);
+
+// remove from wishlist
+router.post('/remove-from-wishlist', verifyRequired, removeFromWishlist);
+
 // adds address
 router.post('/address/add', verifyRequired, addAddress);
 
 // edit address
 router.post('/address/edit/:id', verifyRequired, editAddress);
+
+// places order
+router.post('/placeorder', verifyRequired, placeOrder);
+
 module.exports = router;
