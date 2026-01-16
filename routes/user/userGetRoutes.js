@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/userSchema');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
-const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist } = require('../../controller/userController');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders } = require('../../controller/userController');
 const { asyncWrapProviders } = require('async_hooks');
 
 
@@ -123,9 +123,9 @@ router.get('/profile', verifyRequired, (req, res) => {
   res.render('user/profile', {user: req.user, errors: null, oldInput: null});
 });
 
-router.get('/userorders', verifyRequired, (req, res) => {
-  res.render('user/profileOrder', {user: req.user, errors: null, oldInput: null});  
-});
+router.get('/userorders', verifyRequired, getUserOrders);
+
+router.get('/user/orders/filter', verifyRequired, filterUserOrders);
 
 router.get('/useraddress', verifyRequired, getAddress);
 
@@ -166,5 +166,7 @@ router.get('/address/delete/:id', verifyRequired, deleteAddress);
 router.get('/address/setdefault/:id', verifyRequired, setDefaultAddress);
 
 router.get('/ordersuccess/:id', verifyRequired, orderSuccess);
+
+
 
 module.exports = router;

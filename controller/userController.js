@@ -758,7 +758,55 @@ const removeFromWishlist = async (req, res) => {
     }
 };
 
+const getUserOrders = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        // Fetch all orders sorted by creation date (newest first)
+        const orders = await Order.find({ userId })
+            .populate('items.productId')
+            .sort({ createdAt: -1 });
 
+        res.render('user/profileOrder', {
+            user: req.user,
+            orders: orders,
+            reqPage: 'orders' 
+        });
+    } catch (error) {
+        console.error("Error fetching user orders:", error);
+        res.render('user/profileOrder', { user: req.user, orders: [] });
+    }
+};
+
+const filterUserOrders = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { status } = req.query;
+        
+        let query = { userId };
+
+        // Filter Logic
+        if (status && status !== 'All Orders') {
+            if (status === 'Processing') {
+                // Assuming 'pending' and 'shipped' count as processing
+                query.orderStatus = { $in: ['pending', 'shipped'] };
+            } else {
+                // Exact match for 'Delivered', 'Cancelled', etc.
+                query.orderStatus = status.toLowerCase();
+            }
+        }
+
+        const orders = await Order.find(query)
+            .populate('items.productId')
+            .sort({ createdAt: -1 });
+
+        // Return JSON data for the frontend to render
+        res.json({ success: true, orders: orders });
+
+    } catch (error) {
+        console.error("Error filtering orders:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
 
 module.exports = {
     userRegister,
@@ -783,5 +831,7 @@ module.exports = {
     orderSuccess,
     getWishlist,
     addToWishlist,
-    removeFromWishlist
+    removeFromWishlist,
+    getUserOrders,
+    filterUserOrders
 };
