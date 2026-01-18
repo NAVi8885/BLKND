@@ -170,21 +170,30 @@
             </div>
             
             <div class="col-lg-9">
+                <% if (typeof req !== 'undefined' && req.query.success) { %>
+                    <div class="alert alert-success"><%= req.query.success %></div>
+                <% } %>
+                <% if (typeof req !== 'undefined' && req.query.error) { %>
+                    <div class="alert alert-danger"><%= req.query.error %></div>
+                <% } %>
+                    <% if (error) { %>
+                        <div class="alert alert-danger"><%= error %></div> 
+                    <% } %>
                 <div class="card mb-4">
                     <div class="card-body p-4">
                         <h4 class="mb-4">Change Password</h4>
-                        <form>
+                        <form action="/settings/change-password" method="POST">
                             <div class="mb-3">
                                 <label class="form-label">Current Password</label>
-                                <input type="password" class="form-control" required>
+                                <input type="password" name="currentPassword" class="form-control" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">New Password</label>
-                                <input type="password" class="form-control" required>
+                                <input type="password" name="newPassword" class="form-control" required>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" required>
+                                <input type="password" name="confirmNewPassword" class="form-control" required>
                             </div>
                             <button type="submit" class="btn btn-dark">Update Password</button>
                         </form>
@@ -193,61 +202,51 @@
                 
                 <div class="card mb-4">
                     <div class="card-body p-4">
-                        <h4 class="mb-4">Email Preferences</h4>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="newsletter" checked>
-                            <label class="form-check-label" for="newsletter">
-                                <strong>Newsletter</strong><br>
-                                <small class="text-muted">Receive our weekly newsletter with special offers and new arrivals</small>
-                            </label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="orderUpdates" checked>
-                            <label class="form-check-label" for="orderUpdates">
-                                <strong>Order Updates</strong><br>
-                                <small class="text-muted">Get notifications about your orders and deliveries</small>
-                            </label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="promotions" checked>
-                            <label class="form-check-label" for="promotions">
-                                <strong>Promotional Emails</strong><br>
-                                <small class="text-muted">Receive exclusive deals and discount codes</small>
-                            </label>
-                        </div>
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" id="recommendations">
-                            <label class="form-check-label" for="recommendations">
-                                <strong>Product Recommendations</strong><br>
-                                <small class="text-muted">Get personalized product suggestions based on your preferences</small>
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-dark">Save Preferences</button>
-                    </div>
-                </div>
-                
-                <div class="card mb-4">
-                    <div class="card-body p-4">
-                        <h4 class="mb-4">Privacy Settings</h4>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="profileVisible" checked>
-                            <label class="form-check-label" for="profileVisible">
-                                <strong>Make my profile visible to other users</strong>
-                            </label>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="showActivity" checked>
-                            <label class="form-check-label" for="showActivity">
-                                <strong>Show my activity and purchase history</strong>
-                            </label>
-                        </div>
-                        <div class="form-check mb-4">
-                            <input class="form-check-input" type="checkbox" id="dataCollection">
-                            <label class="form-check-label" for="dataCollection">
-                                <strong>Allow data collection for personalized experience</strong>
-                            </label>
-                        </div>
-                        <button type="submit" class="btn btn-dark">Save Settings</button>
+                        <h4 class="mb-4">Preferences</h4>
+                        <form action="/settings/preferences" method="POST">
+                            <h6 class="mb-3 text-uppercase text-muted" style="font-size: 0.8rem;">Email Notifications</h6>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="newsletter" id="newsletter" <%= (user.emailPreferences && user.emailPreferences.newsletter) ? 'checked' : '' %>>
+                                <label class="form-check-label" for="newsletter">
+                                    <strong>Newsletter</strong><br>
+                                    <small class="text-muted">Receive our weekly newsletter with special offers.</small>
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="orderUpdates" id="orderUpdates" <%= (user.emailPreferences && user.emailPreferences.orderUpdates) ? 'checked' : '' %>>
+                                <label class="form-check-label" for="orderUpdates">
+                                    <strong>Order Updates</strong><br>
+                                    <small class="text-muted">Get notifications about your orders and deliveries.</small>
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="promotions" id="promotions" <%= (user.emailPreferences && user.emailPreferences.promotions) ? 'checked' : '' %>>
+                                <label class="form-check-label" for="promotions">
+                                    <strong>Promotional Emails</strong><br>
+                                    <small class="text-muted">Receive exclusive deals and discount codes.</small>
+                                </label>
+                            </div>
+
+                            <hr class="my-4">
+                            <h6 class="mb-3 text-uppercase text-muted" style="font-size: 0.8rem;">Privacy & Personalization</h6>
+                            
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" name="recommendations" id="recommendations" <%= (user.emailPreferences && user.emailPreferences.recommendations) ? 'checked' : '' %>>
+                                <label class="form-check-label" for="recommendations">
+                                    <strong>Product Recommendations</strong><br>
+                                    <small class="text-muted">Get personalized product suggestions.</small>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" name="dataCollection" id="dataCollection" <%= (user.emailPreferences && user.emailPreferences.dataCollection) ? 'checked' : '' %>>
+                                <label class="form-check-label" for="dataCollection">
+                                    <strong>Allow data collection for personalized experience</strong>
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-dark">Save All Preferences</button>
+                        </form>
                     </div>
                 </div>
                 
@@ -255,10 +254,12 @@
                     <div class="card-body p-4">
                         <h4 class="mb-3 text-danger">Danger Zone</h4>
                         <p class="text-muted">Once you delete your account, there is no going back. Please be certain.</p>
-                        <button class="btn btn-outline-danger">Delete Account</button>
+                        <form action="/settings/delete-account" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+                            <button type="submit" class="btn btn-outline-danger">Delete Account</button>
+                        </form>
                     </div>
                 </div>
-            </div>
+            </div>  
         </div>
     </div>
 

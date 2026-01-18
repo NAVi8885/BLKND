@@ -3,15 +3,13 @@ const router = express.Router();
 const passport = require('passport');
 const {optionalVerify, verifyRequired} = require('../../middlewares/authentication/userAuth');
 const jwt = require('jsonwebtoken');
-const User = require('../../models/userSchema');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
-const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment } = require('../../controller/userController');
-const { asyncWrapProviders } = require('async_hooks');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage } = require('../../controller/userController');
 
 
 
-router.get('/index', optionalVerify,async (req, res) => {
+router.get('/index', loadHomepage, optionalVerify, async (req, res) => {
   res.render('user/index',{user: req.user});
 })
 
@@ -130,7 +128,7 @@ router.get('/user/orders/filter', verifyRequired, filterUserOrders);
 router.get('/useraddress', verifyRequired, getAddress);
 
 router.get('/usersetting', verifyRequired, (req, res) => {
-  res.render('user/profileSetting', {user: req.user})
+  res.render('user/profileSetting', {user: req.user, error: null})
 })
 ///////////\\\\\\\\\\\\\
 //USER PROFILE SECTION\\

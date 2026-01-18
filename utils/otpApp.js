@@ -1,22 +1,74 @@
-const NodemailerHelper = require('nodemailer-otp');
-const {hash} = require('@node-rs/argon2');
+// 1. IMPORTANT: Load the .env file immediately
+require('dotenv').config(); 
 
-const helper = new NodemailerHelper(process.env.EMAIL_ID, process.env.EMAIL_PASS);
+const nodemailer = require('nodemailer');
+const { hash } = require('@node-rs/argon2');
 
-// Creating and sending otp through email
-async function sendOtpEmail(email){
-    const otp = helper.generateOtp(6);
-    console.log(otp);
+// 2. DEBUG CHECK: This will print to your terminal when the server starts.
+// If it says "undefined", your .env file is not being found.
+console.log("---------------------------------------------------");
+console.log("📧 Email Config Check:");
+console.log("   User:", process.env.NODEMAILER_EMAIL ? process.env.NODEMAILER_EMAIL : "MISSING ❌");
+console.log("   Pass:", process.env.NODEMAILER_PASSWORD ? "Loaded ✅" : "MISSING ❌");
+console.log("---------------------------------------------------");
 
-    hashedOtp = await hash(otp, 10)
-    await helper.sendEmail(
-        email,
-        'BLKND OTP verification',
-        "verify your account using this otp ",
-        otp
-    );
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+    }
+});
 
-    return hashedOtp;
-}
+const sendOtpEmail = async (email) => {
+    try {
+        const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
+        
+        const mailOptions = {
+            from: process.env.NODEMAILER_EMAIL,
+            to: email,
+            subject: "Verify Your Email",
+            html: `<p>Your OTP verification code is <b>${otp}</b>. It expires in 1 hour.</p>`
+        };
 
-module.exports = {sendOtpEmail};
+        await transporter.sendMail(mailOptions);
+        
+        // Return hashed OTP
+        return await hash(otp); 
+    } catch (error) {
+        console.log("Error sending OTP:", error);
+        throw error;
+    }
+};
+
+const sendCustomMessage = async (toEmail, subject, content) => {
+    try {
+        const mailOptions = {
+            from: `"BLKND Support" <${process.env.NODEMAILER_EMAIL}>`,
+            to: toEmail,
+            subject: subject,
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #000; border-bottom: 2px solid #000; padding-bottom: 10px;">BLKND</h2>
+                    <p style="font-size: 16px; line-height: 1.6; color: #333; margin-top: 20px;">
+                        ${content.replace(/\n/g, '<br>')}
+                    </p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin-top: 30px;">
+                    <p style="font-size: 12px; color: #888;">© BLKND. All rights reserved.</p>
+                </div>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`Email sent to ${toEmail}: ${info.messageId}`);
+        return true;
+    } catch (error) {
+        console.error(`Error sending email to ${toEmail}:`, error);
+        return false;
+    }
+};
+
+module.exports = { 
+    sendOtpEmail, 
+    sendCustomMessage 
+};

@@ -211,25 +211,39 @@
                             <% } %>
                         </div>
                         
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>₹<%= cart.subTotal.toFixed(2) %></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Shipping:</span>
-                            <span><%= cart.shipping === 0 ? 'Free' : '₹' + cart.shipping %></span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Tax:</span>
-                            <span>₹<%= cart.tax.toFixed(2) %></span>
-                        </div>
-                        
-                        <hr>
-                        
-                        <div class="d-flex justify-content-between mb-4">
-                            <strong>Total:</strong>
-                            <strong class="text-primary fs-4">₹<%= cart.total.toFixed(2) %></strong>
-                        </div>
+                        <div class="mb-3">
+    <div class="input-group">
+        <input type="text" id="couponCode" class="form-control" placeholder="Coupon Code">
+        <button class="btn btn-outline-secondary" type="button" onclick="applyCoupon()">Apply</button>
+    </div>
+    <div id="couponMessage" class="small mt-1"></div>
+</div>
+
+<div class="d-flex justify-content-between mb-2">
+    <span>Subtotal:</span>
+    <span>₹<%= cart.subTotal.toFixed(2) %></span>
+</div>
+
+<div class="d-flex justify-content-between mb-2 text-success" id="discountRow" style="<%= cart.coupon ? '' : 'display:none;' %>">
+    <span>Discount (<span id="appliedCouponCode"><%= cart.couponName[0] || '' %></span>):</span>
+    <span>-₹<span id="discountAmount"><%= cart.couponDiscount ? cart.couponDiscount.toFixed(2) : '0.00' %></span></span>
+    <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="removeCoupon()" style="text-decoration:none;">&times;</button>
+</div>
+
+<div class="d-flex justify-content-between mb-2">
+    <span>Tax:</span>
+    <span>₹<%= cart.tax.toFixed(2) %></span>
+</div>
+<div class="d-flex justify-content-between mb-2">
+    <span>Shipping:</span>
+    <span><%= cart.shipping === 0 ? 'Free' : '₹' + cart.shipping %></span>
+</div>
+<hr>
+<div class="d-flex justify-content-between mb-4">
+    <strong>Total:</strong>
+    <strong class="text-primary fs-4" id="finalTotal">₹<%= cart.total.toFixed(2) %></strong>
+</div>
+                 
                         
                         <button type="submit" class="btn btn-dark w-100 btn-lg">Place Order</button>
                         
@@ -317,6 +331,52 @@
     });
 
     toggleForm();
+</script>
+<script>
+async function applyCoupon() {
+    const code = document.getElementById('couponCode').value;
+    const messageEl = document.getElementById('couponMessage');
+    
+    if(!code) {
+        messageEl.innerText = "Please enter a code";
+        messageEl.className = "small mt-1 text-danger";
+        return;
+    }
+
+    const response = await fetch('/apply-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+        messageEl.innerText = data.message;
+        messageEl.className = "small mt-1 text-success";
+        
+        // Update DOM
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('appliedCouponCode').innerText = code;
+        document.getElementById('discountAmount').innerText = data.discount.toFixed(2);
+        document.getElementById('finalTotal').innerText = '₹' + data.newTotal.toFixed(2);
+    } else {
+        messageEl.innerText = data.message;
+        messageEl.className = "small mt-1 text-danger";
+    }
+}
+
+async function removeCoupon() {
+    const response = await fetch('/remove-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    const data = await response.json();
+    if(data.success) {
+        location.reload(); // Reload to reset server-side calculations easily
+    }
+}
 </script>
 </body>
 </html>

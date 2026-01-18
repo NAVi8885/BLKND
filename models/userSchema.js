@@ -46,6 +46,13 @@ const userSchema = new Schema({
         type: String,
         enum:['Not Specified','male', 'female'],
         default: 'Not Specified'
+    },
+    emailPreferences: {
+        newsletter: { type: Boolean, default: true },
+        orderUpdates: { type: Boolean, default: true },
+        promotions: { type: Boolean, default: true },
+        recommendations: { type: Boolean, default: true },
+        dataCollection: { type: Boolean, default: false } // Saved from privacy section
     }
     
 }, {

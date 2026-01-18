@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express();
 const { validateUserReg, validateUserLogin, validateUpdateUser } = require("../../middlewares/validation/userValidator");
-const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress, placeOrder, addToWishlist, removeFromWishlist } = require('../../controller/userController');
+const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress, placeOrder, addToWishlist, removeFromWishlist, changePassword, submitContact, deleteAccount, updatePreferences, removeCoupon, applyCoupon } = require('../../controller/userController');
 const { verifyRequired } = require('../../middlewares/authentication/userAuth');
 const upload = require('../../config/multer');
 const createMulter = require('../../config/multer');
@@ -32,6 +32,18 @@ router.post('/savechanges', verifyRequired, validateUpdateUser, updateProfile);
 const profileUpload = createMulter('profile');
 router.post('/updateprofile', verifyRequired, profileUpload.single('avatar'), updateProfileImage);
 
+// Changing password from user settings
+router.post('/settings/change-password', verifyRequired, changePassword);
+
+// preferencee updates here
+router.post('/settings/preferences', verifyRequired, updatePreferences);
+
+// deletes account
+router.post('/settings/delete-account', verifyRequired, deleteAccount);
+
+// Contacvt admin
+router.post('/contact/submit', verifyRequired, submitContact);
+
 // gets cart 
 router.post('/add-to-cart', verifyRequired, addToCart);
 
@@ -52,6 +64,12 @@ router.post('/address/add', verifyRequired, addAddress);
 
 // edit address
 router.post('/address/edit/:id', verifyRequired, editAddress);
+
+// Apply's coupon
+router.post('/apply-coupon', verifyRequired, applyCoupon);
+
+// Removes coupon
+router.post('/remove-coupon', verifyRequired, removeCoupon);
 
 // places order
 router.post('/placeorder', verifyRequired, placeOrder);

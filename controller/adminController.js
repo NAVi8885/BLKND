@@ -1,9 +1,14 @@
 const argon2 = require('@node-rs/argon2');
-const Admin = require('../models/adminSchema');
 const jwt = require('jsonwebtoken');
+const Admin = require('../models/adminSchema');
 const Product = require('../models/product');
 const Category = require('../models/categorySchema');
 const User = require('../models/userSchema');
+const Message = require('../models/message');
+const Order = require('../models/order');
+const Coupon = require('../models/coupon');
+const Banner = require('../models/banner');
+const { sendCustomMessage } = require('../utils/otpApp');
 
 const adminLogin = async (req, res) => {
     try{
@@ -332,6 +337,253 @@ const getCustomers = async (req, res) => {
     }
 }; 
 
+const sendMessageToUser = async (req, res) => {
+    try {
+        const { userId, subject, message } = req.body;
+        
+        if (!req.admin) {
+            return res.redirect('/adminLogin');
+        }
+
+        if (!userId || !message) {
+            return res.redirect('/customers?error=Message and Recipient are required');
+        }
+
+        // Handle Single vs Bulk (Standardize to Array)
+        // If one ID comes in, it's a string. If multiple, it's an array.
+        const userIds = Array.isArray(userId) ? userId : [userId];
+
+        // Find all users to get their email addresses
+        const users = await User.find({ _id: { $in: userIds } });
+
+        // Send Emails and Save to Database in Parallel
+        const tasks = users.map(async (user) => {
+            // A. Send the real email
+            await sendCustomMessage(user.email, subject, message);
+
+            // B. Save copy to database (for the "Inbox" feature)
+            return Message.create({
+                sender: 'admin',
+                userId: user._id,
+                adminId: req.admin._id,
+                name: "Admin", // Display name
+                email: process.env.NODEMAILER_EMAIL,
+                subject: subject,
+                message: message,
+                type: 'admin_message',
+                isRead: false
+            });
+        });
+
+        // Wait for all emails to be sent
+        await Promise.all(tasks);
+
+        return res.redirect(`/customers?success=Successfully sent ${users.length} message(s)`);
+
+    } catch (error) {
+        console.error("SendMessage Error:", error);
+        return res.redirect('/customers?error=Something went wrong while sending messages');
+    }
+};
+
+const getCoupons = async (req, res) => {
+    try {
+        const coupons = await Coupon.find().sort({ createdAt: -1 });
+        res.render('admin/coupons', { coupons });
+    } catch (error) {
+        console.log("Error fetching coupons:", error);
+    }
+};
+
+const createCoupon = async (req, res) => {
+    try {
+        const { 
+            code, type, value, minOrderValue, 
+            maxDiscount, expiryDate, usageLimit 
+        } = req.body;
+
+        const newCoupon = new Coupon({
+            code,
+            type: type.toLowerCase(),
+            value: Number(value),
+            minOrderValue: Number(minOrderValue),
+            maxDiscount: Number(maxDiscount),
+            expiryDate: new Date(expiryDate),
+            usageLimit: usageLimit ? Number(usageLimit) : null
+        });
+
+        await newCoupon.save();
+        res.redirect('/coupons');
+    } catch (error) {
+        console.log("Error creating coupon:", error);
+        res.redirect('/coupons');
+    }
+};
+
+const updateCoupon = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { 
+            code, type, value, minOrderValue, 
+            maxDiscount, expiryDate, usageLimit 
+        } = req.body;
+
+        await Coupon.findByIdAndUpdate(id, {
+            code: code.toUpperCase(),
+            type,
+            value: Number(value),
+            minOrderValue: Number(minOrderValue),
+            maxDiscount: Number(maxDiscount),
+            expiryDate: new Date(expiryDate),
+            usageLimit: usageLimit ? Number(usageLimit) : null
+        });
+
+        res.redirect('/coupons');
+    } catch (error) {
+        console.log("Error updating coupon:", error);
+        res.redirect('/coupons');
+    }
+};
+
+const deleteCoupon = async (req, res) => {
+    try {
+        await Coupon.findByIdAndDelete(req.params.id);
+        res.redirect('/coupons');
+    } catch (error) {
+        console.log("Error deleting coupon:", error);
+        res.redirect('/coupons');
+    }
+};
+
+const getAnalytics = async (req, res) => {
+    try {
+        // 1. Get KPI Data (Total Revenue, Total Orders, etc.)
+        const kpiData = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'cancelled' } } }, // Exclude cancelled
+            {
+                $group: {
+                    _id: null,
+                    totalRevenue: { $sum: "$totalAmount" },
+                    totalOrders: { $sum: 1 },
+                    avgOrderValue: { $avg: "$totalAmount" }
+                }
+            }
+        ]);
+
+        const kpis = kpiData.length > 0 ? kpiData[0] : { totalRevenue: 0, totalOrders: 0, avgOrderValue: 0 };
+
+        // 2. Get Chart Data: Revenue & Orders by Date (Last 7 days example)
+        // Note: You can adjust the $match to filter by date range
+        const salesData = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'cancelled' } } },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    dailyRevenue: { $sum: "$totalAmount" },
+                    dailyOrders: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }, // Sort by date ascending
+            { $limit: 7 } // Last 7 days/entries
+        ]);
+
+        // Prepare arrays for Chart.js
+        const dates = salesData.map(d => d._id);
+        const revenues = salesData.map(d => d.dailyRevenue);
+        const orderCounts = salesData.map(d => d.dailyOrders);
+
+        // 3. Get Top 5 Best Selling Products
+        const topProducts = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'cancelled' } } },
+            { $unwind: "$items" },
+            {
+                $group: {
+                    _id: "$items.productId",
+                    name: { $first: "$items.name" },
+                    totalSold: { $sum: "$items.quantity" },
+                    totalRevenue: { $sum: "$items.total" }
+                }
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 5 }
+        ]);
+
+        // 4. Get Payment Method Stats (Replacing "Channels" chart)
+        const paymentStats = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'cancelled' } } },
+            {
+                $group: {
+                    _id: "$paymentMethod",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Render the view with all data
+        res.render('admin/analytics', {
+            kpis,
+            chartData: {
+                dates: JSON.stringify(dates),
+                revenues: JSON.stringify(revenues),
+                orderCounts: JSON.stringify(orderCounts),
+                paymentMethods: JSON.stringify(paymentStats.map(p => p._id)),
+                paymentCounts: JSON.stringify(paymentStats.map(p => p.count))
+            },
+            topProducts
+        });
+
+    } catch (error) {
+        console.error("Analytics Error:", error);
+        res.status(500).send("Server Error");
+    }
+};
+
+const getBannerPage = async (req, res) => {
+    try {
+            const banners = await Banner.find({}).sort({ order: 1 });
+            res.render('admin/banners', { banners });
+        } catch (error) {
+            console.log("Error loading banner page:", error);
+            res.status(500).send("Server Error");
+        }
+}
+
+const addBanner = async (req, res) => {
+    try {
+            const { title, subtitle, link, order } = req.body;
+            
+            // Assuming your multer saves file details in req.file
+            if (!req.file) {
+                return res.redirect('/banners');
+            }
+
+            const newBanner = new Banner({
+                image: req.file.filename,
+                title,
+                subtitle,
+                link,
+                order
+            });
+
+            await newBanner.save();
+            res.redirect('/banners');
+        } catch (error) {
+            console.log("Error adding banner:", error);
+            res.status(500).send("Server Error");
+        }
+}
+
+const deleteBanner = async (req, res) => {
+    try {
+            const { id } = req.params;
+            await Banner.findByIdAndDelete(id);
+            res.redirect('/banners');
+        } catch (error) {
+            console.log("Error deleting banner:", error);
+            res.status(500).send("Server Error");
+        }
+}
+
 module.exports = {
     adminLogin,
     adminLogout,
@@ -343,7 +595,16 @@ module.exports = {
     deleteCategory,
     deleteSub,
     updateCategory,
-    getCustomers
+    getCustomers,
+    sendMessageToUser,
+    getCoupons,
+    getAnalytics,
+    createCoupon,
+    updateCoupon,
+    deleteCoupon,
+    getBannerPage,
+    addBanner,
+    deleteBanner
 }
 
     

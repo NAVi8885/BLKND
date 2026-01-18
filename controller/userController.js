@@ -6,6 +6,9 @@ const Product = require('../models/product');
 const Address = require('../models/address');
 const Order = require('../models/order');
 const Wishlist = require('../models/wishlist');
+const Message = require('../models/message');
+const Coupon = require('../models/coupon');
+const Banner = require('../models/banner');
 const { sendOtpEmail } = require('../utils/otpApp');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -65,6 +68,26 @@ const loginUser = async (req, res) => {
         console.log("Error happened at user Login controller",error);
     }
 }
+
+// for Banners
+const loadHomepage = async (req, res) => {
+    try {
+        // Fetch active banners sorted by order
+        const banners = await Banner.find({ isActive: true }).sort({ order: 1 });
+        
+        // Fetch products, etc.
+        const products = await Product.find({ isListed: true }); 
+
+        res.render('user/index', { 
+            banners, 
+            products, 
+            user: req.user
+        });
+    } catch (error) {
+        console.log("Home page error:", error);
+        res.status(500).send("Server Error");
+    }
+};
 
 const logoutUser = async (req, res) => {
     res.clearCookie('token',  { httpOnly: true, sameSite: "strict" });
@@ -197,6 +220,88 @@ const updateProfileImage = async (req, res) => {
   } catch (error) {
         console.log("error happened at user controller / updateprofileimage", error);
   }
+};
+
+const changePassword = async (req, res) => {
+    try {
+        console.log("here");
+        
+        const { currentPassword, newPassword, confirmNewPassword } = req.body;
+        const userId = req.user._id;
+        
+        const user = await User.findById(userId);
+
+        if (user.loginType === 'google') {
+            return res.render('user/profileSetting', { 
+                user: req.user, 
+                error: "Google users cannot change password manually." 
+            });
+        }
+
+        const isMatch = await verify(user.password, currentPassword);
+        if (!isMatch) {
+            return res.redirect('/usersetting?error=Incorrect current password');
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            return res.redirect('/usersetting?error=New passwords do not match');
+        }
+
+        if (newPassword.length < 5) {
+            return res.redirect('/usersetting?error=Password must be at least 5 characters');
+        }
+
+        const hashedPassword = await hash(newPassword);
+        user.password = hashedPassword;
+        console.log(user.password);
+        
+        await user.save();
+
+        return res.redirect('/usersetting?success=Password updated successfully');
+
+    } catch (error) {
+        console.error("Change Password Error:", error);
+        res.redirect('/usersetting?error=Server Error');
+    }
+};
+
+const updatePreferences = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        // Checkboxes only send value if checked. We check for existence in req.body
+        const preferences = {
+            newsletter: !!req.body.newsletter,
+            orderUpdates: !!req.body.orderUpdates,
+            promotions: !!req.body.promotions,
+            recommendations: !!req.body.recommendations,
+            dataCollection: !!req.body.dataCollection
+        };
+
+        await User.findByIdAndUpdate(userId, {
+            $set: { emailPreferences: preferences }
+        });
+
+        res.redirect('/usersetting?success=Preferences saved');
+    } catch (error) {
+        console.error("Update Prefs Error:", error);
+        res.redirect('/usersetting?error=Failed to save preferences');
+    }
+};
+
+const deleteAccount = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        
+        // Optional: Delete related data or just the user
+        await User.findByIdAndDelete(userId);
+        
+        // Clear cookie and logout
+        res.clearCookie('token', { httpOnly: true, sameSite: "strict" });
+        res.redirect('/login?msg=Account deleted');
+    } catch (error) {
+        console.error("Delete Account Error:", error);
+        res.redirect('/usersetting?error=Could not delete account');
+    }
 };
 
 const addToCart = async (req, res) => {
@@ -573,6 +678,89 @@ const setDefaultAddress = async (req, res) => {
     }
 };
 
+const applyCoupon = async (req, res) => {
+    try {
+        const { code } = req.body;
+        const userId = req.user._id;
+        const cart = await Cart.findOne({ userId }).populate('items.productId');
+
+        if (!cart) return res.json({ success: false, message: 'Cart not found' });
+
+        const coupon = await Coupon.findOne({ code: code.toUpperCase(), isActive: true });
+
+        // 1. Validation Checks
+        if (!coupon) {
+            return res.json({ success: false, message: 'Invalid Coupon Code' });
+        }
+        if (new Date() > coupon.expiryDate) {
+            return res.json({ success: false, message: 'Coupon Expired' });
+        }
+        if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+            return res.json({ success: false, message: 'Coupon usage limit reached' });
+        }
+        if (cart.subTotal < coupon.minOrderValue) {
+            return res.json({ success: false, message: `Minimum order of ₹${coupon.minOrderValue} required` });
+        }
+
+        // 2. Calculate Discount
+        let discount = 0;
+        if (coupon.type === 'percentage') {
+            discount = (cart.subTotal * coupon.value) / 100;
+            if (coupon.maxDiscount > 0 && discount > coupon.maxDiscount) {
+                discount = coupon.maxDiscount;
+            }
+        } else if (coupon.type === 'fixed') {
+            discount = coupon.value;
+        }
+
+        // Ensure discount doesn't exceed subtotal
+        if (discount > cart.subTotal) {
+            discount = cart.subTotal;
+        }
+
+        // 3. Update Cart
+        cart.coupon = true;
+        cart.couponName = [coupon.code]; // Storing as array based on your model
+        cart.couponDiscount = discount;
+        
+        // Recalculate Total
+        cart.total = cart.subTotal + cart.tax + cart.shipping - discount;
+
+        await cart.save();
+
+        res.json({ 
+            success: true, 
+            message: 'Coupon Applied', 
+            discount: discount, 
+            newTotal: cart.total 
+        });
+
+    } catch (error) {
+        console.log("Apply Coupon Error:", error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+const removeCoupon = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const cart = await Cart.findOne({ userId });
+
+        if (cart) {
+            cart.coupon = false;
+            cart.couponName = [];
+            cart.couponDiscount = 0;
+            cart.total = cart.subTotal + cart.tax + cart.shipping;
+            await cart.save();
+        }
+
+        res.json({ success: true, message: 'Coupon Removed' });
+    } catch (error) {
+        console.log("Remove Coupon Error:", error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
 const placeOrder = async (req, res) => {
     try {
         const userId = req.user._id;
@@ -872,15 +1060,42 @@ const filterUserOrders = async (req, res) => {
     }
 };
 
+const submitContact = async (req, res) => {
+    try {
+        const { firstName, lastName, email, phone, subject, message } = req.body;
+        
+        const newMessage = new Message({
+            sender: 'user',
+            userId: req.user ? req.user._id : null, // Store ID if logged in
+            name: `${firstName} ${lastName}`,
+            email: email,
+            subject: subject,
+            message: message,
+            type: 'contact_query'
+        });
+
+        await newMessage.save();
+
+        res.redirect('/contact?success=Message sent successfully');
+    } catch (error) {
+        console.error("Contact Form Error:", error);
+        res.redirect('/contact?error=Failed to send message');
+    }
+};
+
 module.exports = {
     userRegister,
     loginUser,
+    loadHomepage,
     logoutUser,
     forgotPassword,
     verifyOtp,
     resetPassword,
     updateProfile,
     updateProfileImage,
+    changePassword,
+    updatePreferences,
+    deleteAccount,
     addToCart,
     getCart,
     updateCart,
@@ -891,6 +1106,8 @@ module.exports = {
     editAddress,
     deleteAddress,
     setDefaultAddress,
+    applyCoupon,
+    removeCoupon,
     placeOrder,
     verifyPayment,
     orderSuccess,
@@ -898,5 +1115,6 @@ module.exports = {
     addToWishlist,
     removeFromWishlist,
     getUserOrders,
-    filterUserOrders
+    filterUserOrders,
+    submitContact
 };

@@ -8,91 +8,17 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    :root {
-      --side: 260px
-    }
-
-    body {
-      background: #f8f9fa
-    }
-
-    .sidebar {
-      position: fixed;
-      inset: 0 auto 0 0;
-      width: var(--side);
-      background: #d8d8d8da;
-      border-right: 1px solid #e9ecef;
-      padding: 20px;
-      overflow-y: auto
-    }
-
-    .brand {
-      font-weight: 700;
-      letter-spacing: .5px;
-      color: var(--dark);
-      text-decoration: none;
-    }
-
-    .nav-aside .nav-link {
-      color: #212529;
-      padding: 10px 12px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .nav-aside .nav-link.active,
-    .nav-aside .nav-link:hover {
-      background: #000000da;
-      color: #f8f9fa;
-      font-weight: 500;
-    }
-
-    .content {
-      margin-left: var(--side)
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: #d8d8d8;
-      border-bottom: 1px solid #e9ecef;
-      text-align: center;
-      padding: 10px 0;
-      font-size: 1.50rem;
-    }
-
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover
-    }
-
-    .tag {
-      background: #f1f3f5;
-      border-radius: 20px;
-      padding: .15rem .6rem;
-      font-size: .8rem
-    }
-
-    @media(max-width:992px) {
-      .sidebar {
-        transform: translateX(-100%);
-        transition: transform .3s;
-        z-index: 1000;
-      }
-
-      .sidebar.show {
-        transform: translateX(0)
-      }
-
-      .content {
-        margin-left: 0
-      }
-    }
+    :root { --side: 260px; }
+    body { background: #f8f9fa; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: var(--side); background: #d8d8d8da; border-right: 1px solid #e9ecef; padding: 20px; overflow-y: auto; }
+    .brand { font-weight: 700; letter-spacing: .5px; color: var(--dark); text-decoration: none; }
+    .nav-aside .nav-link { color: #212529; padding: 10px 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+    .nav-aside .nav-link.active, .nav-aside .nav-link:hover { background: #000000da; color: #f8f9fa; font-weight: 500; }
+    .content { margin-left: var(--side); }
+    .topbar { position: sticky; top: 0; z-index: 10; background: #d8d8d8; border-bottom: 1px solid #e9ecef; text-align: center; padding: 10px 0; font-size: 1.50rem; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .tag { background: #f1f3f5; border-radius: 20px; padding: .15rem .6rem; font-size: .8rem; }
+    @media(max-width:992px) { .sidebar { transform: translateX(-100%); transition: transform .3s; z-index: 1000; } .sidebar.show { transform: translateX(0); } .content { margin-left: 0; } }
   </style>
 </head>
 
@@ -107,6 +33,7 @@
       <a class="nav-link active" href="/customers"><i class="fa-solid fa-user-group"></i> Customers</a>
       <a class="nav-link" href="/coupons"><i class="fa-solid fa-ticket"></i> Coupons</a>
       <a class="nav-link" href="/analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+      <a class="nav-link" href="/banners"><i class="fa-solid fa-image"></i> Banners</a>
       <a class="nav-link" href="/settings"><i class="fa-solid fa-gear"></i> Settings</a>
     </nav>
   </aside>
@@ -116,22 +43,33 @@
       <div class="container-fluid">
         <div class="d-flex align-items-center justify-content-between py-2">
           <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-outline-secondary d-lg-none"
-              onclick="document.getElementById('sidebar').classList.toggle('show')"><i
-                class="fa-solid fa-bars"></i></button>
+            <button class="btn btn-outline-secondary d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')">
+                <i class="fa-solid fa-bars"></i>
+            </button>
             <span class="fw-bold">Customers</span>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-file-export me-1"></i> Export
-              CSV</button>
-            <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#segmentModal"><i
-                class="fa-solid fa-filter me-1"></i> Save segment</button>
+             <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-file-export me-1"></i> Export CSV</button>
           </div>
         </div>
       </div>
     </header>
 
-    <section class="container-fluid py-3" id="tickets">
+    <section class="container-fluid py-3">
+      
+      <% if (typeof req !== 'undefined' && req.query.success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= req.query.success %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      <% if (typeof req !== 'undefined' && req.query.error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= req.query.error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+
       <div class="card mb-3">
         <div class="card-body">
           <form class="row g-2 align-items-end">
@@ -140,37 +78,15 @@
               <input type="search" class="form-control" placeholder="Name, email, phone">
             </div>
             <div class="col-md-2">
-              <label class="form-label">Segment</label>
-              <select class="form-select">
-                <option>All customers</option>
-                <option>High LTV</option>
-                <option>1st‑time buyers</option>
-                <option>Churn risk (90d)</option>
-                <option>Newsletter subscribers</option>
-              </select>
-            </div>
-            <div class="col-md-2">
               <label class="form-label">Country</label>
               <select class="form-select">
                 <option>Any</option>
                 <option>India</option>
                 <option>USA</option>
                 <option>UK</option>
-                <option>UAE</option>
               </select>
             </div>
-            <div class="col-md-2">
-              <label class="form-label">LTV ≥ ($)</label>
-              <input type="number" class="form-control" placeholder="0">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Last order</label>
-              <div class="input-group">
-                <input type="date" class="form-control"><span class="input-group-text">to</span><input type="date"
-                  class="form-control">
-              </div>
-            </div>
-            <div class="col-12 col-md-3 ms-auto">
+            <div class="col-12 col-md-2 ms-auto">
               <button type="button" class="btn btn-dark w-100"><i class="fa-solid fa-filter me-1"></i> Apply</button>
             </div>
           </form>
@@ -182,8 +98,9 @@
           <table class="table align-middle table-hover mb-0">
             <thead class="table-light">
               <tr>
-                <th style="width:36px"><input type="checkbox"
-                    onclick="document.querySelectorAll('.row-check').forEach(c=>c.checked=this.checked)"></th>
+                <th style="width:36px">
+                    <input type="checkbox" onclick="toggleAll(this)">
+                </th>
                 <th>Customer</th>
                 <th>Email</th>
                 <th>Orders</th>
@@ -193,71 +110,72 @@
               </tr>
             </thead>
             <tbody>
-  <% customers.forEach( customer => { %>
-    <tr>
-      <td><input type="checkbox" class="row-check"></td>
+              <% if(customers && customers.length > 0) { %>
+                <% customers.forEach( customer => { %>
+                  <tr>
+                    <td>
+                      <input type="checkbox" class="row-check" value="<%= customer._id %>">
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center gap-2">
+                        <% if(customer.profilePic) { %>
+                            <img class="avatar" src="<%= customer.profilePic %>">
+                        <% } else { %>
+                            <div class="avatar d-flex align-items-center justify-content-center bg-dark text-white" style="font-size:0.9rem">
+                                <%= customer.name.charAt(0).toUpperCase() %>
+                            </div>
+                        <% } %>
+                        <div>
+                          <div class="fw-semibold"><%= customer.name %></div>
+                          <div class="small text-muted"><%= customer.country || 'India' %></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><%= customer.email %></td>
+                    <td><%= customer.orders ? customer.orders.length : 0 %></td>
+                    <td>$<%= customer.orders ? customer.orders.reduce((s,o)=>s+(o.total||0),0) : 0 %></td>
+                    <td>
+                      <%= (customer.orders && customer.orders.length > 0) ? customer.orders.at(-1)?.createdAt?.toDateString() : '—' %>
+                    </td>
+                    <td class="text-nowrap">
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary view-btn"
+                          data-customer='<%- JSON.stringify(customer) %>'
+                          data-bs-toggle="offcanvas"
+                          data-bs-target="#viewCustomer">
+                          <i class="fa-regular fa-eye"></i>
+                        </button>
 
-      <td>
-        <div class="d-flex align-items-center gap-2">
-          <img class="avatar"
-            src="">
-          <div>
-            <div class="fw-semibold"><%= customer.name %></div>
-            <div class="small text-muted">
-              <%= customer.city %>, <%= customer.country %>
-            </div>
-          </div>
-        </div>
-      </td>
+                        <button class="btn btn-outline-secondary" onclick="openMessageModal('single', '<%= customer._id %>')">
+                          <i class="fa-regular fa-paper-plane"></i>
+                        </button>
 
-      <td><%= customer.email %></td>
-      <td><%= customer.orders.length %></td>
-      <td>$<%= customer.orders.reduce((s,o)=>s+o.total,0) %></td>
-      <td>
-        <%= customer.orders.at(-1)?.createdAt?.toDateString() || '—' %>
-      </td>
-
-      <td class="text-nowrap">
-        <div class="btn-group btn-group-sm">
-          <button
-            class="btn btn-outline-secondary view-btn"
-            data-customer='<%- JSON.stringify(customer) %>'
-            data-bs-toggle="offcanvas"
-            data-bs-target="#viewCustomer">
-            <i class="fa-regular fa-eye"></i>
-          </button>
-
-          <button class="btn btn-outline-secondary">
-            <i class="fa-regular fa-paper-plane"></i>
-          </button>
-
-          <button class="btn btn-outline-danger">
-            <i class="fa-solid fa-user-slash"></i>
-          </button>
-        </div>
-      </td>
-    </tr>
-  <% }) %>
-</tbody>
-
+                        <button class="btn btn-outline-danger">
+                          <i class="fa-solid fa-user-slash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr><td colspan="7" class="text-center py-4">No customers found</td></tr>
+              <% } %>
+            </tbody>
           </table>
         </div>
+        
         <div class="card-footer d-flex justify-content-between align-items-center">
           <div class="d-flex gap-2">
-            <select class="form-select form-select-sm" style="width:160px">
-              <option>Bulk actions</option>
-              <option>Tag: VIP</option>
-              <option>Send message</option>
-              <option>Block</option>
-              <option>Export</option>
+            <select class="form-select form-select-sm" id="bulkActionSelect" style="width:160px">
+              <option value="">Bulk actions</option>
+              <option value="message">Send message</option>
             </select>
-            <button class="btn btn-sm btn-outline-secondary">Apply</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="handleBulkAction()">Apply</button>
           </div>
+          
           <ul class="pagination pagination-sm mb-0">
             <li class="page-item disabled"><a class="page-link">Prev</a></li>
             <li class="page-item active"><a class="page-link">1</a></li>
-            <li class="page-item"><a class="page-link">2</a></li>
-            <li class="page-item"><a class="page-link">3</a></li>
             <li class="page-item"><a class="page-link">Next</a></li>
           </ul>
         </div>
@@ -265,133 +183,171 @@
     </section>
   </main>
 
-  <!-- Save Segment -->
-  <div class="modal fade" id="segmentModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Save segment</h5><button class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <label class="form-label">Segment name</label>
-          <input class="form-control" placeholder="e.g., High LTV Kerala">
-          <div class="form-check mt-3">
-            <input class="form-check-input" type="checkbox" id="shareSeg">
-            <label class="form-check-label" for="shareSeg">Share with team</label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button class="btn btn-dark">Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Message Customer -->
   <div class="modal fade" id="messageModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Message customer</h5><button class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3"><label class="form-label">Subject</label><input class="form-control" placeholder="Subject">
-          </div>
-          <div class="mb-3"><label class="form-label">Message</label><textarea class="form-control" rows="5"
-              placeholder="Write your message"></textarea></div>
-          <div class="form-check"><input class="form-check-input" type="checkbox" id="bcc"><label
-              class="form-check-label" for="bcc">BCC me</label></div>
-        </div>
-        <div class="modal-footer"><button class="btn btn-outline-secondary"
-            data-bs-dismiss="modal">Close</button><button class="btn btn-dark">Send</button></div>
+        <form action="/admin/customers/send-message" method="POST">
+            <div class="modal-header">
+              <h5 class="modal-title">Message Customer(s)</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body">
+              <div id="recipientIds"></div>
+
+              <div class="mb-3">
+                <label class="form-label">Subject</label>
+                <input type="text" name="subject" class="form-control" placeholder="Subject" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Message</label>
+                <textarea name="message" class="form-control" rows="5" placeholder="Write your message..." required></textarea>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="bcc">
+                <label class="form-check-label" for="bcc">Send copy to support</label>
+              </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-dark">Send Message</button>
+            </div>
+        </form>
       </div>
     </div>
   </div>
 
-  <!-- View Customer (Offcanvas) -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="viewCustomer" style="width:520px">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title">Customer</h5>
+      <h5 class="offcanvas-title">Customer Profile</h5>
       <button class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
       <div class="d-flex align-items-center gap-3 mb-3">
-        <img class="avatar" src="https://ui-avatars.com/api/?name=Jane+Smith&background=212529&color=fff" alt="">
+        <div id="ocAvatar"></div>
         <div>
-          <div class="fw-semibold">Jane Smith</div>
-          <div class="small text-muted">jane@example.com</div>
+          <div class="fw-semibold" id="ocName"></div>
+          <div class="small text-muted" id="ocEmail"></div>
         </div>
       </div>
+      
       <div class="row g-2 mb-3">
         <div class="col-4">
           <div class="border rounded p-2 text-center">
             <div class="small text-muted">Orders</div>
-            <div class="fw-bold">8</div>
+            <div class="fw-bold" id="ocOrderCount">0</div>
           </div>
         </div>
         <div class="col-4">
           <div class="border rounded p-2 text-center">
-            <div class="small text-muted">LTV</div>
-            <div class="fw-bold">$742</div>
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="border rounded p-2 text-center">
-            <div class="small text-muted">AOV</div>
-            <div class="fw-bold">$93</div>
+            <div class="small text-muted">Spent</div>
+            <div class="fw-bold" id="ocTotalSpent">$0</div>
           </div>
         </div>
       </div>
+
       <div class="card mb-3">
         <div class="card-header fw-semibold">Details</div>
         <div class="card-body">
-          <div class="d-flex justify-content-between"><span>Phone</span><span class="fw-semibold">+91 98xxxxxx10</span>
-          </div>
+          <div class="d-flex justify-content-between"><span>Phone</span><span class="fw-semibold" id="ocPhone">-</span></div>
           <div class="d-flex justify-content-between"><span>Country</span><span class="fw-semibold">India</span></div>
-          <div class="d-flex justify-content-between"><span>Created</span><span class="fw-semibold">Jan 12, 2024</span>
-          </div>
-          <div class="mt-2"><span class="tag">VIP</span> <span class="tag">Email</span></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header fw-semibold">Recent orders</div>
-        <div class="table-responsive">
-          <table class="table align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Order</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>#12345</td>
-                <td>Oct 20</td>
-                <td>$149.98</td>
-                <td><span class="badge text-bg-success">Paid</span></td>
-              </tr>
-              <tr>
-                <td>#12341</td>
-                <td>Oct 10</td>
-                <td>$79.99</td>
-                <td><span class="badge text-bg-danger">Refunded</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      
       <div class="d-flex gap-2 mt-3">
-        <button class="btn btn-dark w-50" data-bs-toggle="modal" data-bs-target="#messageModal"><i
-            class="fa-regular fa-paper-plane me-1"></i> Message</button>
+        <button class="btn btn-dark w-50" id="ocMessageBtn">
+            <i class="fa-regular fa-paper-plane me-1"></i> Message
+        </button>
         <button class="btn btn-outline-danger w-50"><i class="fa-solid fa-user-slash me-1"></i> Block</button>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  
+  <script>
+    // Initialize Modal
+    const messageModalEl = document.getElementById('messageModal');
+    const messageModalObj = new bootstrap.Modal(messageModalEl);
 
+    // Toggle All Checkboxes
+    function toggleAll(source) {
+        document.querySelectorAll('.row-check').forEach(c => c.checked = source.checked);
+    }
+
+    // MAIN FUNCTION: Open Message Modal (Single or Bulk)
+    function openMessageModal(type, id) {
+        const container = document.getElementById('recipientIds');
+        container.innerHTML = ''; // Clear previous inputs
+
+        if (type === 'single') {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'userId';
+            input.value = id;
+            container.appendChild(input);
+            messageModalObj.show();
+        } 
+        else if (type === 'bulk') {
+            const checkedBoxes = document.querySelectorAll('.row-check:checked');
+            
+            if (checkedBoxes.length === 0) {
+                alert('Please select at least one customer to message.');
+                return;
+            }
+
+            checkedBoxes.forEach(box => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'userId';
+                input.value = box.value;
+                container.appendChild(input);
+            });
+            messageModalObj.show();
+        }
+    }
+
+    // Handle Bulk Action Apply Button
+    function handleBulkAction() {
+        const action = document.getElementById('bulkActionSelect').value;
+        if (action === 'message') {
+            openMessageModal('bulk');
+        }
+    }
+
+    // Populate Offcanvas Data dynamically
+    const viewCustomerOffcanvas = document.getElementById('viewCustomer');
+    viewCustomerOffcanvas.addEventListener('show.bs.offcanvas', function (event) {
+        const button = event.relatedTarget;
+        const customer = JSON.parse(button.getAttribute('data-customer'));
+
+        document.getElementById('ocName').textContent = customer.name;
+        document.getElementById('ocEmail').textContent = customer.email;
+        document.getElementById('ocPhone').textContent = customer.phoneNumber || 'Not provided';
+        document.getElementById('ocOrderCount').textContent = customer.orders ? customer.orders.length : 0;
+        
+        const totalSpent = customer.orders ? customer.orders.reduce((sum, order) => sum + (order.total || 0), 0) : 0;
+        document.getElementById('ocTotalSpent').textContent = '₹' + totalSpent;
+
+        const avatarDiv = document.getElementById('ocAvatar');
+        if (customer.profilePic) {
+            avatarDiv.innerHTML = `<img class="avatar" src="${customer.profilePic}" style="width:50px; height:50px;">`;
+        } else {
+            avatarDiv.innerHTML = `<div class="avatar d-flex align-items-center justify-content-center bg-dark text-white" style="width:50px; height:50px; font-size: 1.2rem;">${customer.name.charAt(0).toUpperCase()}</div>`;
+        }
+
+        // Setup the Message Button inside Offcanvas to trigger the modal
+        const msgBtn = document.getElementById('ocMessageBtn');
+        msgBtn.onclick = function() {
+            // Close offcanvas first (optional, but cleaner UI)
+            const offcanvasInstance = bootstrap.Offcanvas.getInstance(viewCustomerOffcanvas);
+            offcanvasInstance.hide();
+            
+            // Open message modal
+            openMessageModal('single', customer._id);
+        };
+    });
+  </script>
+</body>
 </html>

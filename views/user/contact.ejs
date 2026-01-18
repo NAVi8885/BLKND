@@ -118,32 +118,36 @@
                 <div class="card">
                     <div class="card-body p-5">
                         <h3 class="mb-4 text-center">Send Us a Message</h3>
-                        <form>
+                        <% if (typeof req !== 'undefined' && req.query.success) { %>
+                            <div class="alert alert-success"><%= req.query.success %></div>
+                        <% } %>
+                        <form action="/contact/submit" method="POST">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">First Name *</label>
-                                    <input type="text" class="form-control" required>
+                                    <input type="text" name="firstName" class="form-control" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Last Name *</label>
-                                    <input type="text" class="form-control" required>
+                                    <input type="text" name="lastName" class="form-control" required>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email Address *</label>
-                                <input type="email" class="form-control" required>
+                                <input type="email" name="email" class="form-control" required 
+                                       value="<%= (typeof user !== 'undefined' && user) ? user.email : '' %>">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control">
+                                <input type="tel" name="phone" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Subject *</label>
-                                <input type="text" class="form-control" required>
+                                <input type="text" name="subject" class="form-control" required>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Message *</label>
-                                <textarea class="form-control" rows="5" required></textarea>
+                                <textarea name="message" class="form-control" rows="5" required></textarea>
                             </div>
                             <button type="submit" class="btn btn-dark btn-lg w-100">Send Message</button>
                         </form>
