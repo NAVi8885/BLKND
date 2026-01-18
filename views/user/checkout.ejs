@@ -154,17 +154,19 @@
                             <label class="form-label">ZIP Code *</label>
                             <input type="text" name="pincode" class="form-control" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Order Notes (Optional)</label>
-                            <textarea class="form-control" name="orderNotes" rows="3" placeholder="Notes about your order"></textarea>
-                        </div>
                     </div>
                 </div>
-                
+
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title mb-4">Payment Method</h5>
                         <div class="form-check mb-3">
+                            <% if (typeof error !== 'undefined' && error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>Error:</strong> <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            <% } %>
                             <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="card" checked>
                             <label class="form-check-label" for="creditCard">
                                 <i class="fab fa-cc-visa"></i> <i class="fab fa-cc-mastercard"></i> Online Payment / Card
@@ -284,33 +286,37 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const addressRadios = document.querySelectorAll('input[name="selectedAddress"]');
-        const newAddressForm = document.getElementById('newAddressForm');
-        const newAddressInputs = newAddressForm.querySelectorAll('input, select, textarea');
+    const addressRadios = document.querySelectorAll('input[name="selectedAddress"]');
+    const newAddressForm = document.getElementById('newAddressForm');
+    // Select inputs that should be required ONLY when creating a new address
+    const newAddressInputs = newAddressForm.querySelectorAll('input, select, textarea');
 
-        function toggleForm() {
-            const isNew = document.getElementById('addNewAddressRadio')?.checked;
-            
-            if (isNew || addressRadios.length === 0) {
-                newAddressForm.style.display = 'block';
-                newAddressInputs.forEach(input => input.setAttribute('required', 'true'));
-                // Optional: remove required from Order Notes as it's optional
-                document.getElementsByName('orderNotes')[0].removeAttribute('required');
-            } else {
-                newAddressForm.style.display = 'none';
-                newAddressInputs.forEach(input => input.removeAttribute('required'));
-            }
-        }
-
-        addressRadios.forEach(radio => {
-            radio.addEventListener('change', toggleForm);
-        });
+    function toggleForm() {
+        const addNewAddressRadio = document.getElementById('addNewAddressRadio');
+        // Check if "New Address" is selected OR if there are no saved addresses (radios length is 0)
+        const isNew = addNewAddressRadio?.checked || addressRadios.length === 0;
         
-        // Initial check
-        if (document.querySelectorAll('input[name="selectedAddress"]').length === 0) {
-             // No saved addresses, show form
-             newAddressForm.style.display = 'block';
+        if (isNew) {
+            newAddressForm.style.display = 'block';
+            newAddressInputs.forEach(input => {
+                // Don't make Order Notes required, as it is optional
+                if (input.name !== 'orderNotes') {
+                    input.setAttribute('required', 'true');
+                }
+            });
+        } else {
+            newAddressForm.style.display = 'none';
+            newAddressInputs.forEach(input => input.removeAttribute('required'));
         }
-    </script>
+    }
+
+    // Add event listeners to all radio buttons (Saved addresses + New address option)
+    const allRadios = document.querySelectorAll('input[name="selectedAddress"]');
+    allRadios.forEach(radio => {
+        radio.addEventListener('change', toggleForm);
+    });
+
+    toggleForm();
+</script>
 </body>
 </html>

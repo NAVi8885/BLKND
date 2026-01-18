@@ -7,7 +7,7 @@ const Address = require('../models/address');
 const Order = require('../models/order');
 const Wishlist = require('../models/wishlist');
 const { sendOtpEmail } = require('../utils/otpApp');
-
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const userRegister = async (req, res) => {
     try {
@@ -439,18 +439,18 @@ const getCheckout = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        // 1. Fetch the user's cart and populate product details
+        //the user's cart and populate product details
         const cart = await Cart.findOne({ userId }).populate('items.productId');
 
-        // If cart is empty, redirect back to shop or cart
+        // If cart is empty, redirect back to shop 
         if (!cart || cart.items.length === 0) {
             return res.redirect('/shop');
         }
 
-        // 2. Fetch user's saved addresses
+        // Fetch user's saved addresses
         const addresses = await Address.find({ userId });
 
-        // 3. Render the view with all necessary data
+        // Rendering the view with all necessary data
         res.render('user/checkout', {
             user: req.user,
             cart: cart,
@@ -460,7 +460,7 @@ const getCheckout = async (req, res) => {
 
     } catch (error) {
         console.error("Error in getCheckout:", error);
-        res.render('user/404'); // Or handle error appropriately
+        res.render('user/404');
     }
 };
 
@@ -578,33 +578,29 @@ const placeOrder = async (req, res) => {
         const userId = req.user._id;
         const { selectedAddress, paymentMethod, orderNotes } = req.body;
 
-        // Fetch Cart
+        // 1. Fetch Cart
         const cart = await Cart.findOne({ userId }).populate('items.productId');
         if (!cart || cart.items.length === 0) {
             return res.redirect('/shop');
         }
 
+        // 2. Prepare Address (Same as your existing logic)
         let orderAddress = {};
-
-        // Handle Address Selection
         if (selectedAddress === 'new') {
-            // Construct address from form data
             orderAddress = {
                 name: req.body.name,
                 email: req.body.email,
                 phone: req.body.phone,
                 street: req.body.street,
                 city: req.body.city,
-                district: req.body.state, // Mapping state to district based on schema
+                district: req.body.state,
                 pincode: req.body.pincode,
-                country: 'India', // Default
+                country: 'India',
                 label: 'Home'
             };
         } else {
-            // Fetch existing address
             const addressDoc = await Address.findById(selectedAddress);
             if (!addressDoc) return res.redirect('/checkout');
-            
             orderAddress = {
                 name: addressDoc.name,
                 email: req.user.email,
@@ -618,7 +614,7 @@ const placeOrder = async (req, res) => {
             };
         }
 
-        // Prepare Order Items
+        // 3. Prepare Order Items
         const orderItems = cart.items.map(item => ({
             productId: item.productId._id,
             name: item.productId.name,
@@ -627,14 +623,14 @@ const placeOrder = async (req, res) => {
             total: item.quantity * item.productId.price
         }));
 
-        // Create Order Document
+        // 4. Create Order Document (Pending State)
         const newOrder = new Order({
             userId,
             address: orderAddress,
             items: orderItems,
             totalAmount: cart.total,
             paymentMethod,
-            paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
+            paymentStatus: 'pending', // Default to pending
             orderStatus: 'pending',
             deliveryInstruction: orderNotes || '',
             orderDate: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
@@ -642,27 +638,95 @@ const placeOrder = async (req, res) => {
 
         await newOrder.save();
 
-        // Update Product Stock
-        for (const item of cart.items) {
-            await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: -item.quantity } });
+        // ==========================================
+        // CASE 1: CASH ON DELIVERY (COD)
+        // ==========================================
+        if (paymentMethod === 'cod') {
+            // Update Stock
+            for (const item of cart.items) {
+                await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: -item.quantity } });
+            }
+            // Clear Cart
+            await Cart.findOneAndUpdate({ userId }, { 
+                $set: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 } 
+            });
+            
+            return res.redirect(`/ordersuccess/${newOrder._id}`);
         }
 
-        // Clear Cart
-        await Cart.findOneAndUpdate({ userId }, { 
-            $set: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 } 
-        });
+        // ==========================================
+        // CASE 2: ONLINE PAYMENT (STRIPE)
+        // ==========================================
+        if (paymentMethod === 'card') {
+            // Create Line Items for Stripe
+            const lineItems = cart.items.map(item => ({
+                price_data: {
+                    currency: 'inr', // Change to 'usd' if needed
+                    product_data: {
+                        name: item.productId.name,
+                        // images: [item.productId.image[0]] // Optional: Add image URL if public
+                    },
+                    unit_amount: Math.round(item.productId.price * 100), // Amount in cents/paise
+                },
+                quantity: item.quantity,
+            }));
 
-        // Redirect to Success Page
-        res.redirect(`/ordersuccess/${newOrder._id}`);
+            // Create Stripe Session
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: lineItems,
+                mode: 'payment',
+                success_url: `${req.protocol}://${req.get('host')}/payment/verify?orderId=${newOrder._id}&session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${req.protocol}://${req.get('host')}/checkout?error=Payment Cancelled`,
+                customer_email: req.user.email,
+                metadata: {
+                    orderId: newOrder._id.toString()
+                }
+            });
+
+            // Redirect to Stripe Payment Page
+            return res.redirect(303, session.url);
+        }
 
     } catch (error) {
         console.error("Place Order Error:", error);
-        res.render('user/checkout', {
-            user: req.user,
-            cart: await Cart.findOne({ userId: req.user._id }),
-            addresses: await Address.find({ userId: req.user._id }),
-            error: "Something went wrong while placing the order."
-        });
+        res.redirect('/checkout?error=Something went wrong');
+    }
+};
+
+//Verify Payment after Stripe Redirect
+const verifyPayment = async (req, res) => {
+    try {
+        const { orderId, session_id } = req.query;
+        const userId = req.user._id;
+
+        const session = await stripe.checkout.sessions.retrieve(session_id);
+
+        if (session.payment_status === 'paid') {
+            // 1. Update Order Status
+            await Order.findByIdAndUpdate(orderId, { 
+                $set: { paymentStatus: 'paid' } 
+            });
+
+            // 2. Update Stock (Fetch original cart items from the order we saved)
+            const order = await Order.findById(orderId);
+            for (const item of order.items) {
+                await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
+            }
+
+            // 3. Clear Cart
+            await Cart.findOneAndUpdate({ userId }, { 
+                $set: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 } 
+            });
+
+            return res.redirect(`/ordersuccess/${orderId}`);
+        } else {
+            return res.redirect('/checkout?error=Payment Failed');
+        }
+
+    } catch (error) {
+        console.error("Verify Payment Error:", error);
+        res.redirect('/checkout?error=Payment Verification Failed');
     }
 };
 
@@ -828,6 +892,7 @@ module.exports = {
     deleteAddress,
     setDefaultAddress,
     placeOrder,
+    verifyPayment,
     orderSuccess,
     getWishlist,
     addToWishlist,

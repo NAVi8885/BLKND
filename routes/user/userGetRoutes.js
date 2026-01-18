@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/userSchema');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
-const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders } = require('../../controller/userController');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment } = require('../../controller/userController');
 const { asyncWrapProviders } = require('async_hooks');
 
 
@@ -160,6 +160,8 @@ router.get('/contact', optionalVerify, async (req, res) => {
 });
 
 router.get('/checkout', verifyRequired, getCheckout);
+
+router.get('/payment/verify', verifyRequired, verifyPayment);
 
 // Action Buttons of addreses (delete/ set default)
 router.get('/address/delete/:id', verifyRequired, deleteAddress);
