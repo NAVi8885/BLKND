@@ -1,16 +1,5 @@
-// 1. IMPORTANT: Load the .env file immediately
-require('dotenv').config(); 
-
 const nodemailer = require('nodemailer');
 const { hash } = require('@node-rs/argon2');
-
-// 2. DEBUG CHECK: This will print to your terminal when the server starts.
-// If it says "undefined", your .env file is not being found.
-console.log("---------------------------------------------------");
-console.log("📧 Email Config Check:");
-console.log("   User:", process.env.NODEMAILER_EMAIL ? process.env.NODEMAILER_EMAIL : "MISSING ❌");
-console.log("   Pass:", process.env.NODEMAILER_PASSWORD ? "Loaded ✅" : "MISSING ❌");
-console.log("---------------------------------------------------");
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',

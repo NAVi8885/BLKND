@@ -41,6 +41,74 @@ const adminLogout= async (req, res) => {
     return res.redirect('admin/adminLogin');
 }
 
+const getOrderPage = async (req, res) => {
+    try {
+        const { search, status, payment, dateFrom, dateTo, page = 1 } = req.query;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        // 1. Build Query
+        let query = {};
+
+        // Search (Order ID or User Name)
+        if (search) {
+            // Check if search is a valid ObjectId for exact match
+            const isObjectId = mongoose.Types.ObjectId.isValid(search);
+            if (isObjectId) {
+                query._id = search;
+            } else {
+                // Otherwise search inside address.name or paymentMethod
+                query.$or = [
+                    { 'address.name': { $regex: search, $options: 'i' } },
+                    { paymentMethod: { $regex: search, $options: 'i' } }
+                ];
+            }
+        }
+
+        // Filter by Status
+        if (status && status !== 'Any') {
+            // Map UI status to DB status if they differ, or ensure exact match
+            // Your model uses lowercase: 'pending', 'shipped', 'delivered', 'cancelled'
+            query.orderStatus = status.toLowerCase();
+        }
+
+        // Filter by Payment Method
+        if (payment && payment !== 'Any') {
+            query.paymentMethod = payment.toLowerCase();
+        }
+
+        // Filter by Date Range
+        if (dateFrom || dateTo) {
+            query.createdAt = {};
+            if (dateFrom) query.createdAt.$gte = new Date(dateFrom);
+            if (dateTo) query.createdAt.$lte = new Date(dateTo);
+        }
+
+        // 2. Fetch Data
+        const totalOrders = await Order.countDocuments(query);
+        const orders = await Order.find(query)
+            .populate('userId', 'email') // Get user email from User model
+            .populate('items.productId', 'name') // Get product details if needed
+            .sort({ createdAt: -1 }) // Newest first
+            .skip(skip)
+            .limit(limit);
+
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        // 3. Render
+        res.render('admin/orders', {
+            orders,
+            currentPage: Number(page),
+            totalPages,
+            filters: { search, status, payment, dateFrom, dateTo }
+        });
+
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).send("Server Error");
+    }
+};
+
 // create or update a product based on if the product id is available or not 
 const upsertProducts = async (req, res) => {
     try {
@@ -573,6 +641,36 @@ const addBanner = async (req, res) => {
         }
 }
 
+const updateBanner = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, subtitle, link, order } = req.body;
+        
+        // Find the banner
+        const banner = await Banner.findById(id);
+        if (!banner) {
+            return res.redirect('/banners');
+        }
+
+        // Update fields
+        banner.title = title;
+        banner.subtitle = subtitle;
+        banner.link = link;
+        banner.order = order;
+
+        // If a new image , update it
+        if (req.file) {
+            banner.image = req.file.filename;
+        }
+
+        await banner.save();
+        res.redirect('/banners');
+    } catch (error) {
+        console.log("Error updating banner:", error);
+        res.status(500).send("Server Error");
+    }
+}
+
 const deleteBanner = async (req, res) => {
     try {
             const { id } = req.params;
@@ -587,6 +685,7 @@ const deleteBanner = async (req, res) => {
 module.exports = {
     adminLogin,
     adminLogout,
+    getOrderPage,
     upsertProducts,
     deleteProduct,
     getProductsPage,
@@ -604,6 +703,7 @@ module.exports = {
     deleteCoupon,
     getBannerPage,
     addBanner,
+    updateBanner,
     deleteBanner
 }
 

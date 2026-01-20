@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../../models/product');
-const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory, getCustomers, getAnalytics, getCoupons, deleteCoupon, getBannerPage } = require('../../controller/adminController');
+const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory, getCustomers, getAnalytics, getCoupons, deleteCoupon, getBannerPage, getOrderPage } = require('../../controller/adminController');
 const verifyAdmin = require('../../middlewares/authentication/adminAuth');
 const Category = require('../../models/categorySchema');
 
@@ -24,10 +24,7 @@ router.get('/admin/products/delete/:id', verifyAdmin, deleteProduct);
 
 router.get('/admin/products', verifyAdmin, getProductsPage);
 
-
-router.get('/orders', (req, res) => {
-    res.render('admin/orders');
-})
+router.get('/orders', verifyAdmin, getOrderPage);
 
 router.get('/categories', async (req, res) => {
     const categories = await Category.find().sort({createdAt: -1});

@@ -10,6 +10,7 @@ const Message = require('../models/message');
 const Coupon = require('../models/coupon');
 const Banner = require('../models/banner');
 const { sendOtpEmail } = require('../utils/otpApp');
+const { client } = require('../config/redis');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const userRegister = async (req, res) => {
@@ -69,20 +70,76 @@ const loginUser = async (req, res) => {
     }
 }
 
-// for Banners
+// for Banners using redis
 const loadHomepage = async (req, res) => {
     try {
-        // Fetch active banners sorted by order
-        const banners = await Banner.find({ isActive: true }).sort({ order: 1 });
-        
-        // Fetch products, etc.
-        const products = await Product.find({ isListed: true }); 
+        const cacheKey = 'homepage_data';
 
-        res.render('user/index', { 
-            banners, 
-            products, 
-            user: req.user
-        });
+        // 1. Check Redis Cache
+        const cachedData = await client.get(cacheKey);
+        
+        if (cachedData) {
+            const { banners, products } = JSON.parse(cachedData);
+            console.log('Redis used for Homepage');
+            return res.render('user/index', { banners, products, user: req.user });
+        }
+
+        // 2. Fetch Banners (Existing logic)
+        const banners = await Banner.find({ isActive: true }).sort({ order: 1 });
+
+        // 3. Aggregate Top 4 Best Selling Products
+        const topProducts = await Order.aggregate([
+            // Filter only valid orders (paid, pending, shipped, delivered) - exclude cancelled
+            { $match: { orderStatus: { $ne: 'cancelled' } } },
+            
+            // Unwind the items array to process individual products
+            { $unwind: "$items" },
+            
+            // Group by Product ID and sum the quantity
+            { 
+                $group: { 
+                    _id: "$items.productId", 
+                    totalSold: { $sum: "$items.quantity" } 
+                } 
+            },
+            
+            // Sort by totalSold in descending order
+            { $sort: { totalSold: -1 } },
+            
+            // Limit to top 4
+            { $limit: 4 },
+            
+            // Lookup product details from Products collection
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            
+            // Unwind productDetails array to get the object
+            { $unwind: "$productDetails" },
+            
+            // Replace root to make the product data the main object
+            { $replaceRoot: { newRoot: "$productDetails" } }
+        ]);
+
+        // Note: If no orders exist yet, topProducts might be empty. 
+        // You might want a fallback to fetch 4 random products in that case.
+        let displayProducts = topProducts;
+        if (displayProducts.length === 0) {
+            displayProducts = await Product.find({ status: 'active' }).limit(4);
+        }
+
+        // 4. Save to Redis (Cache for 1 hour)
+        // Store 'displayProducts' as 'products' to match the view variable
+        await client.setEx(cacheKey, 3600, JSON.stringify({ banners, products: displayProducts }));
+
+        console.log('Fetched from DB and Cached');
+        res.render('user/index', { banners, products: displayProducts, user: req.user });
+
     } catch (error) {
         console.log("Home page error:", error);
         res.status(500).send("Server Error");

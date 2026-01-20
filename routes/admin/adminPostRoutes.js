@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const validateAdminLogin = require('../../middlewares/validation/adminValidator');
-const {adminLogin, adminLogout, upsertProducts, deleteProduct, createCategory, addSubCategory, updateCategory, sendMessageToUser, createCoupon, updateCoupon, deleteBanner, addBanner} = require('../../controller/adminController');
+const {adminLogin, adminLogout, upsertProducts, deleteProduct, createCategory, addSubCategory, updateCategory, sendMessageToUser, createCoupon, updateCoupon, deleteBanner, addBanner, updateBanner} = require('../../controller/adminController');
 const verifyAdmin = require('../../middlewares/authentication/adminAuth');
 const createMulter = require('../../config/multer');
 
@@ -27,5 +27,6 @@ router.post('/admin/coupons/edit/:id', verifyAdmin, updateCoupon);
 
 const bannerUpload = createMulter('banners');// for uploading banner images
 router.post('/admin/add-banner', verifyAdmin, bannerUpload.single('image'), addBanner);
-router.post('/delete-banner/:id', verifyAdmin, deleteBanner);
+router.post('/admin/edit-banner/:id', verifyAdmin, bannerUpload.single('image'), updateBanner);
+router.post('/admin/delete-banner/:id', verifyAdmin, deleteBanner);
 module.exports = router;

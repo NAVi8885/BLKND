@@ -13,16 +13,22 @@ const adminGetRouter = require('./routes/admin/adminGetRoutes');
 const adminPostRouter = require('./routes/admin/adminPostRoutes');
 
 const connectDB = require('./config/db');
-// const connectRedis = require('./config/redis');
 const passport = require('passport');
 require('./config/passport');
-
+const { RedisStore } = require('connect-redis');
+const redisClient = require('./config/redis');
 
 app.use(
     session({
+        store: new RedisStore({ client: redisClient }),  
         secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false
+        resave: false,             // Recommended false for Redis
+        saveUninitialized: false,  // Recommended false for Redis to save memory
+        cookie: {
+            secure: false, // Set to TRUE when hosting
+            httpOnly: true, // Prevents client-side JS from reading the cookie
+            maxAge: 1000 * 60 * 60 * 24 // 1 Day
+        }
     })
 );
 
@@ -30,7 +36,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 connectDB();
-// connectRedis();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

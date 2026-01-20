@@ -28,48 +28,55 @@
         .section-title { font-size: 36px; font-weight: 700; margin-bottom: 50px; text-align: center; }
         html { margin: 0; padding: 0; }
 
-    /* Force Navbar to float ON TOP of the banner */
-    .navbar {
-        position: absolute;
+    .top-nav {
+        position: absolute; /* Floats on top */
         top: 0;
         left: 0;
         width: 100%;
-        z-index: 1000;
-        background: transparent !important; /* Make transparent */
-        border-bottom: none !important;
+        z-index: 1031; /* Higher than navbar */
+        background-color: transparent !important; /* Removes dark background */
+        border-bottom: 1px solid rgba(255,255,255,0.1); /* Optional: subtle subtle divider */
     }
-    
-    /* Make nav links white so they are visible on banner */
-    .nav-link, .navbar-brand { color: #fff !important; }
 
-    /* The Carousel Height */
+    /* 2. Make the Main Navbar Transparent & Float */
+    .navbar {
+        position: absolute; /* Floats on top */
+        top: 40px; /* Pushes it down below the top-nav text */
+        left: 0;
+        width: 100%;
+        z-index: 1030;
+        background: transparent !important; /* Removes white background */
+        box-shadow: none !important; /* Removes shadow */
+    }
+
+    /* 3. Ensure Text is White */
+    .nav-link, .navbar-brand, .top-nav a, .top-nav span {
+        color: #fff !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Makes text readable on bright images */
+    }
+
+    /* 4. Full Screen Hero Settings */
     .full-screen-hero {
-        height: 100vh; /* Covers 100% of viewport height */
+        height: 100vh; /* exact height of the screen */
         width: 100%;
         position: relative;
         overflow: hidden;
     }
 
-    .carousel-item, .carousel-inner {
-        height: 100%;
-    }
-
-    /* The Image */
     .banner-img {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* Ensures image covers area without distortion */
+        object-fit: cover; /* Ensures 1920x1080 image covers entire screen */
         object-position: center;
     }
 
-    /* Overlay for text readability */
     .hero-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,0.3);
+        background: rgba(0,0,0,0.3); /* Darkens image slightly so buttons pop */
     }
     
-    /* Centered Text */
+    /* Center the banner text */
     .hero-content {
         position: absolute;
         top: 50%;
@@ -82,7 +89,7 @@
     </style>
 </head>
 <body>
-    <div class="top-nav text-white" style="background-color: #2125297f; padding: 10px 0; font-size: 14px;">
+    <div class="top-nav text-white" style="background-color: #0e0a0ab4;  padding: 10px 0; font-size: 14px;">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -105,7 +112,7 @@
         </div>
     </div>
     
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top" style="padding: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/index" style="font-size: 28px; font-weight: 700;">BLKND</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -119,10 +126,10 @@
                     <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
                 </ul>
                 <div class="nav-icons d-flex align-items-center">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
-                    <a href="/profile" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
-                    <a href="/wishlist" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
-                    <a href="/cart" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #fff; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
+                    <a href="/profile" style="color: #fff; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
+                    <a href="/wishlist" style="color: #fff; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
+                    <a href="/cart" style="color: #fff; font-size: 18px; margin-left: 20px; position: relative;">
                         <i class="fas fa-shopping-cart"></i>
                         <span style="position: absolute; top: -8px; right: -8px; background: #212529; color: #fff; border-radius: 50%; padding: 2px 6px; font-size: 10px;">0</span>
                     </a>
@@ -149,7 +156,7 @@
             <% if(banners && banners.length > 0) { %>
                 <% banners.forEach((banner, index) => { %>
                     <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                        <img src="/uploads/products/<%= banner.image %>" class="banner-img" alt="<%= banner.title %>">
+                        <img src="/uploads/banners/<%= banner.image %>" class="banner-img" alt="<%= banner.title %>">
 
                         <div class="hero-overlay"></div>
 
@@ -209,54 +216,41 @@
 
     <section class="py-5 bg-light">
         <div class="container">
-            <h2 class="section-title">Featured Products</h2>
+            <h2 class="section-title">Top Sellers</h2>
+
             <div class="row">
-                <div class="col-md-3">
-                    <div class="card product-card">
-                        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400" class="card-img-top" alt="Product">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Classic White Shirt</h5>
-                            <p class="text-muted">$49.99</p>
-                            <a href="/single-product" class="btn btn-outline-dark btn-sm">View Details</a>
+                <% if(products && products.length > 0) { %>
+                    <% products.forEach(product => { %>
+                        <div class="col-md-3">
+                            <div class="card product-card">
+                                <a href="/product/<%= product._id %>" class="text-decoration-none text-dark">
+                                    <img src="<%= product.image[0] %>" 
+                                         class="card-img-top" 
+                                         alt="<%= product.name %>">
+
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title"><%= product.name %></h5>
+
+                                        <p class="text-muted">₹<%= product.price %></p>
+
+                                        <a href="/product/<%= product._id %>" class="btn btn-outline-dark btn-sm">View Details</a>
+                                    </div>
+                                </a>
+                            </div>
                         </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="col-12 text-center">
+                        <p>No products available at the moment.</p>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card product-card">
-                        <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400" class="card-img-top" alt="Product">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Denim Jacket</h5>
-                            <p class="text-muted">$89.99</p>
-                            <a href="/single-product" class="btn btn-outline-dark btn-sm">View Details</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card product-card">
-                        <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400" class="card-img-top" alt="Product">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Summer Dress</h5>
-                            <p class="text-muted">$69.99</p>
-                            <a href="/single-product" class="btn btn-outline-dark btn-sm">View Details</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card product-card">
-                        <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400" class="card-img-top" alt="Product">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Casual Sneakers</h5>
-                            <p class="text-muted">$79.99</p>
-                            <a href="/single-product" class="btn btn-outline-dark btn-sm">View Details</a>
-                        </div>
-                    </div>
-                </div>
+                <% } %>
             </div>
+
             <div class="text-center mt-4">
                 <a href="/shop" class="btn btn-dark btn-lg">View All Products</a>
             </div>
         </div>
-    </section>
+    </section>  
 
     <section class="py-5 my-5 bg-dark text-white">
         <div class="container text-center">
