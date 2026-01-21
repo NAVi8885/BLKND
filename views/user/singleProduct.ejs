@@ -295,6 +295,7 @@
             </div>
         </form>
 
+        
         <div class="mt-4">
           <p><strong>Category:</strong>
             <%= product.category || 'Uncategorized' %>
@@ -313,7 +314,33 @@
         </div>
       </div>
     </div>
+    <div class="ai-tryon-container mt-4 p-4 border rounded shadow-sm" style="background: #f9f9f9;">
+    <h4 class="mb-3" style="font-family: 'Playfair Display', serif;">✨ AI Virtual Try-On</h4>
+    <p class="text-muted small">See how this looks on you instantly. Upload a photo to generate a preview.</p>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <form id="tryOnForm" enctype="multipart/form-data">
+                <input type="hidden" name="productId" value="<%= product._id %>">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Upload Your Photo</label>
+                    <input type="file" class="form-control" name="userPhoto" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-dark w-100" id="generateBtn">
+                    <span id="btnText">Generate Look</span>
+                    <span id="btnLoader" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            </form>
+        </div>
 
+        <div class="col-md-6 d-flex align-items-center justify-content-center bg-white border rounded">
+            <div id="resultContainer" class="text-center p-3">
+                <p class="text-muted mb-0 small" id="placeholderText">Result will appear here</p>
+                <img id="generatedImage" src="" class="img-fluid rounded d-none" style="max-height: 250px; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+</div>
     <div class="row mt-5">
       <div class="col-md-12">
         <ul class="nav nav-tabs mb-4" role="tablist">
@@ -485,6 +512,53 @@
       }
     })();
   </script>
+  // For ai 
+  <script>
+document.getElementById('tryOnForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById('generateBtn');
+    const loader = document.getElementById('btnLoader');
+    const btnText = document.getElementById('btnText');
+    const resultImg = document.getElementById('generatedImage');
+    const placeholder = document.getElementById('placeholderText');
+    
+    // UI Loading State
+    btn.disabled = true;
+    loader.classList.remove('d-none');
+    btnText.textContent = " Designing...";
+    placeholder.textContent = "AI is generating your look...";
+    resultImg.classList.add('d-none');
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('/try-on', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            resultImg.src = data.image;
+            resultImg.classList.remove('d-none');
+            placeholder.classList.add('d-none');
+        } else {
+            alert(data.msg || "Something went wrong");
+            placeholder.textContent = "Generation failed. Try again.";
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Server error");
+    } finally {
+        // Reset UI
+        btn.disabled = false;
+        loader.classList.add('d-none');
+        btnText.textContent = "Generate Look";
+    }
+});
+</script>
 </body>
 
 </html>

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express();
 const { validateUserReg, validateUserLogin, validateUpdateUser } = require("../../middlewares/validation/userValidator");
-const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress, placeOrder, addToWishlist, removeFromWishlist, changePassword, submitContact, deleteAccount, updatePreferences, removeCoupon, applyCoupon } = require('../../controller/userController');
+const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress, placeOrder, addToWishlist, removeFromWishlist, changePassword, submitContact, deleteAccount, updatePreferences, removeCoupon, applyCoupon, tryOnProduct } = require('../../controller/userController');
 const { verifyRequired } = require('../../middlewares/authentication/userAuth');
 const upload = require('../../config/multer');
 const createMulter = require('../../config/multer');
@@ -73,5 +73,9 @@ router.post('/remove-coupon', verifyRequired, removeCoupon);
 
 // places order
 router.post('/placeorder', verifyRequired, placeOrder);
+
+// For AI try on
+const tryOnUpload = createMulter('tryons');
+router.post('/try-on', tryOnUpload.single('userPhoto'), tryOnProduct);
 
 module.exports = router;

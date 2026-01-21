@@ -57,26 +57,33 @@
 
     /* 4. Full Screen Hero Settings */
     .full-screen-hero {
-        height: 100vh; /* exact height of the screen */
-        width: 100%;
         position: relative;
+        width: 100%;
+        /* Use min-height to prevent content cutting off on small/landscape screens */
+        min-height: 100vh; 
         overflow: hidden;
+    }
+
+    .carousel-item {
+        /* Ensure the item itself takes up the full height */
+        height: 100vh;
+        min-height: 600px; /* Fallback for very short screens */
     }
 
     .banner-img {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* Ensures 1920x1080 image covers entire screen */
+        object-fit: cover;
         object-position: center;
     }
 
     .hero-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,0.3); /* Darkens image slightly so buttons pop */
+        background: rgba(0,0,0,0.4); /* Slightly darker for better text readability */
+        z-index: 1;
     }
     
-    /* Center the banner text */
     .hero-content {
         position: absolute;
         top: 50%;
@@ -85,7 +92,53 @@
         text-align: center;
         color: white;
         z-index: 2;
+        width: 90%; /* Prevents text from hitting the screen edges */
+        max-width: 900px; /* Keeps text constrained on large screens */
     }
+
+    /* DEFAULT (Desktop) Typography */
+    .hero-title {
+        font-size: 4rem; /* Equivalent to display-3 but easier to control */
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* RESPONSIVE: Tablet & Mobile Tweaks */
+    @media (max-width: 992px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .carousel-item {
+            min-height: 500px; /* Allow shorter height on mobile if needed */
+        }
+        
+        .hero-title {
+            font-size: 2.2rem; /* Much smaller for mobile to prevent overflow */
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-lg {
+            padding: 10px 25px;
+            font-size: 1rem;
+        }
+    }
+</style>
     </style>
 </head>
 <body>

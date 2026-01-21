@@ -13,6 +13,14 @@ const { sendOtpEmail } = require('../utils/otpApp');
 const { client } = require('../config/redis');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+//  For ai 
+const { Client } = require("@gradio/client");
+const fs = require('fs');
+const path = require('path');
+const { HfInference } = require("@huggingface/inference"); // Optional fallback
+
+
+
 const userRegister = async (req, res) => {
     try {
         const {fullName, email, phoneNumber, password, confirmPassword} = req.body
@@ -75,7 +83,7 @@ const loadHomepage = async (req, res) => {
     try {
         const cacheKey = 'homepage_data';
 
-        // 1. Check Redis Cache
+        //Check's Redis Cache
         const cachedData = await client.get(cacheKey);
         
         if (cachedData) {
@@ -84,10 +92,10 @@ const loadHomepage = async (req, res) => {
             return res.render('user/index', { banners, products, user: req.user });
         }
 
-        // 2. Fetch Banners (Existing logic)
+        // Fetches Banners 
         const banners = await Banner.find({ isActive: true }).sort({ order: 1 });
 
-        // 3. Aggregate Top 4 Best Selling Products
+        //Aggregating Top 4 Best Selling Products
         const topProducts = await Order.aggregate([
             // Filter only valid orders (paid, pending, shipped, delivered) - exclude cancelled
             { $match: { orderStatus: { $ne: 'cancelled' } } },
@@ -126,14 +134,14 @@ const loadHomepage = async (req, res) => {
             { $replaceRoot: { newRoot: "$productDetails" } }
         ]);
 
-        // Note: If no orders exist yet, topProducts might be empty. 
-        // You might want a fallback to fetch 4 random products in that case.
+        // If no orders exist yet, topProducts will be empty. 
+        // fallback to fetch 4 random products in that case.
         let displayProducts = topProducts;
         if (displayProducts.length === 0) {
             displayProducts = await Product.find({ status: 'active' }).limit(4);
         }
 
-        // 4. Save to Redis (Cache for 1 hour)
+        // Save to Redis (Cache for 1 hour)
         // Store 'displayProducts' as 'products' to match the view variable
         await client.setEx(cacheKey, 3600, JSON.stringify({ banners, products: displayProducts }));
 
@@ -1140,6 +1148,89 @@ const submitContact = async (req, res) => {
     }
 };
 
+const tryOnProduct = async (req, res) => {
+    try {
+        const { productId } = req.body;
+        
+        // 1. Validate User Image
+        if (!req.file) {
+            return res.status(400).json({ success: false, msg: "Please upload your photo." });
+        }
+
+        // 2. Fetch Product & Resolve Paths
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ success: false, msg: "Product not found" });
+
+        // Resolve local path for the product image (e.g., /uploads/products/image.png)
+        // Ensure path logic matches your folder structure in 'uploads'
+        const productPath = path.join(__dirname, '..', product.image[0]); 
+        const userPath = req.file.path;
+
+        console.log("👗 AI Try-On Started for:", product.name);
+
+        // 3. Connect to the IDM-VTON Space (The "Senior Engineer" Model)
+        // yisol/IDM-VTON is the state-of-the-art open source try-on model
+        const client = await Client.connect("yisol/IDM-VTON");
+
+        // 4. Send Images to AI
+        // This specific model expects: [dict(background, layers), garment_image, description, ...]
+        // We use the "tryon" endpoint or the generic predict endpoint.
+        
+        // Note: Public spaces can be slow/busy. We add a timeout logic or error handling.
+        const result = await client.predict("/tryon", { 
+            dict: { "background": fs.readFileSync(userPath), "layers": [], "composite": null },
+            garm_img: fs.readFileSync(productPath),
+            garment_des: `A ${product.color} ${product.description}`, // AI uses this to help understanding
+            is_checked: true, 
+            is_checked_crop: false, 
+            denoise_steps: 30, // Higher = better quality, slower
+            seed: 42
+        });
+
+        // 5. Process Result
+        // The API returns a URL or file path in the result object
+        const generatedImageDetails = result.data[0]; 
+        
+        // Use the URL directly if public, or fetch and convert to Base64
+        return res.json({ 
+            success: true, 
+            image: generatedImageDetails.url // Or convert blob to base64 if needed
+        });
+
+    } catch (error) {
+        console.error("AI Try-On Error:", error);
+
+        // --- FALLBACK TO SDXL (Prompt Based) ---
+        // If the specialized VTON model is busy (common with free spaces), 
+        // fallback to the "Prompt-Based" method which is faster but less accurate.
+        try {
+            console.log("⚠️ VTON busy, switching to SDXL fallback...");
+            const hf = new HfInference(process.env.HF_API_TOKEN);
+            
+            // Construct "Senior Prompt"
+            const seniorPrompt = `(photorealistic:1.3), professional full body shot, 
+            wearing ${product.color} ${product.name}, ${product.description}, 
+            highly detailed fabric, 8k, cinematic lighting.`;
+
+            const blob = await hf.imageToImage({
+                model: 'stabilityai/stable-diffusion-xl-base-1.0',
+                inputs: fs.readFileSync(req.file.path), // Use User's photo as base
+                parameters: { 
+                    prompt: seniorPrompt, 
+                    strength: 0.75 // How much to change the original image (0.7-0.8 is sweet spot)
+                }
+            });
+
+            const buffer = await blob.arrayBuffer();
+            const base64 = `data:image/jpeg;base64,${Buffer.from(buffer).toString('base64')}`;
+            return res.json({ success: true, image: base64, msg: "Generated with SDXL (Fast Mode)" });
+
+        } catch (fallbackError) {
+             return res.status(500).json({ success: false, msg: "AI servers are currently busy. Try again later." });
+        }
+    }
+};
+
 module.exports = {
     userRegister,
     loginUser,
@@ -1173,5 +1264,6 @@ module.exports = {
     removeFromWishlist,
     getUserOrders,
     filterUserOrders,
-    submitContact
+    submitContact,
+    tryOnProduct
 };
