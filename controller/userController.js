@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userSchema');
 const Cart = require('../models/cart');
 const Product = require('../models/product');
+const Category = require('../models/categorySchema')
 const Address = require('../models/address');
 const Order = require('../models/order');
 const Wishlist = require('../models/wishlist');
@@ -369,6 +370,67 @@ const deleteAccount = async (req, res) => {
     }
 };
 
+const shopFilter = async (req, res) => {
+    try {
+    const { category, subcategory, search, sort, minPrice, maxPrice, ajax } = req.query;
+
+    // 1. Base Query
+    let query = { status: 'active' };
+
+    // 2. Category Filter
+    if (category) query.category = category;
+    if (subcategory) query.subcategory = subcategory;
+
+    // 3. Search Filter
+    if (search) query.name = { $regex: search, $options: 'i' };
+
+    // 4. Price Filter
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // 5. Sorting Logic
+    let sortOption = { createdAt: -1 }; // Default: Newest first
+    if (sort === 'priceLowHigh') sortOption = { price: 1 };
+    if (sort === 'priceHighLow') sortOption = { price: -1 };
+    if (sort === 'nameAZ') sortOption = { name: 1 };
+
+    // 6. Fetch Products
+    const products = await Product.find(query).sort(sortOption);
+
+    // --- AJAX HANDLER (NEW) ---
+    // If the request comes from our AJAX script, return JSON only
+    if (ajax) {
+      return res.json({ success: true, products: products });
+    }
+    // --------------------------
+
+    // 7. Standard Page Load
+    const categories = await Category.find().lean();
+
+    res.render('user/shop', {
+      products,
+      categories,
+      user: req.user,
+      selectedCategory: category || '',
+      selectedSubcategory: subcategory || '',
+      selectedSort: sort || '',
+      selectedMinPrice: minPrice || 0,
+      selectedMaxPrice: maxPrice || 10000,
+      selectedSearch: search || ''
+    });
+
+  } catch (error) {
+    console.error("Shop Load Error:", error);
+    if(req.query.ajax) {
+        return res.status(500).json({ success: false, error: "Server Error" });
+    }
+    res.status(500).send("Server Error");
+  }
+}
+
 const addToCart = async (req, res) => {
   try {
     const { productId, selectedSize, selectedColor } = req.body;
@@ -398,6 +460,15 @@ const addToCart = async (req, res) => {
       i.selectedColor === selectedColor
     );
 
+    let currentQty = 0;
+    if (itemIndex > -1) {
+        currentQty = cart.items[itemIndex].quantity;
+    }
+
+    if (product.stock < (currentQty + quantity)) {
+         return res.status(400).send("Insufficient stock");
+    }
+
     if (itemIndex > -1) {
       cart.items[itemIndex].quantity += quantity;
     } else {
@@ -407,20 +478,8 @@ const addToCart = async (req, res) => {
     // Populate to get prices for calculation
     await cart.populate('items.productId');
 
-    let subTotal = 0;
-    
-    // Filter out invalid items just in case
-    cart.items = cart.items.filter(item => item.productId != null);
-
-    cart.items.forEach(item => {
-      subTotal += item.productId.price * item.quantity;
-    });
-
-    //  Update Cart Fields
-    cart.subTotal = subTotal;
-    cart.tax = subTotal * 0.04; // 4% Tax
-    cart.shipping = subTotal >= 100 ? 0 : 100; // Free shipping over 100
-    cart.total = cart.subTotal + cart.tax + cart.shipping;
+    const { calculateCartTotals } = require('../utils/cartUtils');
+    calculateCartTotals(cart);
 
     // Save the Cart with calculated totals
     await cart.save();
@@ -505,22 +564,8 @@ const updateCart = async (req, res) => {
     /* ===============================
        RECALCULATE TOTALS
     ================================ */
-    let subTotal = 0;
-    let count = 0;
-
-    cart.items.forEach(i => {
-        subTotal += i.productId.price * i.quantity;
-        count += i.quantity;
-    });
-
-    const tax = +(subTotal * 0.04).toFixed(2);
-    const shipping = subTotal >= 100 ? 0 : 100;
-    const total = +(subTotal + tax + shipping).toFixed(2);
-
-    cart.subTotal = subTotal;
-    cart.tax = tax;
-    cart.shipping = shipping;
-    cart.total = total;
+    const { calculateCartTotals } = require('../utils/cartUtils');
+    const { subTotal, tax, shipping, total, count } = calculateCartTotals(cart);
 
     await cart.save();
 
@@ -569,22 +614,8 @@ const removeFromCart = async (req, res) => {
     cart.items.pull(itemId);
 
     // Recalculate totals
-    let subTotal = 0;
-    let count = 0;
-
-    cart.items.forEach(i => {
-      subTotal += i.productId.price * i.quantity;
-      count += i.quantity;
-    });
-
-    const tax = +(subTotal * 0.04).toFixed(2);
-    const shipping = subTotal >= 100 ? 0 : 100;
-    const total = +(subTotal + tax + shipping).toFixed(2);
-
-    cart.subTotal = subTotal;
-    cart.tax = tax;
-    cart.shipping = shipping;
-    cart.total = total;
+    const { calculateCartTotals } = require('../utils/cartUtils');
+    const { subTotal, tax, shipping, total, count } = calculateCartTotals(cart);
 
     await cart.save();
 
@@ -1205,7 +1236,7 @@ const tryOnProduct = async (req, res) => {
         // fallback to the "Prompt-Based" method which is faster but less accurate.
         try {
             console.log("⚠️ VTON busy, switching to SDXL fallback...");
-            const hf = new HfInference(process.env.HF_API_TOKEN);
+            const hf = new HfInference(process.env.HF_API_TOKEN );
             
             // Construct "Senior Prompt"
             const seniorPrompt = `(photorealistic:1.3), professional full body shot, 
@@ -1231,6 +1262,29 @@ const tryOnProduct = async (req, res) => {
     }
 };
 
+/*
+  Retrieve Cached Try-On Image
+  - Called on page load to persist state.
+*/
+const getTryOnImage = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const userId = req.user._id;
+        const redisKey = `tryon:${userId}:${productId}`;
+
+        const cachedPath = await client.get(redisKey);
+
+        if (cachedPath) {
+            return res.json({ success: true, image: cachedPath });
+        } else {
+            return res.json({ success: false });
+        }
+    } catch (error) {
+        console.error("Get Try-On Error:", error);
+        res.json({ success: false });
+    }
+};
+
 module.exports = {
     userRegister,
     loginUser,
@@ -1244,6 +1298,7 @@ module.exports = {
     changePassword,
     updatePreferences,
     deleteAccount,
+    shopFilter,
     addToCart,
     getCart,
     updateCart,
@@ -1265,5 +1320,6 @@ module.exports = {
     getUserOrders,
     filterUserOrders,
     submitContact,
-    tryOnProduct
+    tryOnProduct,
+    getTryOnImage
 };

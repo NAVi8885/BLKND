@@ -514,6 +514,44 @@
   </script>
   // For ai 
   <script>
+document.addEventListener('DOMContentLoaded', function() {
+    checkExistingTryOn();
+});
+
+// 1. Check Redis for existing session image
+async function checkExistingTryOn() {
+    const productId = '<%= product._id %>';
+    const resultImg = document.getElementById('generatedImage');
+    const placeholder = document.getElementById('placeholderText');
+    const container = document.getElementById('resultContainer');
+
+    try {
+        const response = await fetch('/get-try-on-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId })
+        });
+        const data = await response.json();
+
+        if (data.success && data.image) {
+            // Show persisted image
+            resultImg.src = data.image;
+            resultImg.classList.remove('d-none');
+            placeholder.classList.add('d-none');
+            // Add a subtle border to indicate it's saved
+            container.style.border = "2px solid #212529";
+        }
+    } catch (err) {
+        console.log("No existing try-on found");
+    }
+}
+
+// 2. Handle Generation Request
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for previous try-on session
+    // (Optional: Implement checkExistingTryOn() here if needed)
+});
+
 document.getElementById('tryOnForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     

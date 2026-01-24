@@ -42,7 +42,10 @@ const verifyRequired = async(req, res, next) => {
 
         next();
     }catch(err){
-        console.log("error happened at user-verify in userauth :", err)
+        console.log("error happened at user-verify in userauth :", err);
+        // Clean cookie if invalid
+        res.clearCookie('token');
+        return res.redirect('/login');
     }
 }
 module.exports = { 

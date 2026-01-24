@@ -5,7 +5,7 @@ const {optionalVerify, verifyRequired} = require('../../middlewares/authenticati
 const jwt = require('jsonwebtoken');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
-const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage } = require('../../controller/userController');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter } = require('../../controller/userController');
 
 
 
@@ -134,11 +134,10 @@ router.get('/usersetting', verifyRequired, (req, res) => {
 //USER PROFILE SECTION\\
 ///////////\\\\\\\\\\\\\
 
-router.get('/shop', optionalVerify, async(req, res) => {
-  const products = await Product.find();
-  const categories = await Category.find().lean();
-  res.render('user/shop', {products, categories, user: req.user});
-});
+
+router.get('/shop', optionalVerify, shopFilter);
+
+
 
 router.get('/product/:id', optionalVerify, async (req, res) => {
   const product = await Product.findById(req.params.id).lean();
