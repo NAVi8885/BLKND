@@ -5,7 +5,7 @@ const {optionalVerify, verifyRequired} = require('../../middlewares/authenticati
 const jwt = require('jsonwebtoken');
 const Product = require('../../models/product');
 const Category = require('../../models/categorySchema');
-const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter } = require('../../controller/userController');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter, searchProducts } = require('../../controller/userController');
 
 
 
@@ -165,6 +165,9 @@ router.get('/address/delete/:id', verifyRequired, deleteAddress);
 router.get('/address/setdefault/:id', verifyRequired, setDefaultAddress);
 
 router.get('/ordersuccess/:id', verifyRequired, orderSuccess);
+
+// API: Search Products
+router.get('/api/search', optionalVerify, searchProducts);
 
 
 

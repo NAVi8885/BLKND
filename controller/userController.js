@@ -1285,6 +1285,27 @@ const getTryOnImage = async (req, res) => {
     }
 };
 
+const searchProducts = async (req, res) => {
+    try {
+        const { q } = req.query;
+        
+        if (!q) {
+            return res.json({ success: false, message: 'Query is required' });
+        }
+        
+        const products = await Product.find({
+            status: 'active',
+            name: { $regex: q, $options: 'i' }
+        }).limit(10).select('_id name price image').lean();
+        
+        res.json({ success: true, products });
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ success: false, message: 'Search failed' });
+    }
+}
+
+
 module.exports = {
     userRegister,
     loginUser,
@@ -1321,5 +1342,6 @@ module.exports = {
     filterUserOrders,
     submitContact,
     tryOnProduct,
-    getTryOnImage
+    getTryOnImage,
+    searchProducts
 };
