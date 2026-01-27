@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../../models/product');
-const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory, getCustomers, getAnalytics, getCoupons, deleteCoupon, getBannerPage, getOrderPage } = require('../../controller/adminController');
+const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory, getCustomers, getCoupons, deleteCoupon, getBannerPage, getOrderPage, getDashboard } = require('../../controller/adminController');
 const verifyAdmin = require('../../middlewares/authentication/adminAuth');
 const Category = require('../../models/categorySchema');
 
@@ -9,9 +9,7 @@ router.get('/adminlogin',(req, res) => {
     res.render('admin/adminLogin',{errors:null});
 });
 
-router.get('/dashboard',(req, res) => {
-    res.render('admin/dashboard');
-})
+router.get('/dashboard', verifyAdmin, getDashboard);
 
 router.get('/products', async (req, res) => {
     const products = await Product.find();
@@ -40,8 +38,6 @@ router.get('/customers', verifyAdmin, getCustomers);
 router.get('/coupons', verifyAdmin, getCoupons);
 
 router.get('/admin/coupons/delete/:id', verifyAdmin, deleteCoupon);
-
-router.get('/analytics', verifyAdmin, getAnalytics);
 
 router.get('/banners', verifyAdmin, getBannerPage);
 

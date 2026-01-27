@@ -30,7 +30,7 @@ const adminLogin = async (req, res) => {
             sameSite: 'strict'
         });        
 
-        return res.render('admin/dashboard');
+        return res.redirect('/dashboard');
     }catch(err){
         console.log("error happened at adminLogin", err);
     }
@@ -523,88 +523,6 @@ const deleteCoupon = async (req, res) => {
     }
 };
 
-const getAnalytics = async (req, res) => {
-    try {
-        // 1. Get KPI Data (Total Revenue, Total Orders, etc.)
-        const kpiData = await Order.aggregate([
-            { $match: { orderStatus: { $ne: 'cancelled' } } }, // Exclude cancelled
-            {
-                $group: {
-                    _id: null,
-                    totalRevenue: { $sum: "$totalAmount" },
-                    totalOrders: { $sum: 1 },
-                    avgOrderValue: { $avg: "$totalAmount" }
-                }
-            }
-        ]);
-
-        const kpis = kpiData.length > 0 ? kpiData[0] : { totalRevenue: 0, totalOrders: 0, avgOrderValue: 0 };
-
-        // 2. Get Chart Data: Revenue & Orders by Date (Last 7 days example)
-        // Note: You can adjust the $match to filter by date range
-        const salesData = await Order.aggregate([
-            { $match: { orderStatus: { $ne: 'cancelled' } } },
-            {
-                $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-                    dailyRevenue: { $sum: "$totalAmount" },
-                    dailyOrders: { $sum: 1 }
-                }
-            },
-            { $sort: { _id: 1 } }, // Sort by date ascending
-            { $limit: 7 } // Last 7 days/entries
-        ]);
-
-        // Prepare arrays for Chart.js
-        const dates = salesData.map(d => d._id);
-        const revenues = salesData.map(d => d.dailyRevenue);
-        const orderCounts = salesData.map(d => d.dailyOrders);
-
-        // 3. Get Top 5 Best Selling Products
-        const topProducts = await Order.aggregate([
-            { $match: { orderStatus: { $ne: 'cancelled' } } },
-            { $unwind: "$items" },
-            {
-                $group: {
-                    _id: "$items.productId",
-                    name: { $first: "$items.name" },
-                    totalSold: { $sum: "$items.quantity" },
-                    totalRevenue: { $sum: "$items.total" }
-                }
-            },
-            { $sort: { totalSold: -1 } },
-            { $limit: 5 }
-        ]);
-
-        // 4. Get Payment Method Stats (Replacing "Channels" chart)
-        const paymentStats = await Order.aggregate([
-            { $match: { orderStatus: { $ne: 'cancelled' } } },
-            {
-                $group: {
-                    _id: "$paymentMethod",
-                    count: { $sum: 1 }
-                }
-            }
-        ]);
-
-        // Render the view with all data
-        res.render('admin/analytics', {
-            kpis,
-            chartData: {
-                dates: JSON.stringify(dates),
-                revenues: JSON.stringify(revenues),
-                orderCounts: JSON.stringify(orderCounts),
-                paymentMethods: JSON.stringify(paymentStats.map(p => p._id)),
-                paymentCounts: JSON.stringify(paymentStats.map(p => p.count))
-            },
-            topProducts
-        });
-
-    } catch (error) {
-        console.error("Analytics Error:", error);
-        res.status(500).send("Server Error");
-    }
-};
 
 const getBannerPage = async (req, res) => {
     try {
@@ -671,6 +589,184 @@ const updateBanner = async (req, res) => {
     }
 }
 
+const getDashboard = async (req, res) => {
+    try {
+        const { range } = req.query;
+        let dateFilter = new Date();
+        let daysToSubtract = 30; // Default 30 days
+        let dateFormat = "%d %b"; // Default format: '20 Oct'
+
+        if (range === 'Last 90 days') {
+            daysToSubtract = 90;
+            dateFilter.setDate(dateFilter.getDate() - 90);
+        } else if (range === 'This year') {
+            dateFilter = new Date(new Date().getFullYear(), 0, 1); // Jan 1st of current year
+            daysToSubtract = 365;
+            dateFormat = "%b"; // Format: 'Oct'
+        } else {
+            // Default: Last 30 days
+            dateFilter.setDate(dateFilter.getDate() - 30);
+        }
+
+        // ==========================================
+        // 1. Chart Data Aggregation (Revenue & Orders)
+        // ==========================================
+        const chartData = await Order.aggregate([
+            { 
+                $match: { 
+                    orderStatus: { $ne: 'cancelled' },
+                    createdAt: { $gte: dateFilter }
+                } 
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    dailyRevenue: { $sum: "$totalAmount" },
+                    dailyOrders: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        // Fill in missing dates with 0 values
+        const labels = [];
+        const revenueData = [];
+        const orderCountData = [];
+        
+        const today = new Date();
+        const startDate = new Date(dateFilter);
+
+        for (let d = startDate; d <= today; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().split('T')[0];
+            // Format label (e.g., "20 Oct")
+            const label = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+            
+            const dayData = chartData.find(item => item._id === dateStr);
+            
+            labels.push(label);
+            revenueData.push(dayData ? dayData.dailyRevenue : 0);
+            orderCountData.push(dayData ? dayData.dailyOrders : 0);
+        }
+
+        // ==========================================
+        // 2. KPI Cards Data (Overall / Range based)
+        // ==========================================
+        
+        // Revenue (This Month/Range)
+        const totalRevenue = revenueData.reduce((a, b) => a + b, 0);
+        
+        // Orders (This Month/Range)
+        const totalOrders = orderCountData.reduce((a, b) => a + b, 0);
+
+        // Total Customers (All time)
+        const totalCustomers = await User.countDocuments({});
+        const newCustomers = await User.countDocuments({ createdAt: { $gte: dateFilter } });
+
+        // Refund Rate (All time)
+        const totalOrdersCt = await Order.countDocuments({});
+        const refundedOrders = await Order.countDocuments({ 
+            $or: [{ orderStatus: 'cancelled' }, { orderStatus: 'refunded' }] 
+        });
+        const refundRate = totalOrdersCt > 0 ? ((refundedOrders / totalOrdersCt) * 100).toFixed(1) : 0;
+
+        // Top Categories (Value based on range)
+        const topCategories = await Order.aggregate([
+             { $match: { orderStatus: { $ne: 'cancelled' }, createdAt: { $gte: dateFilter } } },
+             { $unwind: "$items" },
+             {
+                 $lookup: {
+                     from: "products",
+                     localField: "items.productId",
+                     foreignField: "_id",
+                     as: "product"
+                 }
+             },
+             { $unwind: "$product" },
+             {
+                 $group: {
+                     _id: "$product.category",
+                     revenue: { $sum: "$items.total" }
+                 }
+             },
+             { $sort: { revenue: -1 } },
+             { $limit: 4 }
+        ]);
+        
+        // Recent Orders
+        const recentOrders = await Order.find()
+            .populate('userId', 'name')
+            .sort({ createdAt: -1 })
+            .limit(5);
+
+        // ==========================================
+        // 3. Top Products (Best Sellers)
+        // ==========================================
+        const topProducts = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'cancelled' }, createdAt: { $gte: dateFilter } } },
+            { $unwind: "$items" },
+            {
+                $group: {
+                    _id: "$items.productId",
+                    name: { $first: "$items.name" },
+                    totalSold: { $sum: "$items.quantity" },
+                    totalRevenue: { $sum: "$items.total" }
+                }
+            },
+            { $sort: { totalSold: -1 } },
+            { $limit: 5 }
+        ]);
+
+        // ==========================================
+        // 4. Payment Method Distribution
+        // ==========================================
+        const paymentStats = await Order.aggregate([
+            { $match: { orderStatus: { $ne: 'cancelled' }, createdAt: { $gte: dateFilter } } },
+            {
+                $group: {
+                    _id: "$paymentMethod",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+
+        res.render('admin/dashboard', {
+            kpi: {
+                revenue: totalRevenue.toLocaleString('en-US'),
+                orders: totalOrders.toLocaleString('en-US'),
+                customers: totalCustomers.toLocaleString('en-US'),
+                newCustomers,
+                refundRate
+            },
+            chart: {
+                labels: JSON.stringify(labels),
+                revenue: JSON.stringify(revenueData),
+                orders: JSON.stringify(orderCountData)
+            },
+            topCategories,
+            recentOrders,
+            topProducts,
+            paymentStats: {
+                methods: JSON.stringify(paymentStats.map(p => p._id || 'Unknown')),
+                counts: JSON.stringify(paymentStats.map(p => p.count))
+            },
+            selectedRange: range || 'Last 30 days'
+        });
+
+    } catch (error) {
+        console.error("Dashboard Error:", error);
+        res.render('admin/dashboard', { 
+            kpi: { revenue: 0, orders: 0, customers: 0, newCustomers: 0, refundRate: 0 },
+            chart: { labels: '[]', revenue: '[]', orders: '[]' },
+            topCategories: [],
+            recentOrders: [],
+            topProducts: [],
+            paymentStats: { methods: '[]', counts: '[]' },
+            selectedRange: 'Last 30 days'
+        });
+    }
+}
+
 const deleteBanner = async (req, res) => {
     try {
             const { id } = req.params;
@@ -697,14 +793,14 @@ module.exports = {
     getCustomers,
     sendMessageToUser,
     getCoupons,
-    getAnalytics,
     createCoupon,
     updateCoupon,
     deleteCoupon,
     getBannerPage,
     addBanner,
     updateBanner,
-    deleteBanner
+    deleteBanner,
+    getDashboard
 }
 
     

@@ -115,7 +115,6 @@
       <a class="nav-link" href="/categories"><i class="fa-solid fa-layer-group"></i> Categories</a>
       <a class="nav-link" href="/customers"><i class="fa-solid fa-user-group"></i> Customers</a>
       <a class="nav-link" href="/coupons"><i class="fa-solid fa-ticket"></i> Coupons</a>
-      <a class="nav-link" href="/analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
       <a class="nav-link" href="/banners"><i class="fa-solid fa-image"></i> Banners</a>
       <a class="nav-link" href="/settings"><i class="fa-solid fa-gear"></i> Settings</a>
     </nav>
@@ -160,9 +159,9 @@
         <div class="col-6 col-lg-3">
           <div class="card kpi-card h-100">
             <div class="card-body">
-              <div class="title">Revenue (30d)</div>
-              <div class="value">$82,460</div>
-              <div class="text-success small"><i class="fa-solid fa-arrow-up-right-from-square"></i> +12.4%</div>
+              <div class="title">Revenue (<%= selectedRange %>)</div>
+              <div class="value">₹<%= kpi.revenue %></div>
+              <div class="text-success small"><i class="fa-solid fa-arrow-up-right-from-square"></i> Live</div>
             </div>
           </div>
         </div>
@@ -170,8 +169,8 @@
           <div class="card kpi-card h-100">
             <div class="card-body">
               <div class="title">Orders</div>
-              <div class="value">2,341</div>
-              <div class="text-success small">+5.1%</div>
+              <div class="value"><%= kpi.orders %></div>
+              <div class="text-success small">Avg Order Value: ₹<%= kpi.orders > 0 ? (parseInt(kpi.revenue.replace(/,/g, '')) / parseInt(kpi.orders.replace(/,/g, ''))).toFixed(0) : 0 %></div>
             </div>
           </div>
         </div>
@@ -179,8 +178,8 @@
           <div class="card kpi-card h-100">
             <div class="card-body">
               <div class="title">Customers</div>
-              <div class="value">12,047</div>
-              <div class="text-primary small">+640 new</div>
+              <div class="value"><%= kpi.customers %></div>
+              <div class="text-primary small">+<%= kpi.newCustomers %> new in range</div>
             </div>
           </div>
         </div>
@@ -188,8 +187,8 @@
           <div class="card kpi-card h-100">
             <div class="card-body">
               <div class="title">Refund Rate</div>
-              <div class="value">1.8%</div>
-              <div class="text-danger small">+0.2%</div>
+              <div class="value"><%= kpi.refundRate %>%</div>
+              <div class="text-danger small">All time</div>
             </div>
           </div>
         </div>
@@ -201,10 +200,10 @@
             <div class="card-header d-flex justify-content-between align-items-center">
               <span class="fw-semibold">Sales performance</span>
               <div>
-                <select class="form-select form-select-sm">
-                  <option>Last 30 days</option>
-                  <option>Last 90 days</option>
-                  <option>This year</option>
+                <select class="form-select form-select-sm" onchange="window.location.href='/dashboard?range='+this.value">
+                  <option <%= selectedRange === 'Last 30 days' ? 'selected' : '' %>>Last 30 days</option>
+                  <option <%= selectedRange === 'Last 90 days' ? 'selected' : '' %>>Last 90 days</option>
+                  <option <%= selectedRange === 'This year' ? 'selected' : '' %>>This year</option>
                 </select>
               </div>
             </div>
@@ -217,26 +216,24 @@
           <div class="card h-100">
             <div class="card-header fw-semibold">Top categories</div>
             <div class="card-body">
-              <div class="d-flex justify-content-between mb-2"><span>Women</span><span
-                  class="fw-semibold">$24,300</span></div>
-              <div class="progress mb-3" style="height:8px;">
-                <div class="progress-bar bg-dark" style="width:62%"></div>
-              </div>
-              <div class="d-flex justify-content-between mb-2"><span>Men</span><span class="fw-semibold">$18,120</span>
-              </div>
-              <div class="progress mb-3" style="height:8px;">
-                <div class="progress-bar bg-secondary" style="width:46%"></div>
-              </div>
-              <div class="d-flex justify-content-between mb-2"><span>Accessories</span><span
-                  class="fw-semibold">$12,040</span></div>
-              <div class="progress mb-3" style="height:8px;">
-                <div class="progress-bar bg-success" style="width:34%"></div>
-              </div>
-              <div class="d-flex justify-content-between mb-2"><span>Shoes</span><span class="fw-semibold">$9,200</span>
-              </div>
-              <div class="progress" style="height:8px;">
-                <div class="progress-bar bg-info" style="width:26%"></div>
-              </div>
+              <% if(topCategories && topCategories.length > 0) { %>
+                <% topCategories.forEach((cat, index) => { 
+                     // Calculate percentage based on the top category (just for visual bar)
+                     const maxVal = topCategories[0].revenue;
+                     const percent = (cat.revenue / maxVal) * 100;
+                     const colors = ['bg-dark', 'bg-secondary', 'bg-success', 'bg-info'];
+                %>
+                <div class="d-flex justify-content-between mb-2">
+                    <span><%= cat._id %></span>
+                    <span class="fw-semibold">₹<%= cat.revenue.toLocaleString() %></span>
+                </div>
+                <div class="progress mb-3" style="height:8px;">
+                    <div class="progress-bar <%= colors[index % colors.length] %>" style="width:<%= percent %>%"></div>
+                </div>
+                <% }) %>
+              <% } else { %>
+                <div class="text-center text-muted py-4">No sales data for this period</div>
+              <% } %>
             </div>
           </div>
         </div>
@@ -261,41 +258,30 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>#12345</td>
-                    <td>Oct 20</td>
-                    <td>Jane Smith</td>
-                    <td>$149.98</td>
-                    <td><span class="badge text-bg-success status-badge">Paid</span></td>
-                  </tr>
-                  <tr>
-                    <td>#12344</td>
-                    <td>Oct 20</td>
-                    <td>Arjun Das</td>
-                    <td>$89.99</td>
-                    <td><span class="badge text-bg-warning status-badge">Processing</span></td>
-                  </tr>
-                  <tr>
-                    <td>#12343</td>
-                    <td>Oct 19</td>
-                    <td>Wei Chen</td>
-                    <td>$219.40</td>
-                    <td><span class="badge text-bg-info status-badge">Shipped</span></td>
-                  </tr>
-                  <tr>
-                    <td>#12342</td>
-                    <td>Oct 19</td>
-                    <td>Ana Ruiz</td>
-                    <td>$59.00</td>
-                    <td><span class="badge text-bg-secondary status-badge">Awaiting</span></td>
-                  </tr>
-                  <tr>
-                    <td>#12341</td>
-                    <td>Oct 18</td>
-                    <td>John Doe</td>
-                    <td>$79.99</td>
-                    <td><span class="badge text-bg-danger status-badge">Refunded</span></td>
-                  </tr>
+                <tbody>
+                  <% if(recentOrders && recentOrders.length > 0) { %>
+                    <% recentOrders.forEach(order => { %>
+                    <tr>
+                        <td>#<%= order._id.toString().slice(-6).toUpperCase() %></td>
+                        <td><%= new Date(order.createdAt).toLocaleDateString('en-US', {month:'short', day:'numeric'}) %></td>
+                        <td><%= order.userId ? order.userId.name : 'Unknown' %></td>
+                        <td>₹<%= order.totalAmount %></td>
+                        <td>
+                            <% let badgeClass = 'text-bg-secondary';
+                               if(order.orderStatus === 'paid') badgeClass = 'text-bg-success';
+                               if(order.orderStatus === 'pending') badgeClass = 'text-bg-warning';
+                               if(order.orderStatus === 'shipped') badgeClass = 'text-bg-info';
+                               if(order.orderStatus === 'delivered') badgeClass = 'text-bg-success';
+                               if(order.orderStatus === 'cancelled') badgeClass = 'text-bg-danger';
+                            %>
+                            <span class="badge <%= badgeClass %> status-badge"><%= order.orderStatus %></span>
+                        </td>
+                    </tr>
+                    <% }) %>
+                  <% } else { %>
+                    <tr><td colspan="5" class="text-center text-muted">No recent orders found</td></tr>
+                  <% } %>
+                </tbody>
                 </tbody>
               </table>
             </div>
@@ -321,8 +307,8 @@
                     Create coupon</a>
                 </div>
                 <div class="col-sm-6">
-                  <a class="btn btn-outline-dark w-100" href="/analytics"><i class="fa-solid fa-chart-line me-1"></i>
-                    View analytics</a>
+                  <a class="btn btn-outline-dark w-100" href="/banners"><i class="fa-solid fa-image me-1"></i>
+                    Manage banners</a>
                 </div>
               </div>
               <hr>
@@ -344,6 +330,49 @@
           </div>
         </div>
       </div>
+
+      <!-- New Analytics Row -->
+      <div class="row g-3 mt-1">
+        <div class="col-lg-8">
+          <div class="card h-100">
+            <div class="card-header fw-semibold">Top Products</div>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Product</th>
+                    <th>Units Sold</th>
+                    <th>Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if(topProducts && topProducts.length > 0) { %>
+                    <% topProducts.forEach(product => { %>
+                    <tr>
+                      <td><%= product.name %></td>
+                      <td><%= product.totalSold %></td>
+                      <td>₹<%= product.totalRevenue.toLocaleString() %></td>
+                    </tr>
+                    <% }) %>
+                  <% } else { %>
+                    <tr><td colspan="3" class="text-center text-muted">No product sales in this period</td></tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer small text-muted">Based on <%= selectedRange.toLowerCase() %></div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card h-100">
+            <div class="card-header fw-semibold">Payment Methods</div>
+            <div class="card-body">
+              <canvas id="chartPayments" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -352,18 +381,85 @@
   <script>
     const ctx = document.getElementById('chartSales');
     if (ctx) {
+      // Dynamic Data injected from Backend
+      const labels = <%- chart.labels %>;
+      const revenueData = <%- chart.revenue %>;
+      const ordersData = <%- chart.orders %>;
+
       new Chart(ctx, {
         type: 'line',
         data: {
-          labels: Array.from({ length: 12 }, (_, i) => `W${i + 1}`),
+          labels: labels,
           datasets: [
-            { label: 'Revenue', data: [8, 9, 10, 9, 12, 13, 11, 15, 14, 16, 18, 17], borderColor: '#212529', backgroundColor: 'rgba(33,37,41,.08)', fill: true, tension: .35 },
-            { label: 'Orders', data: [420, 480, 520, 500, 560, 590, 570, 630, 610, 680, 720, 700], borderColor: '#adb5bd', borderDash: [4, 4], tension: .35 }
+            { 
+                label: 'Revenue (INR)', 
+                data: revenueData, 
+                borderColor: '#212529', 
+                backgroundColor: 'rgba(33,37,41,.08)', 
+                fill: true, 
+                tension: .35,
+                yAxisID: 'y' // Bind to left axis
+            },
+            { 
+                label: 'Orders', 
+                data: ordersData, 
+                borderColor: '#adb5bd', 
+                borderDash: [4, 4], 
+                tension: .35,
+                yAxisID: 'y1' // Bind to right axis
+            }
           ]
         },
         options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
           plugins: { legend: { display: true } },
-          scales: { y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,.05)' } }, x: { grid: { display: false } } }
+          scales: { 
+            y: { 
+                type: 'linear',
+                display: true,
+                position: 'left',
+                beginAtZero: true, 
+                grid: { color: 'rgba(0,0,0,.05)' },
+                title: { display: true, text: 'Revenue (₹)' }
+            }, 
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                beginAtZero: true,
+                grid: { drawOnChartArea: false }, // only want the grid lines for one axis to show up
+                title: { display: true, text: 'Order Count' }
+            },
+            x: { grid: { display: false } } 
+          }
+        }
+      });
+    }
+
+    // Payment Methods Doughnut Chart
+    const ctxPayments = document.getElementById('chartPayments');
+    if (ctxPayments) {
+      const methods = <%- paymentStats.methods %>;
+      const counts = <%- paymentStats.counts %>;
+
+      new Chart(ctxPayments, {
+        type: 'doughnut',
+        data: {
+          labels: methods.map(m => m === 'cod' ? 'Cash on Delivery' : m === 'card' ? 'Card Payment' : m),
+          datasets: [{
+            data: counts,
+            backgroundColor: ['#212529', '#6c757d', '#198754', '#0d6efd']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
         }
       });
     }

@@ -913,6 +913,11 @@ const placeOrder = async (req, res) => {
             address: orderAddress,
             items: orderItems,
             totalAmount: cart.total,
+            subTotal: cart.subTotal,
+            tax: cart.tax,
+            shipping: cart.shipping,
+            couponCode: cart.coupon ? cart.couponName[0] : null,
+            couponDiscount: cart.coupon ? cart.couponDiscount : 0,
             paymentMethod,
             paymentStatus: 'pending', // Default to pending
             orderStatus: 'pending',
@@ -930,9 +935,19 @@ const placeOrder = async (req, res) => {
             for (const item of cart.items) {
                 await Product.findByIdAndUpdate(item.productId._id, { $inc: { stock: -item.quantity } });
             }
-            // Clear Cart
+            // Clear Cart (including coupon fields)
             await Cart.findOneAndUpdate({ userId }, { 
-                $set: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 } 
+                $set: { 
+                    items: [], 
+                    subTotal: 0, 
+                    tax: 0, 
+                    shipping: 0, 
+                    total: 0, 
+                    totalItems: 0,
+                    coupon: false,
+                    couponDiscount: 0,
+                    couponName: []
+                } 
             });
             
             return res.redirect(`/ordersuccess/${newOrder._id}`);
@@ -942,18 +957,21 @@ const placeOrder = async (req, res) => {
         // CASE 2: ONLINE PAYMENT (STRIPE)
         // ==========================================
         if (paymentMethod === 'card') {
-            // Create Line Items for Stripe
-            const lineItems = cart.items.map(item => ({
+            // ✅ FIX: Use final cart total (with discount, tax, shipping) instead of individual product prices
+            // This ensures coupon discount is properly applied to Stripe checkout
+            const lineItems = [{
                 price_data: {
-                    currency: 'inr', // Change to 'usd' if needed
+                    currency: 'inr',
                     product_data: {
-                        name: item.productId.name,
-                        // images: [item.productId.image[0]] // Optional: Add image URL if public
+                        name: 'Order Total',
+                        description: cart.coupon 
+                            ? `Includes ${cart.items.length} item(s), tax, shipping, and discount (${cart.couponName[0]})`
+                            : `Includes ${cart.items.length} item(s), tax, and shipping`
                     },
-                    unit_amount: Math.round(item.productId.price * 100), // Amount in cents/paise
+                    unit_amount: Math.round(cart.total * 100), // ✅ Final total with discount applied
                 },
-                quantity: item.quantity,
-            }));
+                quantity: 1,
+            }];
 
             // Create Stripe Session
             const session = await stripe.checkout.sessions.create({
@@ -998,9 +1016,19 @@ const verifyPayment = async (req, res) => {
                 await Product.findByIdAndUpdate(item.productId, { $inc: { stock: -item.quantity } });
             }
 
-            // 3. Clear Cart
+            // 3. Clear Cart (including coupon fields)
             await Cart.findOneAndUpdate({ userId }, { 
-                $set: { items: [], subTotal: 0, tax: 0, shipping: 0, total: 0, totalItems: 0 } 
+                $set: { 
+                    items: [], 
+                    subTotal: 0, 
+                    tax: 0, 
+                    shipping: 0, 
+                    total: 0, 
+                    totalItems: 0,
+                    coupon: false,
+                    couponDiscount: 0,
+                    couponName: []
+                } 
             });
 
             return res.redirect(`/ordersuccess/${orderId}`);

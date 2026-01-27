@@ -49,6 +49,26 @@ const orderSchema = new Schema({
         type: Number,
         required: true
     },
+    subTotal: {
+        type: Number,
+        default: 0
+    },
+    tax: {
+        type: Number,
+        default: 0
+    },
+    shipping: {
+        type: Number,
+        default: 0
+    },
+    couponCode: {
+        type: String,
+        default: null
+    },
+    couponDiscount: {
+        type: Number,
+        default: 0
+    },
     paymentMethod: {
         type: String,
         enum: ['cod', 'card'],
