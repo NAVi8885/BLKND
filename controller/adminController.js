@@ -22,7 +22,6 @@ const adminLogin = async (req, res) => {
         if(!checkPass) return res.render('admin/adminLogin', {errors: [{msg:"Incorrect password", path: "password"}]});
 
         const token = jwt.sign({id: adminExist._id}, process.env.SECRET_KEY,{expiresIn:'2d'});
-        console.log(token);
 
         res.cookie('token', token,{
             httpOnly: true,
@@ -778,6 +777,139 @@ const deleteBanner = async (req, res) => {
         }
 }
 
+// ==========================================
+// Sub-Admin Management
+// ==========================================
+
+const getAdminManagement = async (req, res) => {
+  try {
+    const subAdmins = await Admin.find({ role: 'sub_admin' })
+      .populate('createdBy', 'name')
+      .sort({ createdAt: -1 });
+    
+    // Define available permissions for checkboxes with categories
+    const availablePermissions = [
+      { category: 'Dashboard', items: [{ key: 'view_dashboard', label: 'View Dashboard' }] },
+      { category: 'Orders', items: [{ key: 'view_orders', label: 'View Orders' }, { key: 'edit_orders', label: 'Edit Orders' }] },
+      { category: 'Products', items: [{ key: 'view_products', label: 'View Products' }, { key: 'edit_products', label: 'Manage Products' }] },
+      { category: 'Categories', items: [{ key: 'view_categories', label: 'View Categories' }, { key: 'edit_categories', label: 'Manage Categories' }] },
+      { category: 'Customers', items: [{ key: 'view_customers', label: 'View Customers' }, { key: 'contact_customers', label: 'Contact Customers' }] },
+      { category: 'Coupons', items: [{ key: 'view_coupons', label: 'View Coupons' }, { key: 'edit_coupons', label: 'Manage Coupons' }] },
+      { category: 'Banners', items: [{ key: 'view_banners', label: 'View Banners' }, { key: 'edit_banners', label: 'Manage Banners' }] }
+    ];
+    
+    // Pass query params for toast messages
+    const { success, error } = req.query;
+
+    res.render('admin/adminManagement', { 
+      subAdmins, 
+      availablePermissions,
+      success,
+      error
+    });
+  } catch (error) {
+    console.error('Error loading admin management:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
+const createSubAdmin = async (req, res) => {
+  try {
+    const { name, email, password, permissions } = req.body;
+    
+    // Validate inputs
+    if (!name || !email || !password) {
+      return res.redirect('/admin-management?error=All fields required');
+    }
+    
+    // Check if email exists
+    const exists = await Admin.findOne({ email });
+    if (exists) {
+      return res.redirect('/admin-management?error=Email already exists');
+    }
+    
+    // Hash password
+    const hashedPassword = await argon2.hash(password);
+    
+    // Parse permissions (checkboxes send array, or string if single, or undefined if none)
+    let permissionsArray = [];
+    if (permissions) {
+        permissionsArray = Array.isArray(permissions) ? permissions : [permissions];
+    }
+    
+    // Create sub-admin
+    await Admin.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'sub_admin',
+      permissions: permissionsArray,
+      createdBy: req.admin._id,
+      isActive: true
+    });
+    
+    res.redirect('/admin-management?success=Sub-admin created successfully');
+  } catch (error) {
+    console.error('Error creating sub-admin:', error);
+    res.redirect('/admin-management?error=Server error');
+  }
+};
+
+const editSubAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, permissions, isActive } = req.body;
+    
+    let permissionsArray = [];
+    if (permissions) {
+        permissionsArray = Array.isArray(permissions) ? permissions : [permissions];
+    }
+    
+    const updateData = {
+      name,
+      permissions: permissionsArray
+    };
+
+    // Only update status if field is present (it might not be in edit form if we use toggle separately)
+    if(isActive !== undefined) {
+        updateData.isActive = isActive === 'active';
+    }
+    
+    await Admin.findByIdAndUpdate(id, updateData);
+    
+    res.redirect('/admin-management?success=Sub-admin updated successfully');
+  } catch (error) {
+    console.error('Error editing sub-admin:', error);
+    res.redirect('/admin-management?error=Server error');
+  }
+};
+
+const deleteSubAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Admin.findByIdAndDelete(id);
+    res.redirect('/admin-management?success=Sub-admin deleted successfully');
+  } catch (error) {
+    console.error('Error deleting sub-admin:', error);
+    res.redirect('/admin-management?error=Server error');
+  }
+};
+
+const toggleAdminStatus = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.params.id);
+    if (!admin) return res.json({ success: false, message: 'Admin not found' });
+    
+    admin.isActive = !admin.isActive;
+    await admin.save();
+    
+    res.json({ success: true, isActive: admin.isActive });
+  } catch (error) {
+    console.error('Error toggling status:', error);
+    res.status(500).json({ success: false });
+  }
+};
+
 module.exports = {
     adminLogin,
     adminLogout,
@@ -800,7 +932,12 @@ module.exports = {
     addBanner,
     updateBanner,
     deleteBanner,
-    getDashboard
+    getDashboard,
+    getAdminManagement,
+    createSubAdmin,
+    editSubAdmin,
+    deleteSubAdmin,
+    toggleAdminStatus
 }
 
     

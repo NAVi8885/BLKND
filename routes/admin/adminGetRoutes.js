@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../../models/product');
-const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory, getCustomers, getCoupons, deleteCoupon, getBannerPage, getOrderPage, getDashboard } = require('../../controller/adminController');
-const verifyAdmin = require('../../middlewares/authentication/adminAuth');
+const { deleteProduct, getProductsPage, deleteCategory, deleteSub, updateCategory, getCustomers, getCoupons, deleteCoupon, getBannerPage, getOrderPage, getDashboard, getAdminManagement, deleteSubAdmin } = require('../../controller/adminController');
+const { verifyAdmin, requireMainAdmin } = require('../../middlewares/authentication/adminAuth');
 const Category = require('../../models/categorySchema');
 
 router.get('/adminlogin',(req, res) => {
@@ -10,6 +10,10 @@ router.get('/adminlogin',(req, res) => {
 });
 
 router.get('/dashboard', verifyAdmin, getDashboard);
+
+// Admin Management Routes (Main Admin Only)
+router.get('/admin-management', verifyAdmin, requireMainAdmin, getAdminManagement);
+router.get('/admin-management/delete/:id', verifyAdmin, requireMainAdmin, deleteSubAdmin);
 
 router.get('/products', async (req, res) => {
     const products = await Product.find();

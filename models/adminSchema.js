@@ -14,6 +14,23 @@ const adminSchema = new Schema({
     password: {
         type: String,
     },
+    role: {
+        type: String,
+        enum: ['main_admin', 'sub_admin'],
+        default: 'main_admin'
+    },
+    permissions: {
+        type: [String],
+        default: []
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'Admin'
+    },
     isAdmin: { type: Boolean, default: true }
 },{
     timestamps: true

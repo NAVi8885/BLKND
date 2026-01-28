@@ -4,8 +4,8 @@ const client = createClient({
     username: 'default',
     password: process.env.REDIS_PASS,
     socket: {
-        host: 'redis-11845.crce276.ap-south-1-3.ec2.cloud.redislabs.com',
-        port: 11845,
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
         reconnectStrategy: retries => Math.min(retries * 50, 1000),
         connectTimeout: 10000
     }

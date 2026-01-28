@@ -64,8 +64,7 @@ const loginUser = async (req, res) => {
             return res.render('user/login', {errors:[{msg:"Incorrect password", path:"password"}]})
         }
 
-        const token = jwt.sign({ id: user._id.toString(), email: user.email }, process.env.SECRET_KEY, {expiresIn:'2d'});
-        // console.log(token);
+        const token = jwt.sign({ _id: user._id.toString(), email: user.email }, process.env.SECRET_KEY, {expiresIn:'2d'});
 
         res.cookie('token', token,{
             httpOnly: true,
@@ -142,8 +141,7 @@ const loadHomepage = async (req, res) => {
             displayProducts = await Product.find({ status: 'active' }).limit(4);
         }
 
-        // Save to Redis (Cache for 1 hour)
-        // Store 'displayProducts' as 'products' to match the view variable
+        // Saved to Redis (Cache for 1 hour)
         await client.setEx(cacheKey, 3600, JSON.stringify({ banners, products: displayProducts }));
 
         console.log('Fetched from DB and Cached');
@@ -372,7 +370,7 @@ const deleteAccount = async (req, res) => {
 
 const shopFilter = async (req, res) => {
     try {
-    const { category, subcategory, search, sort, minPrice, maxPrice, ajax } = req.query;
+    const { category, subcategory, search, sort, minPrice, maxPrice, size, ajax } = req.query;
 
     // 1. Base Query
     let query = { status: 'active' };
@@ -389,6 +387,13 @@ const shopFilter = async (req, res) => {
       query.price = {};
       if (minPrice) query.price.$gte = Number(minPrice);
       if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // 4.5 Size Filter
+    if (size) {
+      // size can be a single value or array of values
+      const sizes = Array.isArray(size) ? size : [size];
+      query.size = { $in: sizes };
     }
 
     // 5. Sorting Logic
@@ -419,7 +424,8 @@ const shopFilter = async (req, res) => {
       selectedSort: sort || '',
       selectedMinPrice: minPrice || 0,
       selectedMaxPrice: maxPrice || 10000,
-      selectedSearch: search || ''
+      selectedSearch: search || '',
+      selectedSizes: size ? (Array.isArray(size) ? size : [size]) : []
     });
 
   } catch (error) {

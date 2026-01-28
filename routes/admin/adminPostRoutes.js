@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const validateAdminLogin = require('../../middlewares/validation/adminValidator');
-const {adminLogin, adminLogout, upsertProducts, deleteProduct, createCategory, addSubCategory, updateCategory, sendMessageToUser, createCoupon, updateCoupon, deleteBanner, addBanner, updateBanner} = require('../../controller/adminController');
-const verifyAdmin = require('../../middlewares/authentication/adminAuth');
+const {adminLogin, adminLogout, upsertProducts, deleteProduct, createCategory, addSubCategory, updateCategory, sendMessageToUser, createCoupon, updateCoupon, deleteBanner, addBanner, updateBanner, createSubAdmin, editSubAdmin, toggleAdminStatus} = require('../../controller/adminController');
+const { verifyAdmin, requireMainAdmin } = require('../../middlewares/authentication/adminAuth');
 const createMulter = require('../../config/multer');
 
 
@@ -29,5 +29,10 @@ const bannerUpload = createMulter('banners');// for uploading banner images
 router.post('/admin/add-banner', verifyAdmin, bannerUpload.single('image'), addBanner);
 router.post('/admin/edit-banner/:id', verifyAdmin, bannerUpload.single('image'), updateBanner);
 router.post('/admin/delete-banner/:id', verifyAdmin, deleteBanner);
+
+// Admin Management (Main Admin Only)
+router.post('/admin-management/create', verifyAdmin, requireMainAdmin, createSubAdmin);
+router.post('/admin-management/edit/:id', verifyAdmin, requireMainAdmin, editSubAdmin);
+router.post('/admin-management/toggle-status/:id', verifyAdmin, requireMainAdmin, toggleAdminStatus);
 
 module.exports = router;

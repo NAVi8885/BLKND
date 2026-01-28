@@ -4,14 +4,11 @@ const passport = require('passport');
 const {optionalVerify, verifyRequired} = require('../../middlewares/authentication/userAuth');
 const jwt = require('jsonwebtoken');
 const Product = require('../../models/product');
-const Category = require('../../models/categorySchema');
 const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter, searchProducts } = require('../../controller/userController');
 
 
 
-router.get('/index', loadHomepage, optionalVerify, async (req, res) => {
-  res.render('user/index',{user: req.user});
-})
+router.get('/index', optionalVerify, loadHomepage);
 
 router.get('/login',(req, res) => {
   const errKey = req.query.error;

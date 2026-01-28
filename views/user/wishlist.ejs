@@ -26,16 +26,17 @@
                     <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-instagram"></i></a>
                     <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
                 </div>
-                <div class="d-none d-md-block"><span>Free shipping on orders over ₹2000</span></div>
-                <div>
-                    <% if (user) { %>
-                        <a href="/profile" style="color: #fff; text-decoration: none; margin: 0 15px;">My Account</a>
-                        <a href="/logout" style="color: #fff; text-decoration: none; margin: 0 15px;">Logout</a>
-                    <% } else { %>
+                <div><span>Free shipping on orders over ₹500</span></div>
+                <% if(!user){ %>
+                    <div>
                         <a href="/login" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
                         <a href="/signup" style="color: #fff; text-decoration: none; margin: 0 15px;">Register</a>
+                    </div>
+                <% } else {%>
+                    <div>
+                        <p style="margin-bottom: 0rem;"><%= user.name %></p>
+                    </div>
                     <% } %>
-                </div>
             </div>
         </div>
     </div>

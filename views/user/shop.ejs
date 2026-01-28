@@ -42,6 +42,7 @@
   text-decoration: underline;
 }
 
+
     </style>
 </head>
 
@@ -61,7 +62,7 @@
                     <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-instagram"></i></a>
                     <a href="#" style="color: #fff; text-decoration: none; margin: 0 15px;"><i class="fab fa-twitter"></i></a>
                 </div>
-                <div><span>Free shipping on orders over $50</span></div>
+                <div><span>Free shipping on orders over ₹500</span></div>
                 <% if(!user){ %>
                     <div>
                         <a href="/login" style="color: #fff; text-decoration: none; margin: 0 15px;">Login</a>
@@ -95,7 +96,7 @@
                 </ul>
 
                 <div class="nav-icons d-flex align-items-center">
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#searchModal" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-search"></i></a>
+                    <%- include('../partials/searchModal') %>
                     <a href="/profile" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-user"></i></a>
                     <a href="/wishlist" style="color: #212529; font-size: 18px; margin-left: 20px;"><i class="fas fa-heart"></i></a>
                     <a href="/cart" style="color: #212529; font-size: 18px; margin-left: 20px; position: relative;">
@@ -109,18 +110,7 @@
     </nav>
 
     <!-- SEARCH MODAL -->
-    <div class="modal fade" id="searchModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
-                    <div class="mt-4">
-                        <input type="search" id="searchInput" class="form-control form-control-lg" placeholder="Search products...">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- PAGE HEADER -->
     <div class="page-header">
@@ -205,27 +195,27 @@
       <div class="fw-semibold mb-3">Size</div>
 
       <div class="form-check mb-1">
-        <input class="form-check-input" type="checkbox" id="sizeXS">
+        <input class="form-check-input size-checkbox" type="checkbox" id="sizeXS" value="XS">
         <label class="form-check-label" for="sizeXS">XS</label>
       </div>
 
       <div class="form-check mb-1">
-        <input class="form-check-input" type="checkbox" id="sizeS">
+        <input class="form-check-input size-checkbox" type="checkbox" id="sizeS" value="S">
         <label class="form-check-label" for="sizeS">S</label>
       </div>
 
       <div class="form-check mb-1">
-        <input class="form-check-input" type="checkbox" id="sizeM">
+        <input class="form-check-input size-checkbox" type="checkbox" id="sizeM" value="M">
         <label class="form-check-label" for="sizeM">M</label>
       </div>
 
       <div class="form-check mb-1">
-        <input class="form-check-input" type="checkbox" id="sizeL">
+        <input class="form-check-input size-checkbox" type="checkbox" id="sizeL" value="L">
         <label class="form-check-label" for="sizeL">L</label>
       </div>
 
       <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="sizeXL">
+        <input class="form-check-input size-checkbox" type="checkbox" id="sizeXL" value="XL">
         <label class="form-check-label" for="sizeXL">XL</label>
       </div>
 
@@ -360,6 +350,19 @@
     minRange.addEventListener("input", updateSliderUI);
     maxRange.addEventListener("input", updateSliderUI);
 
+    // Size filter change listeners
+    document.querySelectorAll('.size-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', applyFilters);
+    });
+
+    // Initialize size checkboxes from server data
+    <% if (selectedSizes && selectedSizes.length > 0) { %>
+      <% selectedSizes.forEach(size => { %>
+        const checkbox<%= size %> = document.getElementById('size<%= size %>');
+        if (checkbox<%= size %>) checkbox<%= size %>.checked = true;
+      <% }); %>
+    <% } %>
+
     // 3. MAIN AJAX FUNCTION
     async function applyFilters() {
         // A. Gather all current values
@@ -369,6 +372,12 @@
         params.set('minPrice', minRange.value);
         params.set('maxPrice', maxRange.value);
         params.set('sort', document.getElementById('sortSelect').value);
+        
+        // Collect selected sizes
+        params.delete('size'); // Clear existing sizes first
+        const selectedSizes = Array.from(document.querySelectorAll('.size-checkbox:checked'))
+          .map(cb => cb.value);
+        selectedSizes.forEach(size => params.append('size', size));
         
         // Ensure we keep category/search if they exist in URL
         // (params object already grabbed them from window.location.search)
@@ -481,14 +490,7 @@
     });
 
     // Search functionality
-    document.getElementById('searchInput')?.addEventListener('keypress', async (e) => {
-        if (e.key !== 'Enter') return;
-        
-        const query = e.target.value.trim();
-        if (!query) return;
-        
-        window.location.href = `/shop?search=${encodeURIComponent(query)}`;
-    });
+
 </script>
 </body>
 </html>
