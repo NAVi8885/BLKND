@@ -10,6 +10,7 @@ const Wishlist = require('../models/wishlist');
 const Message = require('../models/message');
 const Coupon = require('../models/coupon');
 const Banner = require('../models/banner');
+const Review = require('../models/review');
 const { sendOtpEmail } = require('../utils/otpApp');
 const { client } = require('../config/redis');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -166,9 +167,12 @@ const forgotPassword = async (req, res) => {
         }
         const user = await User.findOne({email});
         if(!user){
-            return res.render('user/forgotPassword', {errors:[{msg:"User not found", path:"email"}]})
+            return res.render('user/forgotPassword', {errors:[{msg: "User not found", path: "email"}]})
         }
-
+        if(user.loginType === 'google'){
+            return res.render('user/forgotPassword', {errors:[{msg: "account is logged in using gmail, cannot change the password", path: "email"}]})
+        }
+        
         const hashedOtp = await sendOtpEmail(email);
         await User.findOneAndUpdate({email},
             {  $set : {
@@ -1339,6 +1343,49 @@ const searchProducts = async (req, res) => {
     }
 }
 
+const addReview = async (req, res) => {
+    try {
+        const { productId, rating, comment } = req.body;
+        const userId = req.user._id;
+
+        if (!productId || !rating || !comment) {
+            return res.redirect('back');
+        }
+
+        // Check if user already reviewed
+        const existingReview = await Review.findOne({ product: productId, user: userId });
+        if (existingReview) {
+             // Optional: Handle this case (e.g. show error message)
+             return res.redirect(`/product/${productId}?error=Request already reviewed`);
+        }
+
+        // Create Review
+        await Review.create({
+            product: productId,
+            user: userId,
+            rating: parseInt(rating),
+            comment
+        });
+
+        // Recalculate Average Rating
+        const reviews = await Review.find({ product: productId });
+        const totalRating = reviews.reduce((acc, curr) => acc + curr.rating, 0);
+        const averageRating = totalRating / reviews.length;
+
+        // Update Product
+        await Product.findByIdAndUpdate(productId, {
+            averageRating: averageRating.toFixed(1),
+            reviewCount: reviews.length
+        });
+
+        res.redirect(`/product/${productId}`);
+
+    } catch (error) {
+        console.log("Add Review Error:", error);
+        res.redirect('back');
+    }
+};
+
 
 module.exports = {
     userRegister,
@@ -1377,5 +1424,6 @@ module.exports = {
     submitContact,
     tryOnProduct,
     getTryOnImage,
-    searchProducts
+    searchProducts,
+    addReview
 };

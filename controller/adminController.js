@@ -99,7 +99,8 @@ const getOrderPage = async (req, res) => {
             orders,
             currentPage: Number(page),
             totalPages,
-            filters: { search, status, payment, dateFrom, dateTo }
+            filters: { search, status, payment, dateFrom, dateTo },
+            admin: req.admin
         });
 
     } catch (error) {
@@ -159,14 +160,16 @@ const upsertProducts = async (req, res) => {
             finalImages = [...existingImages, ...newImages];
             if(finalImages.length === 0){
                 return res.render('admin/products', {
-                    errors: [{ msg: "At least one image is required", path: "file"}]
+                    errors: [{ msg: "At least one image is required", path: "file"}],
+                    admin: req.admin
                 });
             }
         }else {
             finalImages = [...newImages];
             if(finalImages.length === 0){
                 return res.render('admin/products', {
-                    errors: [{ msg: "image not found", path: "file"}]
+                    errors: [{ msg: "image not found", path: "file"}],
+                    admin: req.admin
                 });
             }
         }
@@ -270,6 +273,7 @@ const getProductsPage = async (req, res) => {
       products,
       categories,
       filters: { search, category, status, inventory },
+      admin: req.admin
     });
   } catch (error) {
     console.error('error happened at the product filter', error);
@@ -284,14 +288,14 @@ const createCategory = async (req, res) => {
         const error = "Please enter the category name"
         console.log(error);
         
-        return res.render('admin/categories',{error});
+        return res.render('admin/categories',{error, admin: req.admin});
     }
 
     const exists = await Category.findOne({ main: main.trim() });
     if (exists) {
         console.log("category already exists");
 
-        return res.render('admin/categories', {categories});
+        return res.render('admin/categories', {categories, admin: req.admin});
     }
     const categories = await Category.create({
         main: main.trim(),
@@ -397,7 +401,7 @@ const getCustomers = async (req, res) => {
             }
         ]);
         
-        res.render('admin/customers', { customers });
+        res.render('admin/customers', { customers, admin: req.admin });
     } catch (error) {
         console.error("Error fetching customers:", error);
         res.status(500).send("Internal Server Error");
@@ -456,7 +460,7 @@ const sendMessageToUser = async (req, res) => {
 const getCoupons = async (req, res) => {
     try {
         const coupons = await Coupon.find().sort({ createdAt: -1 });
-        res.render('admin/coupons', { coupons });
+        res.render('admin/coupons', { coupons, admin: req.admin });
     } catch (error) {
         console.log("Error fetching coupons:", error);
     }
@@ -526,7 +530,7 @@ const deleteCoupon = async (req, res) => {
 const getBannerPage = async (req, res) => {
     try {
             const banners = await Banner.find({}).sort({ order: 1 });
-            res.render('admin/banners', { banners });
+            res.render('admin/banners', { banners, admin: req.admin });
         } catch (error) {
             console.log("Error loading banner page:", error);
             res.status(500).send("Server Error");
@@ -719,13 +723,46 @@ const getDashboard = async (req, res) => {
         // 4. Payment Method Distribution
         // ==========================================
         const paymentStats = await Order.aggregate([
-            { $match: { orderStatus: { $ne: 'cancelled' }, createdAt: { $gte: dateFilter } } },
             {
                 $group: {
                     _id: "$paymentMethod",
                     count: { $sum: 1 }
                 }
             }
+        ]);
+
+        // ==========================================
+        // 5. Category & Subcategory Sales (Bar Graph)
+        // ==========================================
+        const categorySalesData = await Order.aggregate([
+             { $match: { orderStatus: { $ne: 'cancelled' }, createdAt: { $gte: dateFilter } } },
+             { $unwind: "$items" },
+             {
+                 $lookup: {
+                     from: "products",
+                     localField: "items.productId",
+                     foreignField: "_id",
+                     as: "product"
+                 }
+             },
+             { $unwind: "$product" },
+             {
+                 $group: {
+                     _id: { 
+                        category: "$product.category", 
+                        subcategory: "$product.subcategory" 
+                     },
+                     totalSold: { $sum: "$items.quantity" }
+                 }
+             },
+             {
+                $project: {
+                    _id: 0,
+                    label: { $concat: ["$_id.category", " - ", "$_id.subcategory"] },
+                    count: "$totalSold"
+                }
+             },
+             { $sort: { count: -1 } }
         ]);
 
 
@@ -749,7 +786,12 @@ const getDashboard = async (req, res) => {
                 methods: JSON.stringify(paymentStats.map(p => p._id || 'Unknown')),
                 counts: JSON.stringify(paymentStats.map(p => p.count))
             },
-            selectedRange: range || 'Last 30 days'
+            categorySales: {
+                labels: JSON.stringify(categorySalesData.map(d => d.label)),
+                data: JSON.stringify(categorySalesData.map(d => d.count))
+            },
+            selectedRange: range || 'Last 30 days',
+            admin: req.admin
         });
 
     } catch (error) {
@@ -761,7 +803,9 @@ const getDashboard = async (req, res) => {
             recentOrders: [],
             topProducts: [],
             paymentStats: { methods: '[]', counts: '[]' },
-            selectedRange: 'Last 30 days'
+            paymentStats: { methods: '[]', counts: '[]' },
+            selectedRange: 'Last 30 days',
+            admin: req.admin
         });
     }
 }
@@ -805,7 +849,8 @@ const getAdminManagement = async (req, res) => {
       subAdmins, 
       availablePermissions,
       success,
-      error
+      error,
+      admin: req.admin
     });
   } catch (error) {
     console.error('Error loading admin management:', error);

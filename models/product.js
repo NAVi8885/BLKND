@@ -52,6 +52,14 @@ const productSchema = new Schema({
     tags: {
         type: [String],
         default: []
+    },
+    averageRating: {
+        type: Number,
+        default: 0
+    },
+    reviewCount: {
+        type: Number,
+        default: 0
     }
 },{timestamps: true});
 

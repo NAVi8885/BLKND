@@ -17,7 +17,7 @@ const connectDB = require('./config/db');
 const passport = require('passport');
 require('./config/passport');
 const { RedisStore } = require('connect-redis');
-const redisClient = require('./config/redis');
+const redisClient = require('./config/redis').client;
 
 // Security Headers
 app.use(helmet({
@@ -60,7 +60,8 @@ app.use('/',adminPostRouter);
 // Global Error Handler
 app.use((err, req, res, next) => {
     console.error("Global Error:", err.stack);
-    res.status(500).send("Something broke!");
+    console.log(err);
+    res.status(500).send(`Something broke! in the server. Error: ${err.message}. Stack: ${err.stack}`);
 });
 
 const PORT = process.env.PORT || 4200;

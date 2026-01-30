@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 const sendOtpEmail = async (email) => {
     try {
         const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
-        
+        console.log(otp);
         const mailOptions = {
             from: process.env.NODEMAILER_EMAIL,
             to: email,

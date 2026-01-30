@@ -4,7 +4,8 @@ const passport = require('passport');
 const {optionalVerify, verifyRequired} = require('../../middlewares/authentication/userAuth');
 const jwt = require('jsonwebtoken');
 const Product = require('../../models/product');
-const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter, searchProducts } = require('../../controller/userController');
+const Review = require('../../models/review');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter, searchProducts, forgotPassword } = require('../../controller/userController');
 
 
 
@@ -62,8 +63,7 @@ router.get('/auth/google/signup/callback',(req, res, next) => {
     req.logIn(user, (err) => {
       return res.redirect('/login?error=google-exist');
     })
-  })
-  (req, res, next);
+    })(req, res, next);
 });
 
 // loging in account using passport google auth
@@ -89,8 +89,7 @@ router.get('/auth/google/login/callback',(req, res, next) => {
     })
 
     res.redirect('/index');
-  })
-  (req, res, next);
+    })(req, res, next);
 });
   //========================================\\
  //===========PASS PORT GOOGLE END===========\\
@@ -126,7 +125,7 @@ router.get('/useraddress', verifyRequired, getAddress);
 
 router.get('/usersetting', verifyRequired, (req, res) => {
   res.render('user/profileSetting', {user: req.user, error: null})
-})
+});
 ///////////\\\\\\\\\\\\\
 //USER PROFILE SECTION\\
 ///////////\\\\\\\\\\\\\
@@ -137,8 +136,33 @@ router.get('/shop', optionalVerify, shopFilter);
 
 
 router.get('/product/:id', optionalVerify, async (req, res) => {
-  const product = await Product.findById(req.params.id).lean();
-  res.render('user/singleProduct', {product, user: req.user});
+  console.log("Request for product ID:", req.params.id);
+  try {
+      const product = await Product.findById(req.params.id).lean();
+      console.log("Found product:", product ? product.name : "NULL");
+      
+      if (!product) {
+          console.log("Product not found, rendering 404");
+          return res.status(404).render('user/404'); 
+      }
+
+      const reviews = await Review.find({ product: req.params.id })
+          .populate('user', 'name profilePic')
+          .sort({ createdAt: -1 });
+      console.log("Found reviews count:", reviews.length);
+
+      console.log("Rendering singleProduct with data...");
+      res.render('user/singleProduct', {
+        product, 
+        user: req.user,
+        reviews: reviews || [],
+        averageRating: product.averageRating || 0,
+        reviewCount: product.reviewCount || 0
+      });
+  } catch (error) {
+      console.error("Error in product detail page:", error);
+      res.status(500).render('user/404');
+  }
 });
 
 router.get('/cart', verifyRequired, getCart);

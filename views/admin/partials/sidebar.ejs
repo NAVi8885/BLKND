@@ -1,36 +1,49 @@
+<% 
+   let currentAdmin = null;
+   // Try to get admin from various sources
+   if (typeof admin !== 'undefined') { currentAdmin = admin; }
+   else if (locals && locals.admin) { currentAdmin = locals.admin; }
+   
+   const isMain = currentAdmin && (!currentAdmin.role || currentAdmin.role === 'main_admin');
+   const perms = currentAdmin && currentAdmin.permissions ? currentAdmin.permissions : [];
+   
+   // Helper to check permission
+   const has = (p) => isMain || perms.includes(p);
+%>
+
 <aside id="sidebar" class="sidebar">
   <a href="/dashboard" class="brand h4 d-block mb-3">BLKND Admin</a>
   <nav class="nav nav-pills flex-column nav-aside">
     
-    <% if (!locals.admin || admin.role === 'main_admin' || (admin.permissions && admin.permissions.includes('view_dashboard'))) { %>
+    <% if (has('view_dashboard')) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'dashboard' ? 'active' : '' %>" href="/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
     <% } %>
 
-    <% if (!locals.admin || admin.role === 'main_admin' || (admin.permissions && admin.permissions.includes('view_orders'))) { %>
+    <% if (has('view_orders')) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'orders' ? 'active' : '' %>" href="/orders"><i class="fa-solid fa-receipt"></i> Orders</a>
     <% } %>
 
-    <% if (!locals.admin || admin.role === 'main_admin' || (admin.permissions && admin.permissions.includes('view_products'))) { %>
+    <% if (has('view_products')) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'products' ? 'active' : '' %>" href="/products"><i class="fa-solid fa-shirt"></i> Products</a>
     <% } %>
 
-    <% if (!locals.admin || admin.role === 'main_admin' || (admin.permissions && admin.permissions.includes('view_categories'))) { %>
+    <% if (has('view_categories')) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'categories' ? 'active' : '' %>" href="/categories"><i class="fa-solid fa-layer-group"></i> Categories</a>
     <% } %>
 
-    <% if (!locals.admin || admin.role === 'main_admin' || (admin.permissions && admin.permissions.includes('view_customers'))) { %>
+    <% if (has('view_customers')) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'customers' ? 'active' : '' %>" href="/customers"><i class="fa-solid fa-user-group"></i> Customers</a>
     <% } %>
 
-    <% if (!locals.admin || admin.role === 'main_admin' || (admin.permissions && admin.permissions.includes('view_coupons'))) { %>
+    <% if (has('view_coupons')) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'coupons' ? 'active' : '' %>" href="/coupons"><i class="fa-solid fa-ticket"></i> Coupons</a>
     <% } %>
 
-    <% if (!locals.admin || admin.role === 'main_admin' || (admin.permissions && admin.permissions.includes('view_banners'))) { %>
+    <% if (has('view_banners')) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'banners' ? 'active' : '' %>" href="/banners"><i class="fa-solid fa-image"></i> Banners</a>
     <% } %>
 
-    <% if (locals.admin && admin.role === 'main_admin') { %>
+    <% if (isMain) { %>
     <a class="nav-link <%= typeof page !== 'undefined' && page === 'admin-management' ? 'active' : '' %>" href="/admin-management"><i class="fa-solid fa-users-gear"></i> Admin Management</a>
     <% } %>
 

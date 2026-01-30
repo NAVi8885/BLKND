@@ -10,7 +10,7 @@ const verifyAdmin = async (req, res, next) => {
 
     try{
         const verify = await jwt.verify(token, process.env.SECRET_KEY);
-        const admin = await Admin.findById(verify.id);
+        const admin = await Admin.findById(verify.id).lean();
 
         // Check if admin exists and is active (explicit false check for legacy support)
         if (!admin || admin.isActive === false) {
