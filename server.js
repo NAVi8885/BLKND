@@ -59,11 +59,24 @@ app.use('/',adminPostRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-    console.error("Global Error:", err.stack);
-    console.log(err);
-    res.status(500).send(`Something broke! in the server. Error: ${err.message}. Stack: ${err.stack}`);
+    console.error("Global Error stack:", err.stack);
+    console.error("Global Error message:", err.message);
+    
+    // Don't leak stack traces to user in production
+    const isProduction = process.env.NODE_ENV === 'production';
+    const errorMessage = isProduction ? 'Something went wrong on the server.' : `Error: ${err.message}. Stack: ${err.stack}`;
+    
+    res.status(500).send(errorMessage);
 });
 
 const PORT = process.env.PORT || 4200;
+
+// Check for critical environment variables
+const requiredEnv = ['DB_URI', 'SESSION_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
+const missingEnv = requiredEnv.filter(key => !process.env[key]);
+
+if (missingEnv.length > 0) {
+  console.warn(`WARNING: Missing environment variables: ${missingEnv.join(', ')}`);
+}
 
 app.listen(PORT, () => {console.log(`Server started at localhost: ${PORT}`)});

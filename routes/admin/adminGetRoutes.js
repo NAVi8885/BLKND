@@ -45,7 +45,7 @@ router.get('/admin/coupons/delete/:id', verifyAdmin, checkPermission('edit_coupo
 
 router.get('/banners', verifyAdmin, checkPermission('view_banners'), getBannerPage);
 
-router.get('/settings', verifyAdmin, (req, res) => {
+router.get('/settings', verifyAdmin, requireMainAdmin,(req, res) => {
     res.render('admin/settings', { admin: req.admin });
 })
 
