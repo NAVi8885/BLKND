@@ -14,6 +14,7 @@ router.get('/index', optionalVerify, loadHomepage);
 router.get('/login',(req, res) => {
   const errKey = req.query.error;
   let errorMsg = null;
+  let successMsg = null;
 
   if(errKey === 'email-already-exist'){
     errorMsg = "Email already registered please log in using gmail."
@@ -26,9 +27,14 @@ router.get('/login',(req, res) => {
     errorMsg = "There was a server error."
   }else if(errKey === 'password-changed'){
     errorMsg = "The password has been changed"
-    return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path:'email'}]:[]});
+    // return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path:'email'}]:[]});
+  }else if(errKey === 'google-exist'){
+    errorMsg = "Account already exists. Please log in.";
+  }else if(errKey === 'account-created'){
+    successMsg = "Account created successfully! You are logged in."; // Assuming we redirect to index, but if we come here...
   }
-  return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[]});
+
+  return res.render('user/login',{errors: errorMsg? [{msg:errorMsg, path :'signup'}]:[], success: successMsg});
 });
 
 router.get('/signup',(req, res) => {
@@ -51,6 +57,7 @@ router.get('/signup',(req, res) => {
 router.get('/auth/google/signup', passport.authenticate('google-signup', { scope: ['profile', 'email'] }));
 
 // callback route
+// callback route
 router.get('/auth/google/signup/callback',(req, res, next) => {
   passport.authenticate('google-signup',(err, user, info) =>{
     if(!user){
@@ -59,16 +66,24 @@ router.get('/auth/google/signup/callback',(req, res, next) => {
       return res.redirect(`/login?error=${encodeURIComponent(msg)}`);
     }
 
-    res.clearCookie("token");
-    req.logIn(user, (err) => {
-      return res.redirect('/login?error=google-exist');
-    })
+    // Creating JWT token for immediate login after signup
+    const token = jwt.sign({ _id: user._id, email: user.email }, process.env.SECRET_KEY,{ expiresIn: '7d' });
+    
+    res.cookie('token', token,{
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/'
+    });
+
+    return res.redirect('/index');
     })(req, res, next);
 });
 
 // loging in account using passport google auth
 router.get('/auth/google/login', passport.authenticate('google-login', { scope: ['profile', 'email'] }));
 
+// callback route for login
 // callback route for login
 router.get('/auth/google/login/callback',(req, res, next) => {
   passport.authenticate('google-login', (err, user, info) => {
@@ -83,7 +98,7 @@ router.get('/auth/google/login/callback',(req, res, next) => {
 
     res.cookie('token', token,{
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/'
     })

@@ -6,6 +6,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 
+app.set('trust proxy', 1);  // telling the app it's behind a proxy
 
 const userGetRouter = require('./routes/user/userGetRoutes');
 const userPostRouter = require('./routes/user/userPostRoutes');
@@ -72,7 +73,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 4200;
 
 // Check for critical environment variables
-const requiredEnv = ['DB_URI', 'SESSION_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
+// Check for critical environment variables
+const requiredEnv = ['DB_URI', 'SESSION_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_SIGNUP_CALLBACK_URL', 'GOOGLE_LOGIN_CALLBACK_URL'];
 const missingEnv = requiredEnv.filter(key => !process.env[key]);
 
 if (missingEnv.length > 0) {
