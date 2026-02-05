@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { validateUserReg, validateUserLogin, validateUpdateUser } = require("../../middlewares/validation/userValidator");
-const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress, placeOrder, addToWishlist, removeFromWishlist, changePassword, submitContact, deleteAccount, updatePreferences, removeCoupon, applyCoupon, tryOnProduct, getTryOnImage, addReview } = require('../../controller/userController');
+const { userRegister, loginUser, logoutUser, forgotPassword, verifyOtp, resetPassword, updateProfile, updateProfileImage, addToCart, updateCart, removeFromCart, addAddress, editAddress, placeOrder, addToWishlist, removeFromWishlist, changePassword, submitContact, deleteAccount, updatePreferences, removeCoupon, applyCoupon, tryOnProduct, getTryOnImage, addReview, discardTryOn } = require('../../controller/userController');
 const { verifyRequired } = require('../../middlewares/authentication/userAuth');
 const upload = require('../../config/multer');
 const createMulter = require('../../config/multer');
@@ -76,9 +76,13 @@ router.post('/placeorder', verifyRequired, placeOrder);
 
 // RETRIEVE Try-On Status 
 const tryOnUpload = createMulter('tryons');
-router.post('/try-on', tryOnUpload.single('userPhoto'), tryOnProduct);
+router.post('/try-on', verifyRequired, tryOnUpload.single('userPhoto'), tryOnProduct);
+router.post('/get-try-on-status', verifyRequired, getTryOnImage);
 
 // Add Review
 router.post('/add-review', verifyRequired, addReview);
+
+// Discard AI Try-on
+router.post('/discard-try-on', verifyRequired, discardTryOn);
 
 module.exports = router;

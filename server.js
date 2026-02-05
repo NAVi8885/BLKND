@@ -19,6 +19,10 @@ const passport = require('passport');
 require('./config/passport');
 const { RedisStore } = require('connect-redis');
 const redisClient = require('./config/redis').client;
+const { startCleanupJob } = require('./utils/cleanupJob');
+
+// Start automated cleanup job for try-on images
+startCleanupJob();
 
 // Security Headers
 app.use(helmet({

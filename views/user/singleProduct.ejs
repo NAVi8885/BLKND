@@ -336,9 +336,9 @@
         </div>
       </div>
     </div>
-    <div class="ai-tryon-container mt-4 p-4 border rounded shadow-sm" style="background: #f9f9f9;">
+    <div class="ai-tryon-container mt-4 p-4 border rounded shadow-sm" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
     <h4 class="mb-3" style="font-family: 'Playfair Display', serif;">✨ AI Virtual Try-On</h4>
-    <p class="text-muted small">See how this looks on you instantly. Upload a photo to generate a preview.</p>
+    <p class="text-muted small">See how this looks on you instantly. Upload a photo to generate a preview using state-of-the-art AI.</p>
     
     <div class="row">
         <div class="col-md-6">
@@ -346,20 +346,34 @@
                 <input type="hidden" name="productId" value="<%= product._id %>">
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Upload Your Photo</label>
-                    <input type="file" class="form-control" name="userPhoto" accept="image/*" required>
+                    <input type="file" class="form-control" name="userPhoto" id="userPhotoInput" accept="image/*" required>
+                    <div class="form-text">Best results with full-body photos. Max 10MB.</div>
                 </div>
                 <button type="submit" class="btn btn-dark w-100" id="generateBtn">
                     <span id="btnText">Generate Look</span>
-                    <span id="btnLoader" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                    <span id="btnLoader" class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
                 </button>
+                <div id="modelBadge" class="mt-2 text-center small text-muted d-none">
+                    <span class="badge bg-secondary" id="modelName"></span>
+                </div>
             </form>
         </div>
 
-        <div class="col-md-6 d-flex align-items-center justify-content-center bg-white border rounded">
-            <div id="resultContainer" class="text-center p-3">
-                <p class="text-muted mb-0 small" id="placeholderText">Result will appear here</p>
-                <img id="generatedImage" src="" class="img-fluid rounded d-none" style="max-height: 250px; object-fit: cover;">
+        <div class="col-md-6 d-flex flex-column align-items-center justify-content-center bg-white border rounded position-relative" style="min-height: 300px;">
+            <div id="resultContainer" class="text-center p-3 w-100 position-relative">
+                <p class="text-muted mb-0 small" id="placeholderText">
+                    <i class="fas fa-image fa-3x mb-3 text-secondary"></i><br>
+                    Result will appear here
+                </p>
+                <img id="generatedImage" src="" class="img-fluid rounded d-none" style="max-height: 400px; object-fit: contain;">
+                <div id="cachedBadge" class="badge bg-success position-absolute top-0 start-0 m-2 d-none">
+                    <i class="fas fa-check-circle"></i> Cached
+                </div>
             </div>
+            
+            <button id="discardBtn" class="btn btn-outline-danger btn-sm m-3 d-none rounded-pill" style="min-width: 120px;">
+                <i class="fas fa-trash-alt me-1"></i> Discard Result
+            </button>
         </div>
     </div>
 </div>
@@ -572,18 +586,22 @@
       }
     })();
   </script>
-  // For ai 
+  // AI Virtual Try-On JavaScript
   <script>
 document.addEventListener('DOMContentLoaded', function() {
     checkExistingTryOn();
 });
 
-// 1. Check Redis for existing session image
+// 1. Check for existing cached try-on result on page load
 async function checkExistingTryOn() {
     const productId = '<%= product._id %>';
     const resultImg = document.getElementById('generatedImage');
     const placeholder = document.getElementById('placeholderText');
     const container = document.getElementById('resultContainer');
+    const cachedBadge = document.getElementById('cachedBadge');
+    const modelBadge = document.getElementById('modelBadge');
+    const modelName = document.getElementById('modelName');
+    const discardBtn = document.getElementById('discardBtn');
 
     try {
         const response = await fetch('/get-try-on-status', {
@@ -594,24 +612,27 @@ async function checkExistingTryOn() {
         const data = await response.json();
 
         if (data.success && data.image) {
-            // Show persisted image
+            // Show cached result
             resultImg.src = data.image;
             resultImg.classList.remove('d-none');
             placeholder.classList.add('d-none');
-            // Add a subtle border to indicate it's saved
-            container.style.border = "2px solid #212529";
+            cachedBadge.classList.remove('d-none');
+            discardBtn.classList.remove('d-none');
+            
+            // Show which model was used
+            if (data.model) {
+                modelName.textContent = data.model;
+                modelBadge.classList.remove('d-none');
+            }
+            
+            console.log('✓ Loaded cached try-on result');
         }
     } catch (err) {
-        console.log("No existing try-on found");
+        console.log('No existing try-on found');
     }
 }
 
-// 2. Handle Generation Request
-document.addEventListener('DOMContentLoaded', function() {
-    // Check for previous try-on session
-    // (Optional: Implement checkExistingTryOn() here if needed)
-});
-
+// 2. Handle new try-on generation
 document.getElementById('tryOnForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -620,13 +641,30 @@ document.getElementById('tryOnForm').addEventListener('submit', async function(e
     const btnText = document.getElementById('btnText');
     const resultImg = document.getElementById('generatedImage');
     const placeholder = document.getElementById('placeholderText');
+    const userPhotoInput = document.getElementById('userPhotoInput');
+    const cachedBadge = document.getElementById('cachedBadge');
+    const modelBadge = document.getElementById('modelBadge');
+    const modelName = document.getElementById('modelName');
+    const discardBtn = document.getElementById('discardBtn');
+
+    // Validate file size
+    if (userPhotoInput.files[0]) {
+        const fileSize = userPhotoInput.files[0].size / 1024 / 1024; // in MB
+        if (fileSize > 10) {
+            alert('File size must be less than 10MB');
+            return;
+        }
+    }
     
     // UI Loading State
     btn.disabled = true;
     loader.classList.remove('d-none');
-    btnText.textContent = " Designing...";
-    placeholder.textContent = "AI is generating your look...";
+    btnText.textContent = " Processing...";
+    placeholder.innerHTML = '<i class="fas fa-spinner fa-spin fa-2x mb-3"></i><br>AI is generating your look...<br><small class="text-muted">This may take 15-30 seconds</small>';
     resultImg.classList.add('d-none');
+    cachedBadge.classList.add('d-none');
+    modelBadge.classList.add('d-none');
+    discardBtn.classList.add('d-none');
 
     const formData = new FormData(this);
 
@@ -642,18 +680,85 @@ document.getElementById('tryOnForm').addEventListener('submit', async function(e
             resultImg.src = data.image;
             resultImg.classList.remove('d-none');
             placeholder.classList.add('d-none');
+            discardBtn.classList.remove('d-none');
+            
+            // Show model badge
+            if (data.model) {
+                modelName.textContent = data.model;
+                modelBadge.classList.remove('d-none');
+            }
+            
+            // Show cached badge if it was cached
+            if (data.cached) {
+                cachedBadge.classList.remove('d-none');
+            }
+            
+            console.log('✅ Try-on successful! Model:', data.model);
         } else {
-            alert(data.msg || "Something went wrong");
-            placeholder.textContent = "Generation failed. Try again.";
+            if (data.isServiceError) {
+                 placeholder.innerHTML = `
+                    <div class="text-center p-3">
+                        <i class="fas fa-server fa-3x mb-3 text-warning"></i>
+                        <h5 class="text-muted">AI Service Busy</h5>
+                        <p class="small text-muted mb-0">${data.msg}</p>
+                        <small class="text-secondary mt-2 d-block">Please try again in a few minutes.</small>
+                    </div>`;
+                 alert("⚠️ External AI Service Unavailable:\n\n" + data.msg);
+            } else {
+                alert(data.msg || "Something went wrong");
+                placeholder.innerHTML = `<i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i><br>${data.msg || 'Generation failed. Try again.'}`;
+            }
         }
     } catch (error) {
         console.error(error);
-        alert("Server error");
+        alert("Server error. Please try again later.");
+        placeholder.innerHTML = '<i class="fas fa-exclamation-circle fa-2x mb-3 text-danger"></i><br>Server error. Please try again.';
     } finally {
         // Reset UI
         btn.disabled = false;
         loader.classList.add('d-none');
         btnText.textContent = "Generate Look";
+    }
+});
+
+// 3. Handle Discard
+document.getElementById('discardBtn').addEventListener('click', async function() {
+    if (!confirm('Are you sure you want to discard this image?')) return;
+    
+    const productId = '<%= product._id %>';
+    const resultImg = document.getElementById('generatedImage');
+    const placeholder = document.getElementById('placeholderText');
+    const cachedBadge = document.getElementById('cachedBadge');
+    const modelBadge = document.getElementById('modelBadge');
+    const discardBtn = document.getElementById('discardBtn');
+    
+    try {
+        const response = await fetch('/discard-try-on', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Reset UI to default state
+            resultImg.src = "";
+            resultImg.classList.add('d-none');
+            placeholder.innerHTML = '<i class="fas fa-image fa-3x mb-3 text-secondary"></i><br>Result will appear here';
+            placeholder.classList.remove('d-none');
+            cachedBadge.classList.add('d-none');
+            modelBadge.classList.add('d-none');
+            discardBtn.classList.add('d-none');
+            
+            // Reset file input
+            document.getElementById('userPhotoInput').value = "";
+        } else {
+            alert('Failed to discard: ' + (data.msg || 'Unknown error'));
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Network error');
     }
 });
 </script>

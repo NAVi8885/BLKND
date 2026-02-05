@@ -255,25 +255,25 @@
                         <div class="row text-center">
                             <div class="col-md-3">
                                 <div class="p-3">
-                                    <h3 class="mb-0">24</h3>
+                                    <h3 class="mb-0"><%= stats.totalOrders %></h3>
                                     <p class="text-muted mb-0">Total Orders</p>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="p-3">
-                                    <h3 class="mb-0">12</h3>
+                                    <h3 class="mb-0"><%= stats.wishlistCount %></h3>
                                     <p class="text-muted mb-0">Wishlist Items</p>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="p-3">
-                                    <h3 class="mb-0">3</h3>
+                                    <h3 class="mb-0"><%= stats.addressCount %></h3>
                                     <p class="text-muted mb-0">Addresses</p>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="p-3">
-                                    <h3 class="mb-0">$2,450</h3>
+                                    <h3 class="mb-0">₹<%= stats.totalSpent.toLocaleString('en-IN') %></h3>
                                     <p class="text-muted mb-0">Total Spent</p>
                                 </div>
                             </div>

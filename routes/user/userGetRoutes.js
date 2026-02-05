@@ -5,7 +5,7 @@ const {optionalVerify, verifyRequired} = require('../../middlewares/authenticati
 const jwt = require('jsonwebtoken');
 const Product = require('../../models/product');
 const Review = require('../../models/review');
-const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter, searchProducts, forgotPassword } = require('../../controller/userController');
+const { getCart, getCheckout, getAddress, deleteAddress, setDefaultAddress, orderSuccess, getWishlist, filterUserOrders, getUserOrders, verifyPayment, loadHomepage, shopFilter, searchProducts, forgotPassword, getProfile } = require('../../controller/userController');
 
 
 
@@ -128,9 +128,7 @@ router.get('/forgotpassword', (req, res) => {
 ///////////\\\\\\\\\\\\\
 
 
-router.get('/profile', verifyRequired, (req, res) => {
-  res.render('user/profile', {user: req.user, errors: null, oldInput: null});
-});
+router.get('/profile', verifyRequired, getProfile);
 
 router.get('/userorders', verifyRequired, getUserOrders);
 
